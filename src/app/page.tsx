@@ -35,13 +35,13 @@ const modules = [
 ];
 
 const apps = [
-  { name: 'QUALITY SUSA', subtitle: 'SUSA Reporting...', imageUrl: 'https://picsum.photos/seed/susa/200/200', imageHint: 'quality safety', href: '#' },
-  { name: 'Quality Incident Repor...', imageUrl: 'https://picsum.photos/seed/incident/200/200', imageHint: 'incident report', href: '#' },
-  { name: 'Permit To Work V2.0', imageUrl: 'https://picsum.photos/seed/permit/200/200', imageHint: 'work permit', href: '#' },
-  { name: 'Permit To Work (Obsolete)', imageUrl: 'https://picsum.photos/seed/obsolete/200/200', imageHint: 'work permit', href: '#' },
-  { name: 'Employee Check In', subtitle: 'Employee Self C...', imageUrl: 'https://picsum.photos/seed/employee/200/200', imageHint: 'employee check-in', href: '#' },
-  { name: 'HARP', imageUrl: 'https://picsum.photos/seed/harp/200/200', imageHint: 'hazard analysis', href: '/harp' },
-  { name: 'BBS', imageUrl: 'https://picsum.photos/seed/bbs/200/200', imageHint: 'behavioral safety', href: '#' },
+  { name: 'QUALITY SUSA', subtitle: 'SUSA Reporting...', imageUrl: 'https://picsum.photos/seed/susa/200/200', imageHint: 'quality inspection', href: '#' },
+  { name: 'Quality Incident Repor...', imageUrl: 'https://picsum.photos/seed/incident/200/200', imageHint: 'factory report', href: '#' },
+  { name: 'Permit To Work V2.0', imageUrl: 'https://picsum.photos/seed/permit/200/200', imageHint: 'industrial permit', href: '#' },
+  { name: 'Permit To Work (Obsolete)', imageUrl: 'https://picsum.photos/seed/obsolete/200/200', imageHint: 'archive document', href: '#' },
+  { name: 'Employee Check In', subtitle: 'Employee Self C...', imageUrl: 'https://picsum.photos/seed/employee/200/200', imageHint: 'worker entry', href: '#' },
+  { name: 'HARP', imageUrl: 'https://picsum.photos/seed/harp/200/200', imageHint: 'risk analysis', href: '/harp' },
+  { name: 'BBS', imageUrl: 'https://picsum.photos/seed/bbs/200/200', imageHint: 'safety observation', href: '#' },
 ];
 
 const quickLinks = {
