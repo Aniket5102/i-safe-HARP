@@ -53,7 +53,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { useToast } from "@/hooks/use-toast";
-import { CalendarIcon, FileDown, Loader2, Printer, Download, X, Upload } from "lucide-react";
+import { CalendarIcon, ChevronLeft, FileDown, Loader2, Printer, Download, X, Upload } from "lucide-react";
 import { format } from "date-fns";
 import QRCode from "qrcode.react";
 import jsPDF from "jspdf";
@@ -207,6 +207,10 @@ export default function HarpForm() {
             </CardDescription>
           </div>
           <div className="flex gap-2">
+            <Button variant="outline">
+              <ChevronLeft />
+              Back
+            </Button>
             <Button variant="outline" onClick={handleGenerateQrCode}>
               <Printer />
               Print QR Code
@@ -690,3 +694,4 @@ export default function HarpForm() {
   );
 }
  
+    
