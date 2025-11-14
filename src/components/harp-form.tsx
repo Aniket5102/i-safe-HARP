@@ -10,12 +10,20 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Card,
   CardContent,
@@ -44,74 +52,53 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { useToast } from "@/hooks/use-toast";
-import { CalendarIcon, FileDown, Loader2, QrCode, Save, Sparkles } from "lucide-react";
+import { CalendarIcon, FileDown, Loader2, QrCode, Save } from "lucide-react";
 import { format } from "date-fns";
 import QRCode from "qrcode.react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
-import { getHarpSuggestions } from "@/app/actions";
-import { useDebounce } from "@/hooks/use-debounce";
 
 const formSchema = z.object({
-  harpId: z.string().min(1, "HARP ID is required"),
+  harpId: z.string().max(100).optional(),
   date: z.date({ required_error: "A date is required." }),
-  location: z.string().optional(),
-  department: z.string().optional(),
-  block: z.string().optional(),
-  floor: z.string().optional(),
+  location: z.string().min(1, "Location is required.").max(100),
+  department: z.string().min(1, "Department is required.").max(100),
+  block: z.string().min(1, "Block is required.").max(100),
+  floor: z.string().min(1, "Floor is required.").max(100),
+  activity: z.string().min(1, "Activity is required.").max(100),
+  carriedOutBy: z.string().min(1, "Carried Out By is required.").max(100),
+  employeeType: z.string().min(1, "Employee Type is required.").max(100),
+  employeeName: z.string().min(1, "Employee Name is required.").max(100),
+  employeeId: z.string().min(1, "Employee ID is required.").max(100),
+  designation: z.string().min(1, "Designation is required.").max(100),
+  employeeDepartment: z.string().min(1, "Employee Department is required.").max(100),
 });
 
 type FormValues = z.infer<typeof formSchema>;
+
+const locations = ["Patancheru", "Khandala", "Rohtak", "Vizag", "Mysuru", "Kasna", "Ankleshwar", "Sripi"];
+const departments = ["Production Department", "Quality Department", "Admin Department"];
+const blocks = ["RH House", "EH House", "SPB", "WPB"];
+const floors = ["RH Reactor Floor", "EH Reactor Floor", "SPB Floor", "WPB Floor"];
+const people = ["Sai", "Manmohan", "Ashish", "Tanmay", "Aniket", "Sahriyash"];
+const employeeTypes = ["APL Employee", "APG", "PPGAP", "APPPG"];
+const employeeIds = ["P00126717", "P00126718"];
+const designations = ["EXECUTIVE I - PRODUCTION", "EXECUTIVE I - QUALITY", "Sr. EXECUTIVE I - PRODUCTION", "Sr. EXECUTIVE I - QUALITY", "EXECUTIVE II - PRODUCTION"];
+const employeeDepartments = ["PRODUCTION", "QUALITY"];
 
 export default function HarpForm() {
   const { toast } = useToast();
   const formRef = React.useRef<HTMLDivElement>(null);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
-  const [isSuggesting, setIsSuggesting] = React.useState(false);
   const [qrCodeValue, setQrCodeValue] = React.useState<string | null>(null);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      harpId: "",
-      location: "",
-      department: "",
-      block: "",
-      floor: "",
+        harpId: "",
+        activity: "",
     },
   });
-
-  const watchedFields = form.watch();
-  const debouncedSuggestionQuery = useDebounce({
-      partialLocation: watchedFields.location,
-      partialDepartment: watchedFields.department,
-      partialBlock: watchedFields.block,
-      partialFloor: watchedFields.floor
-  }, 500);
-
-  React.useEffect(() => {
-    const { partialLocation, partialDepartment, partialBlock, partialFloor } = debouncedSuggestionQuery;
-    if (partialLocation || partialDepartment || partialBlock || partialFloor) {
-      setIsSuggesting(true);
-      getHarpSuggestions(debouncedSuggestionQuery)
-        .then((res) => {
-          if (res.success && res.data) {
-            const { suggestedLocation, suggestedDepartment, suggestedBlock, suggestedFloor } = res.data;
-            if (suggestedLocation && !form.getValues('location')) form.setValue('location', suggestedLocation, { shouldValidate: true });
-            if (suggestedDepartment && !form.getValues('department')) form.setValue('department', suggestedDepartment, { shouldValidate: true });
-            if (suggestedBlock && !form.getValues('block')) form.setValue('block', suggestedBlock, { shouldValidate: true });
-            if (suggestedFloor && !form.getValues('floor')) form.setValue('floor', suggestedFloor, { shouldValidate: true });
-          }
-        })
-        .catch(() => {
-          toast({ variant: "destructive", title: "Suggestion Error", description: "Could not fetch AI suggestions." });
-        })
-        .finally(() => {
-          setIsSuggesting(false);
-        });
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedSuggestionQuery, form.setValue, form.getValues]);
 
   async function onSubmit(values: FormValues) {
     setIsSubmitting(true);
@@ -179,8 +166,6 @@ export default function HarpForm() {
     }
   };
   
-  const AiSparkle = isSuggesting ? Loader2 : Sparkles;
-
   return (
     <>
       <Card ref={formRef} className="w-full shadow-2xl" id="harp-form-card">
@@ -203,11 +188,11 @@ export default function HarpForm() {
                         name="harpId"
                         render={({ field }) => (
                           <FormItem className="grid grid-cols-3 items-center gap-4">
-                            <FormLabel className="text-right col-span-1">HARP ID</FormLabel>
+                            <FormLabel className="text-right col-span-1">HARP ID #</FormLabel>
                             <FormControl className="col-span-2">
-                              <Input placeholder="e.g., HID-12345" {...field} />
+                              <Input placeholder="Generated on incident creation" {...field} />
                             </FormControl>
-                             <div className="col-span-3">
+                             <div className="col-start-2 col-span-2">
                                 <FormMessage />
                              </div>
                           </FormItem>
@@ -218,7 +203,7 @@ export default function HarpForm() {
                         name="date"
                         render={({ field }) => (
                           <FormItem className="grid grid-cols-3 items-center gap-4">
-                            <FormLabel className="text-right col-span-1">Date</FormLabel>
+                            <FormLabel className="text-right col-span-1">Date*</FormLabel>
                             <Popover>
                               <PopoverTrigger asChild>
                                 <FormControl className="col-span-2">
@@ -250,7 +235,251 @@ export default function HarpForm() {
                                 />
                               </PopoverContent>
                             </Popover>
-                             <div className="col-span-3">
+                             <div className="col-start-2 col-span-2">
+                                <FormMessage />
+                             </div>
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="location"
+                        render={({ field }) => (
+                          <FormItem className="grid grid-cols-3 items-center gap-4">
+                            <FormLabel className="text-right col-span-1">Location*</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl className="col-span-2">
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select a location" />
+                                </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                {locations.map(loc => <SelectItem key={loc} value={loc}>{loc}</SelectItem>)}
+                                </SelectContent>
+                            </Select>
+                             <div className="col-start-2 col-span-2">
+                                <FormMessage />
+                             </div>
+                          </FormItem>
+                        )}
+                      />
+                       <FormField
+                        control={form.control}
+                        name="department"
+                        render={({ field }) => (
+                          <FormItem className="grid grid-cols-3 items-start gap-4">
+                            <FormLabel className="text-right col-span-1 pt-2">Department*</FormLabel>
+                            <div className="col-span-2">
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                    <FormControl>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select a department" />
+                                    </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                    {departments.map(dep => <SelectItem key={dep} value={dep}>{dep}</SelectItem>)}
+                                    </SelectContent>
+                                </Select>
+                                <FormDescription className="mt-1">
+                                    Select the Department specifically from the list.
+                                </FormDescription>
+                                <FormMessage />
+                            </div>
+                          </FormItem>
+                        )}
+                      />
+                       <FormField
+                        control={form.control}
+                        name="block"
+                        render={({ field }) => (
+                          <FormItem className="grid grid-cols-3 items-start gap-4">
+                            <FormLabel className="text-right col-span-1 pt-2">Block*</FormLabel>
+                            <div className="col-span-2">
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                    <FormControl>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select a block" />
+                                    </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                    {blocks.map(b => <SelectItem key={b} value={b}>{b}</SelectItem>)}
+                                    </SelectContent>
+                                </Select>
+                                <FormDescription className="mt-1">
+                                    Select the Block specifically from the list.
+                                </FormDescription>
+                                <FormMessage />
+                            </div>
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="floor"
+                        render={({ field }) => (
+                           <FormItem className="grid grid-cols-3 items-start gap-4">
+                            <FormLabel className="text-right col-span-1 pt-2">Floor*</FormLabel>
+                            <div className="col-span-2">
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                    <FormControl>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select a floor" />
+                                    </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                    {floors.map(f => <SelectItem key={f} value={f}>{f}</SelectItem>)}
+                                    </SelectContent>
+                                </Select>
+                                <FormDescription className="mt-1">
+                                   Select the Block specifically from the list.
+                                </FormDescription>
+                                <FormMessage />
+                            </div>
+                          </FormItem>
+                        )}
+                      />
+                       <FormField
+                        control={form.control}
+                        name="activity"
+                        render={({ field }) => (
+                          <FormItem className="grid grid-cols-3 items-center gap-4">
+                            <FormLabel className="text-right col-span-1">Activity*</FormLabel>
+                            <FormControl className="col-span-2">
+                              <Input placeholder="Enter activity" {...field} />
+                            </FormControl>
+                             <div className="col-start-2 col-span-2">
+                                <FormMessage />
+                             </div>
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="carriedOutBy"
+                        render={({ field }) => (
+                          <FormItem className="grid grid-cols-3 items-center gap-4">
+                            <FormLabel className="text-right col-span-1">Carried Out By*</FormLabel>
+                             <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl className="col-span-2">
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select a person" />
+                                </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                {people.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+                                </SelectContent>
+                            </Select>
+                             <div className="col-start-2 col-span-2">
+                                <FormMessage />
+                             </div>
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="employeeType"
+                        render={({ field }) => (
+                          <FormItem className="grid grid-cols-3 items-center gap-4">
+                            <FormLabel className="text-right col-span-1">Employee Type</FormLabel>
+                             <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl className="col-span-2">
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select employee type" />
+                                </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                {employeeTypes.map(et => <SelectItem key={et} value={et}>{et}</SelectItem>)}
+                                </SelectContent>
+                            </Select>
+                             <div className="col-start-2 col-span-2">
+                                <FormMessage />
+                             </div>
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="employeeName"
+                        render={({ field }) => (
+                           <FormItem className="grid grid-cols-3 items-center gap-4">
+                            <FormLabel className="text-right col-span-1">Employee Name*</FormLabel>
+                             <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl className="col-span-2">
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select an employee" />
+                                </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                {people.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+                                </SelectContent>
+                            </Select>
+                             <div className="col-start-2 col-span-2">
+                                <FormMessage />
+                             </div>
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="employeeId"
+                        render={({ field }) => (
+                          <FormItem className="grid grid-cols-3 items-center gap-4">
+                            <FormLabel className="text-right col-span-1">Employee ID</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl className="col-span-2">
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select an Employee ID" />
+                                </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                {employeeIds.map(id => <SelectItem key={id} value={id}>{id}</SelectItem>)}
+                                </SelectContent>
+                            </Select>
+                             <div className="col-start-2 col-span-2">
+                                <FormMessage />
+                             </div>
+                          </FormItem>
+                        )}
+                      />
+                       <FormField
+                        control={form.control}
+                        name="designation"
+                        render={({ field }) => (
+                          <FormItem className="grid grid-cols-3 items-center gap-4">
+                            <FormLabel className="text-right col-span-1">Designation</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl className="col-span-2">
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select a designation" />
+                                </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                {designations.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}
+                                </SelectContent>
+                            </Select>
+                             <div className="col-start-2 col-span-2">
+                                <FormMessage />
+                             </div>
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="employeeDepartment"
+                        render={({ field }) => (
+                          <FormItem className="grid grid-cols-3 items-center gap-4">
+                            <FormLabel className="text-right col-span-1">Employee Department</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl className="col-span-2">
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select a department" />
+                                </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                {employeeDepartments.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}
+                                </SelectContent>
+                            </Select>
+                             <div className="col-start-2 col-span-2">
                                 <FormMessage />
                              </div>
                           </FormItem>
@@ -261,81 +490,8 @@ export default function HarpForm() {
                 </AccordionItem>
                 <AccordionItem value="harp-details">
                   <AccordionTrigger className="text-lg font-semibold justify-start">HARP Details</AccordionTrigger>
-                  <AccordionContent className="pt-4 flex justify-center">
-                    <div className="space-y-4 w-full max-w-sm">
-                      <FormField
-                        control={form.control}
-                        name="location"
-                        render={({ field }) => (
-                          <FormItem className="grid grid-cols-3 items-center gap-4">
-                            <FormLabel className="text-right col-span-1 flex items-center justify-end gap-2">
-                              Location
-                              <AiSparkle className={cn("h-4 w-4 text-primary", isSuggesting && "animate-spin")}/>
-                            </FormLabel>
-                            <FormControl className="col-span-2">
-                              <Input placeholder="e.g., Main Hospital" {...field} />
-                            </FormControl>
-                             <div className="col-span-3">
-                                <FormMessage />
-                             </div>
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="department"
-                        render={({ field }) => (
-                          <FormItem className="grid grid-cols-3 items-center gap-4">
-                            <FormLabel className="text-right col-span-1 flex items-center justify-end gap-2">
-                              Department
-                              <AiSparkle className={cn("h-4 w-4 text-primary", isSuggesting && "animate-spin")}/>
-                            </FormLabel>
-                            <FormControl className="col-span-2">
-                              <Input placeholder="e.g., Cardiology" {...field} />
-                            </FormControl>
-                             <div className="col-span-3">
-                                <FormMessage />
-                             </div>
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="block"
-                        render={({ field }) => (
-                          <FormItem className="grid grid-cols-3 items-center gap-4">
-                            <FormLabel className="text-right col-span-1 flex items-center justify-end gap-2">
-                              Block
-                              <AiSparkle className={cn("h-4 w-4 text-primary", isSuggesting && "animate-spin")}/>
-                            </FormLabel>
-                            <FormControl className="col-span-2">
-                              <Input placeholder="e.g., A" {...field} />
-                            </FormControl>
-                             <div className="col-span-3">
-                                <FormMessage />
-                             </div>
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="floor"
-                        render={({ field }) => (
-                          <FormItem className="grid grid-cols-3 items-center gap-4">
-                            <FormLabel className="text-right col-span-1 flex items-center justify-end gap-2">
-                              Floor
-                              <AiSparkle className={cn("h-4 w-4 text-primary", isSuggesting && "animate-spin")}/>
-                            </FormLabel>
-                            <FormControl className="col-span-2">
-                              <Input placeholder="e.g., 4" {...field} />
-                            </FormControl>
-                             <div className="col-span-3">
-                                <FormMessage />
-                             </div>
-                          </FormItem>
-                        )}
-                      />
-                    </div>
+                   <AccordionContent className="pt-4 flex justify-center">
+                    <p className="text-muted-foreground">HARP details can be added here in the future.</p>
                   </AccordionContent>
                 </AccordionItem>
                 <AccordionItem value="other-details">
@@ -381,5 +537,3 @@ export default function HarpForm() {
     </>
   );
 }
-
-    
