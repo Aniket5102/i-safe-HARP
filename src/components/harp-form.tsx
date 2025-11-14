@@ -224,7 +224,7 @@ export default function HarpForm() {
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <Accordion type="multiple" defaultValue={['general-details']} className="w-full">
+              <Accordion type="multiple" className="w-full">
                 <AccordionItem value="general-details">
                   <AccordionTrigger className="text-lg font-semibold">General Details</AccordionTrigger>
                   <AccordionContent className="pt-4 flex justify-center">
@@ -694,4 +694,6 @@ export default function HarpForm() {
   );
 }
  
+    
+
     
