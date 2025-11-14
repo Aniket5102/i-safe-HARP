@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import {
   Card,
   CardContent,
@@ -23,9 +24,11 @@ import {
   HardHat,
   ClipboardCheck,
   CheckCircle,
+  X,
 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { Input } from '@/components/ui/input';
 
 const modules = [
   { name: 'Calendar', icon: CalendarDays },
@@ -52,13 +55,36 @@ const quickLinks = {
 
 
 export default function HomePage() {
+  const [searchTerms, setSearchTerms] = useState({
+    userProfile: '',
+    modules: '',
+    apps: '',
+    quickLinks: '',
+  });
+  const [showSearch, setShowSearch] = useState({
+    userProfile: false,
+    modules: false,
+    apps: false,
+    quickLinks: false,
+  });
+
+  const handleSearchChange = (card: keyof typeof searchTerms, value: string) => {
+    setSearchTerms(prev => ({ ...prev, [card]: value }));
+  };
+
+  const toggleSearch = (card: keyof typeof showSearch) => {
+    setShowSearch(prev => ({ ...prev, [card]: !prev[card] }));
+    if (showSearch[card]) {
+      handleSearchChange(card, '');
+    }
+  };
+
   return (
     <div className="bg-gray-50 min-h-screen p-4 sm:p-6 lg:p-8">
       <div className="max-w-7xl mx-auto">
         <header className="flex justify-between items-center mb-6">
           <div className="flex items-center">
             <h1 className="text-lg font-semibold">Default Home Page</h1>
-            {/* You can replace this with a real dropdown */}
             <Button variant="ghost" size="sm">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
             </Button>
@@ -70,16 +96,34 @@ export default function HomePage() {
         </header>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Left Column */}
           <div className="space-y-6">
-            <UserProfileCard />
-            <QuickLinksCard />
+            <UserProfileCard
+              searchTerm={searchTerms.userProfile}
+              onSearchChange={(value) => handleSearchChange('userProfile', value)}
+              showSearch={showSearch.userProfile}
+              onToggleSearch={() => toggleSearch('userProfile')}
+            />
+            <QuickLinksCard
+              searchTerm={searchTerms.quickLinks}
+              onSearchChange={(value) => handleSearchChange('quickLinks', value)}
+              showSearch={showSearch.quickLinks}
+              onToggleSearch={() => toggleSearch('quickLinks')}
+            />
           </div>
 
-          {/* Right Column */}
           <div className="space-y-6">
-            <ModulesCard />
-            <AppsCard />
+            <ModulesCard
+              searchTerm={searchTerms.modules}
+              onSearchChange={(value) => handleSearchChange('modules', value)}
+              showSearch={showSearch.modules}
+              onToggleSearch={() => toggleSearch('modules')}
+            />
+            <AppsCard
+              searchTerm={searchTerms.apps}
+              onSearchChange={(value) => handleSearchChange('apps', value)}
+              showSearch={showSearch.apps}
+              onToggleSearch={() => toggleSearch('apps')}
+            />
           </div>
         </div>
       </div>
@@ -87,13 +131,54 @@ export default function HomePage() {
   );
 }
 
-function UserProfileCard() {
+interface CardSearchProps {
+  searchTerm: string;
+  onSearchChange: (value: string) => void;
+  showSearch: boolean;
+  onToggleSearch: () => void;
+}
+
+function UserProfileCard({ searchTerm, onSearchChange, showSearch, onToggleSearch }: CardSearchProps) {
+  const profileDetails = {
+    name: 'Aniket Khaladkar',
+    loginName: 'P00126717',
+    activeDate: 'October 15, 2025',
+    scope: '264',
+  };
+
+  const actionItems = [
+    { label: 'Management Review (Open)', value: 0 },
+    { label: 'Open Action Items', value: 0 },
+    { label: 'Overdue Action Items', value: 0 },
+  ];
+
+  const filteredActionItems = actionItems.filter(item =>
+    item.label.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <Card className="shadow-lg">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-lg font-medium">User Profile</CardTitle>
         <div className="flex items-center gap-2">
-          <Search className="text-gray-400" size={20} />
+          {showSearch ? (
+            <div className="flex items-center gap-2">
+              <Input
+                type="text"
+                placeholder="Search..."
+                value={searchTerm}
+                onChange={(e) => onSearchChange(e.target.value)}
+                className="h-8"
+              />
+              <Button variant="ghost" size="icon" onClick={onToggleSearch} className="h-8 w-8">
+                <X size={20} />
+              </Button>
+            </div>
+          ) : (
+            <Button variant="ghost" size="icon" onClick={onToggleSearch} className="h-8 w-8">
+              <Search size={20} />
+            </Button>
+          )}
           <MoreHorizontal className="text-gray-400" size={20} />
         </div>
       </CardHeader>
@@ -105,7 +190,7 @@ function UserProfileCard() {
             <AvatarFallback className="bg-green-200 text-green-800 font-bold">AK</AvatarFallback>
           </Avatar>
           <div>
-            <p className="font-semibold">Aniket Khaladkar</p>
+            <p className="font-semibold">{profileDetails.name}</p>
             <p className="text-sm text-green-600 flex items-center">
               <CheckCircle size={14} className="mr-1" /> Active
             </p>
@@ -116,53 +201,71 @@ function UserProfileCard() {
             <User size={16} className="text-gray-500" />
             <div>
               <p className="text-xs text-gray-500">Login Name</p>
-              <p className="font-medium">P00126717</p>
+              <p className="font-medium">{profileDetails.loginName}</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <Calendar size={16} className="text-gray-500" />
             <div>
               <p className="text-xs text-gray-500">Active Date</p>
-              <p className="font-medium">October 15, 2025</p>
+              <p className="font-medium">{profileDetails.activeDate}</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <MapPin size={16} className="text-gray-500" />
             <div>
               <p className="text-xs text-gray-500">Scope</p>
-              <p className="font-medium">264</p>
+              <p className="font-medium">{profileDetails.scope}</p>
             </div>
           </div>
         </div>
         <div className="border-t pt-2 space-y-2 text-sm">
-          <div className="flex justify-between items-center">
-            <p>Management Review (Open)</p>
-            <span className="font-bold text-blue-600">0</span>
-          </div>
-           <div className="flex justify-between items-center">
-            <p>Open Action Items</p>
-            <span className="font-bold text-blue-600">0</span>
-          </div>
-          <div className="flex justify-between items-center">
-            <p>Overdue Action Items</p>
-            <span className="font-bold text-blue-600">0</span>
-          </div>
+          {filteredActionItems.map((item) => (
+            <div key={item.label} className="flex justify-between items-center">
+              <p>{item.label}</p>
+              <span className="font-bold text-blue-600">{item.value}</span>
+            </div>
+          ))}
         </div>
       </CardContent>
     </Card>
   );
 }
 
-function ModulesCard() {
+function ModulesCard({ searchTerm, onSearchChange, showSearch, onToggleSearch }: CardSearchProps) {
+  const filteredModules = modules.filter(module =>
+    module.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <Card className="shadow-lg">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-lg font-medium">Modules</CardTitle>
-        <MoreHorizontal className="text-gray-400" size={20} />
+        <div className="flex items-center gap-2">
+          {showSearch ? (
+            <div className="flex items-center gap-2">
+              <Input
+                type="text"
+                placeholder="Search..."
+                value={searchTerm}
+                onChange={(e) => onSearchChange(e.target.value)}
+                className="h-8"
+              />
+              <Button variant="ghost" size="icon" onClick={onToggleSearch} className="h-8 w-8">
+                <X size={20} />
+              </Button>
+            </div>
+          ) : (
+            <Button variant="ghost" size="icon" onClick={onToggleSearch} className="h-8 w-8">
+              <Search size={20} />
+            </Button>
+          )}
+          <MoreHorizontal className="text-gray-400" size={20} />
+        </div>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          {modules.map((module) => (
+          {filteredModules.map((module) => (
             <div key={module.name} className="flex flex-col items-center text-center">
               <div className="p-4 rounded-lg bg-gradient-to-br from-blue-400 to-purple-500 mb-2">
                  <module.icon className="h-8 w-8 text-white" />
@@ -176,19 +279,41 @@ function ModulesCard() {
   );
 }
 
-function AppsCard() {
+function AppsCard({ searchTerm, onSearchChange, showSearch, onToggleSearch }: CardSearchProps) {
+  const filteredApps = apps.filter(app =>
+    app.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    app.subtitle?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <Card className="shadow-lg">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-lg font-medium">Apps</CardTitle>
          <div className="flex items-center gap-2">
-          <Search className="text-gray-400" size={20} />
+          {showSearch ? (
+            <div className="flex items-center gap-2">
+              <Input
+                type="text"
+                placeholder="Search..."
+                value={searchTerm}
+                onChange={(e) => onSearchChange(e.target.value)}
+                className="h-8"
+              />
+              <Button variant="ghost" size="icon" onClick={onToggleSearch} className="h-8 w-8">
+                <X size={20} />
+              </Button>
+            </div>
+          ) : (
+            <Button variant="ghost" size="icon" onClick={onToggleSearch} className="h-8 w-8">
+              <Search size={20} />
+            </Button>
+          )}
           <MoreHorizontal className="text-gray-400" size={20} />
         </div>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
-          {apps.map((app) => (
+          {filteredApps.map((app) => (
              <Link key={app.name} href={app.href || '#'} className="flex flex-col items-center text-center no-underline text-current">
               <div className="p-2 rounded-lg bg-gray-100 mb-2 h-20 w-20 flex items-center justify-center">
                 <Image 
@@ -210,20 +335,45 @@ function AppsCard() {
   );
 }
 
-function QuickLinksCard() {
+function QuickLinksCard({ searchTerm, onSearchChange, showSearch, onToggleSearch }: CardSearchProps) {
+  const filteredQuickLinks = Object.entries(quickLinks).reduce((acc, [category, links]) => {
+    const filtered = links.filter(link => link.toLowerCase().includes(searchTerm.toLowerCase()));
+    if (filtered.length > 0 || category.toLowerCase().includes(searchTerm.toLowerCase())) {
+      acc[category] = filtered;
+    }
+    return acc;
+  }, {} as typeof quickLinks);
+
   return (
     <Card className="shadow-lg">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-lg font-medium">Quick Links</CardTitle>
         <div className="flex items-center gap-2">
-          <Search className="text-gray-400" size={20} />
+          {showSearch ? (
+            <div className="flex items-center gap-2">
+              <Input
+                type="text"
+                placeholder="Search..."
+                value={searchTerm}
+                onChange={(e) => onSearchChange(e.target.value)}
+                className="h-8"
+              />
+              <Button variant="ghost" size="icon" onClick={onToggleSearch} className="h-8 w-8">
+                <X size={20} />
+              </Button>
+            </div>
+          ) : (
+            <Button variant="ghost" size="icon" onClick={onToggleSearch} className="h-8 w-8">
+              <Search size={20} />
+            </Button>
+          )}
           <MoreHorizontal className="text-gray-400" size={20} />
         </div>
       </CardHeader>
       <CardContent>
         <div className="text-right text-xs text-gray-500 mb-2">SORT BY: MODULE ASC</div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {Object.entries(quickLinks).map(([category, links]) => (
+          {Object.entries(filteredQuickLinks).map(([category, links]) => (
             <div key={category}>
               <h3 className="font-semibold mb-2 border-b pb-1">{category}</h3>
               <ul className="space-y-2">
