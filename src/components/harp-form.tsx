@@ -59,6 +59,7 @@ import QRCode from "qrcode.react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import Image from "next/image";
+import { Textarea } from "./ui/textarea";
 
 const formSchema = z.object({
   harpId: z.string().max(100).optional(),
@@ -74,6 +75,10 @@ const formSchema = z.object({
   employeeId: z.string().min(1, "Employee ID is required.").max(100),
   designation: z.string().min(1, "Designation is required.").max(100),
   employeeDepartment: z.string().min(1, "Employee Department is required.").max(100),
+  hazard: z.string().max(100).optional(),
+  accident: z.string().max(100).optional(),
+  risk: z.string().max(100).optional(),
+  prevention: z.string().max(500).optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -87,6 +92,8 @@ const employeeTypes = ["APL Employee", "APG", "PPGAP", "APPPG"];
 const employeeIds = ["P00126717", "P00126718"];
 const designations = ["EXECUTIVE I - PRODUCTION", "EXECUTIVE I - QUALITY", "Sr. EXECUTIVE I - PRODUCTION", "Sr. EXECUTIVE I - QUALITY", "EXECUTIVE II - PRODUCTION"];
 const employeeDepartments = ["PRODUCTION", "QUALITY"];
+const hazards = ["Chemical Hazards", "Chemical Splash", "eyes", "face", "body"];
+const risks = ["Medium", "high", "low"];
 
 export default function HarpForm() {
   const { toast } = useToast();
@@ -100,6 +107,7 @@ export default function HarpForm() {
     defaultValues: {
         harpId: "",
         activity: "",
+        accident: "Exposure to chemical while charging",
     },
   });
 
@@ -524,7 +532,82 @@ export default function HarpForm() {
                 <AccordionItem value="harp-details">
                   <AccordionTrigger className="text-lg font-semibold">HARP Details</AccordionTrigger>
                    <AccordionContent className="pt-4 flex justify-center">
-                    <p className="text-muted-foreground">HARP details can be added here in the future.</p>
+                    <div className="space-y-4 w-full max-w-sm">
+                      <FormField
+                        control={form.control}
+                        name="hazard"
+                        render={({ field }) => (
+                          <FormItem className="grid grid-cols-3 items-center gap-4">
+                            <FormLabel className="text-right col-span-1">Hazard</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl className="col-span-2">
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select a hazard" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {hazards.map(h => <SelectItem key={h} value={h}>{h}</SelectItem>)}
+                              </SelectContent>
+                            </Select>
+                            <div className="col-start-2 col-span-2">
+                              <FormMessage />
+                            </div>
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="accident"
+                        render={({ field }) => (
+                          <FormItem className="grid grid-cols-3 items-center gap-4">
+                            <FormLabel className="text-right col-span-1">Accident</FormLabel>
+                            <FormControl className="col-span-2">
+                              <Input placeholder="Enter accident details" {...field} />
+                            </FormControl>
+                            <div className="col-start-2 col-span-2">
+                              <FormMessage />
+                            </div>
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="risk"
+                        render={({ field }) => (
+                          <FormItem className="grid grid-cols-3 items-center gap-4">
+                            <FormLabel className="text-right col-span-1">Risk</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl className="col-span-2">
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select a risk level" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {risks.map(r => <SelectItem key={r} value={r}>{r}</SelectItem>)}
+                              </SelectContent>
+                            </Select>
+                            <div className="col-start-2 col-span-2">
+                              <FormMessage />
+                            </div>
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="prevention"
+                        render={({ field }) => (
+                          <FormItem className="grid grid-cols-3 items-start gap-4">
+                            <FormLabel className="text-right col-span-1 pt-2">Prevention</FormLabel>
+                            <FormControl className="col-span-2">
+                              <Textarea placeholder="Describe prevention measures" {...field} />
+                            </FormControl>
+                            <div className="col-start-2 col-span-2">
+                              <FormMessage />
+                            </div>
+                          </FormItem>
+                        )}
+                      />
+                    </div>
                   </AccordionContent>
                 </AccordionItem>
                 <AccordionItem value="other-details">
@@ -577,7 +660,5 @@ export default function HarpForm() {
     </>
   );
 }
-
-    
 
     
