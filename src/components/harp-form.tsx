@@ -44,6 +44,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
+  DialogClose,
 } from "@/components/ui/dialog";
 import {
   Accordion,
@@ -52,11 +53,12 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { useToast } from "@/hooks/use-toast";
-import { CalendarIcon, FileDown, Loader2, QrCode, Save } from "lucide-react";
+import { CalendarIcon, FileDown, Loader2, Printer, Download, X } from "lucide-react";
 import { format } from "date-fns";
 import QRCode from "qrcode.react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import Image from "next/image";
 
 const formSchema = z.object({
   harpId: z.string().max(100).optional(),
@@ -89,6 +91,7 @@ const employeeDepartments = ["PRODUCTION", "QUALITY"];
 export default function HarpForm() {
   const { toast } = useToast();
   const formRef = React.useRef<HTMLDivElement>(null);
+  const qrCodeRef = React.useRef<HTMLDivElement>(null);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [qrCodeValue, setQrCodeValue] = React.useState<string | null>(null);
 
@@ -125,6 +128,32 @@ export default function HarpForm() {
       });
     }
   };
+
+  const handlePrintQrCode = () => {
+    window.print();
+  };
+
+  const handleDownloadQrCode = async () => {
+    const qrElement = qrCodeRef.current;
+    if (!qrElement) return;
+
+    try {
+      const canvas = await html2canvas(qrElement, { scale: 2, backgroundColor: null });
+      const imgData = canvas.toDataURL("image/png");
+      const link = document.createElement('a');
+      link.href = imgData;
+      link.download = `harp-qr-code-${form.getValues("harpId") || 'export'}.png`;
+      link.click();
+      toast({ title: "Success", description: "QR Code download has started." });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "QR Code Download Error",
+        description: "An error occurred while generating the QR Code image.",
+      });
+    }
+  };
+
 
   const handleExportPdf = async () => {
     const formElement = formRef.current;
@@ -178,8 +207,8 @@ export default function HarpForm() {
           </div>
           <div className="flex gap-2">
             <Button variant="outline" onClick={handleGenerateQrCode}>
-              <QrCode />
-              Generate QR Code
+              <Printer />
+              Print QR Code
             </Button>
             <Button variant="outline" onClick={handleExportPdf}>
               <FileDown />
@@ -518,28 +547,41 @@ export default function HarpForm() {
         </CardContent>
         <CardFooter className="flex flex-col sm:flex-row justify-end gap-4">
           <Button type="submit" onClick={form.handleSubmit(onSubmit)} disabled={isSubmitting}>
-            {isSubmitting ? <Loader2 className="animate-spin" /> : <Save />}
+            {isSubmitting ? <Loader2 className="animate-spin" /> : <Printer />}
             Save HARP Data
           </Button>
         </CardFooter>
       </Card>
+      
       <Dialog open={!!qrCodeValue} onOpenChange={(open) => !open && setQrCodeValue(null)}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="font-headline">HARP Data QR Code</DialogTitle>
-            <DialogDescription>
-              Scan this code to easily access or share the HARP details.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex items-center justify-center p-4 bg-white rounded-lg">
-            {qrCodeValue && <QRCode value={qrCodeValue} size={256} style={{ height: "auto", maxWidth: "100%", width: "100%" }} />}
+        <DialogContent className="sm:max-w-md p-0">
+          <div className="bg-[#002f5f] text-white py-2 px-4 flex items-center justify-end gap-4">
+            <Button variant="ghost" className="hover:bg-transparent hover:text-white" onClick={handlePrintQrCode}>
+              <Printer className="mr-2 h-4 w-4" /> Print
+            </Button>
+            <Button variant="ghost" className="hover:bg-transparent hover:text-white" onClick={handleDownloadQrCode}>
+              <Download className="mr-2 h-4 w-4" /> Download
+            </Button>
+            <DialogClose asChild>
+              <Button variant="ghost" className="hover:bg-transparent hover:text-white">
+                <X className="mr-2 h-4 w-4" /> Close
+              </Button>
+            </DialogClose>
+          </div>
+          <div className="p-4" ref={qrCodeRef}>
+            <div className="flex items-center justify-center space-x-4 mb-4">
+                <Image src="/asian-paints-logo.svg" alt="Asian Paints Logo" width={120} height={20} />
+                <Image src="/l-safe-logo.svg" alt="L-Safe Logo" width={40} height={40} />
+            </div>
+            <div className="flex items-center justify-center p-4 bg-white rounded-lg">
+              {qrCodeValue && <QRCode value={qrCodeValue} size={256} style={{ height: "auto", maxWidth: "100%", width: "100%" }} />}
+            </div>
+            <p className="text-center mt-4 text-sm text-muted-foreground">
+              Scan Using Ideagen EHS Mobile App
+            </p>
           </div>
         </DialogContent>
       </Dialog>
     </>
   );
 }
-
-    
-
-    
