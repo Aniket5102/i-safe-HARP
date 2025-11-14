@@ -1,4 +1,3 @@
-
 import HarpForm from '@/components/harp-form';
 import { ScanSearch } from 'lucide-react';
 
