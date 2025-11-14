@@ -75,10 +75,10 @@ const formSchema = z.object({
   employeeId: z.string().min(1, "Employee ID is required.").max(100),
   designation: z.string().min(1, "Designation is required.").max(100),
   employeeDepartment: z.string().min(1, "Employee Department is required.").max(100),
-  hazard: z.string().max(100).optional(),
-  accident: z.string().max(100).optional(),
-  risk: z.string().max(100).optional(),
-  prevention: z.string().max(500).optional(),
+  hazard: z.string().min(1, "Hazard is required.").max(100),
+  accident: z.string().min(1, "Accident is required.").max(100),
+  risk: z.string().min(1, "Risk is required.").max(100),
+  prevention: z.string().min(1, "Prevention is required.").max(500),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -421,7 +421,7 @@ export default function HarpForm() {
                         name="employeeType"
                         render={({ field }) => (
                           <FormItem className="grid grid-cols-3 items-center gap-4">
-                            <FormLabel className="text-right col-span-1">Employee Type</FormLabel>
+                            <FormLabel className="text-right col-span-1">Employee Type<span className="text-red-500">*</span></FormLabel>
                              <Select onValueChange={field.onChange} defaultValue={field.value}>
                                 <FormControl className="col-span-2">
                                 <SelectTrigger>
@@ -465,7 +465,7 @@ export default function HarpForm() {
                         name="employeeId"
                         render={({ field }) => (
                           <FormItem className="grid grid-cols-3 items-center gap-4">
-                            <FormLabel className="text-right col-span-1">Employee ID</FormLabel>
+                            <FormLabel className="text-right col-span-1">Employee ID<span className="text-red-500">*</span></FormLabel>
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                                 <FormControl className="col-span-2">
                                 <SelectTrigger>
@@ -487,7 +487,7 @@ export default function HarpForm() {
                         name="designation"
                         render={({ field }) => (
                           <FormItem className="grid grid-cols-3 items-center gap-4">
-                            <FormLabel className="text-right col-span-1">Designation</FormLabel>
+                            <FormLabel className="text-right col-span-1">Designation<span className="text-red-500">*</span></FormLabel>
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                                 <FormControl className="col-span-2">
                                 <SelectTrigger>
@@ -509,7 +509,7 @@ export default function HarpForm() {
                         name="employeeDepartment"
                         render={({ field }) => (
                           <FormItem className="grid grid-cols-3 items-center gap-4">
-                            <FormLabel className="text-right col-span-1">Employee Department</FormLabel>
+                            <FormLabel className="text-right col-span-1">Employee Department<span className="text-red-500">*</span></FormLabel>
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                                 <FormControl className="col-span-2">
                                 <SelectTrigger>
@@ -538,7 +538,7 @@ export default function HarpForm() {
                         name="hazard"
                         render={({ field }) => (
                           <FormItem className="grid grid-cols-3 items-center gap-4">
-                            <FormLabel className="text-right col-span-1">Hazard</FormLabel>
+                            <FormLabel className="text-right col-span-1">Hazard<span className="text-red-500">*</span></FormLabel>
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl className="col-span-2">
                                 <SelectTrigger>
@@ -560,7 +560,7 @@ export default function HarpForm() {
                         name="accident"
                         render={({ field }) => (
                           <FormItem className="grid grid-cols-3 items-center gap-4">
-                            <FormLabel className="text-right col-span-1">Accident</FormLabel>
+                            <FormLabel className="text-right col-span-1">Accident<span className="text-red-500">*</span></FormLabel>
                             <FormControl className="col-span-2">
                               <Input placeholder="Enter accident details" {...field} />
                             </FormControl>
@@ -575,7 +575,7 @@ export default function HarpForm() {
                         name="risk"
                         render={({ field }) => (
                           <FormItem className="grid grid-cols-3 items-center gap-4">
-                            <FormLabel className="text-right col-span-1">Risk</FormLabel>
+                            <FormLabel className="text-right col-span-1">Risk<span className="text-red-500">*</span></FormLabel>
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl className="col-span-2">
                                 <SelectTrigger>
@@ -597,7 +597,7 @@ export default function HarpForm() {
                         name="prevention"
                         render={({ field }) => (
                           <FormItem className="grid grid-cols-3 items-start gap-4">
-                            <FormLabel className="text-right col-span-1 pt-2">Prevention</FormLabel>
+                            <FormLabel className="text-right col-span-1 pt-2">Prevention<span className="text-red-500">*</span></FormLabel>
                             <FormControl className="col-span-2">
                               <Textarea placeholder="Describe prevention measures" {...field} />
                             </FormControl>
