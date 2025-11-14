@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -36,6 +37,12 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { useToast } from "@/hooks/use-toast";
 import { CalendarIcon, FileDown, Loader2, QrCode, Save, Sparkles } from "lucide-react";
 import { format } from "date-fns";
@@ -185,127 +192,147 @@ export default function HarpForm() {
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-              <div className="grid grid-cols-1 gap-y-8">
-                <FormField
-                  control={form.control}
-                  name="harpId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>HARP ID</FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g., HID-12345" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="date"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col">
-                      <FormLabel>Date</FormLabel>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant={"outline"}
-                              className={cn(
-                                "w-full pl-3 text-left font-normal",
-                                !field.value && "text-muted-foreground"
-                              )}
-                            >
-                              {field.value ? (
-                                format(field.value, "PPP")
-                              ) : (
-                                <span>Pick a date</span>
-                              )}
-                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={field.value}
-                            onSelect={field.onChange}
-                            disabled={(date) =>
-                              date > new Date() || date < new Date("1900-01-01")
-                            }
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="location"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="flex items-center gap-2">
-                        Location
-                        <AiSparkle className={cn("h-4 w-4 text-primary", isSuggesting && "animate-spin")}/>
-                      </FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g., Main Hospital" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="department"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="flex items-center gap-2">
-                        Department
-                        <AiSparkle className={cn("h-4 w-4 text-primary", isSuggesting && "animate-spin")}/>
-                      </FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g., Cardiology" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="block"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="flex items-center gap-2">
-                        Block
-                        <AiSparkle className={cn("h-4 w-4 text-primary", isSuggesting && "animate-spin")}/>
-                      </FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g., A" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="floor"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="flex items-center gap-2">
-                        Floor
-                        <AiSparkle className={cn("h-4 w-4 text-primary", isSuggesting && "animate-spin")}/>
-                      </FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g., 4" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <Accordion type="multiple" defaultValue={['general-details']} className="w-full">
+                <AccordionItem value="general-details">
+                  <AccordionTrigger className="text-lg font-semibold">General Details</AccordionTrigger>
+                  <AccordionContent className="pt-4">
+                    <div className="space-y-8">
+                      <FormField
+                        control={form.control}
+                        name="harpId"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>HARP ID</FormLabel>
+                            <FormControl>
+                              <Input placeholder="e.g., HID-12345" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="date"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-col">
+                            <FormLabel>Date</FormLabel>
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <FormControl>
+                                  <Button
+                                    variant={"outline"}
+                                    className={cn(
+                                      "w-full pl-3 text-left font-normal",
+                                      !field.value && "text-muted-foreground"
+                                    )}
+                                  >
+                                    {field.value ? (
+                                      format(field.value, "PPP")
+                                    ) : (
+                                      <span>Pick a date</span>
+                                    )}
+                                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                  </Button>
+                                </FormControl>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-auto p-0" align="start">
+                                <Calendar
+                                  mode="single"
+                                  selected={field.value}
+                                  onSelect={field.onChange}
+                                  disabled={(date) =>
+                                    date > new Date() || date < new Date("1900-01-01")
+                                  }
+                                  initialFocus
+                                />
+                              </PopoverContent>
+                            </Popover>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="harp-details">
+                  <AccordionTrigger className="text-lg font-semibold">HARP Details</AccordionTrigger>
+                  <AccordionContent className="pt-4">
+                    <div className="space-y-8">
+                      <FormField
+                        control={form.control}
+                        name="location"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="flex items-center gap-2">
+                              Location
+                              <AiSparkle className={cn("h-4 w-4 text-primary", isSuggesting && "animate-spin")}/>
+                            </FormLabel>
+                            <FormControl>
+                              <Input placeholder="e.g., Main Hospital" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="department"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="flex items-center gap-2">
+                              Department
+                              <AiSparkle className={cn("h-4 w-4 text-primary", isSuggesting && "animate-spin")}/>
+                            </FormLabel>
+                            <FormControl>
+                              <Input placeholder="e.g., Cardiology" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="block"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="flex items-center gap-2">
+                              Block
+                              <AiSparkle className={cn("h-4 w-4 text-primary", isSuggesting && "animate-spin")}/>
+                            </FormLabel>
+                            <FormControl>
+                              <Input placeholder="e.g., A" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="floor"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="flex items-center gap-2">
+                              Floor
+                              <AiSparkle className={cn("h-4 w-4 text-primary", isSuggesting && "animate-spin")}/>
+                            </FormLabel>
+                            <FormControl>
+                              <Input placeholder="e.g., 4" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="other-details">
+                  <AccordionTrigger className="text-lg font-semibold">Other Details</AccordionTrigger>
+                  <AccordionContent className="pt-4">
+                    <p className="text-muted-foreground">Additional details can be added here in the future.</p>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
             </form>
           </Form>
         </CardContent>
