@@ -195,19 +195,21 @@ export default function HarpForm() {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <Accordion type="multiple" defaultValue={['general-details']} className="w-full">
                 <AccordionItem value="general-details">
-                  <AccordionTrigger className="text-lg font-semibold">General Details</AccordionTrigger>
-                  <AccordionContent className="pt-4">
-                    <div className="space-y-8">
-                      <FormField
+                  <AccordionTrigger className="text-lg font-semibold justify-start">General Details</AccordionTrigger>
+                  <AccordionContent className="pt-4 flex justify-center">
+                    <div className="space-y-4 w-full max-w-sm">
+                       <FormField
                         control={form.control}
                         name="harpId"
                         render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>HARP ID</FormLabel>
-                            <FormControl>
+                          <FormItem className="grid grid-cols-3 items-center gap-4">
+                            <FormLabel className="text-right col-span-1">HARP ID</FormLabel>
+                            <FormControl className="col-span-2">
                               <Input placeholder="e.g., HID-12345" {...field} />
                             </FormControl>
-                            <FormMessage />
+                             <div className="col-span-3">
+                                <FormMessage />
+                             </div>
                           </FormItem>
                         )}
                       />
@@ -215,11 +217,11 @@ export default function HarpForm() {
                         control={form.control}
                         name="date"
                         render={({ field }) => (
-                          <FormItem className="flex flex-col">
-                            <FormLabel>Date</FormLabel>
+                          <FormItem className="grid grid-cols-3 items-center gap-4">
+                            <FormLabel className="text-right col-span-1">Date</FormLabel>
                             <Popover>
                               <PopoverTrigger asChild>
-                                <FormControl>
+                                <FormControl className="col-span-2">
                                   <Button
                                     variant={"outline"}
                                     className={cn(
@@ -248,7 +250,9 @@ export default function HarpForm() {
                                 />
                               </PopoverContent>
                             </Popover>
-                            <FormMessage />
+                             <div className="col-span-3">
+                                <FormMessage />
+                             </div>
                           </FormItem>
                         )}
                       />
@@ -256,22 +260,24 @@ export default function HarpForm() {
                   </AccordionContent>
                 </AccordionItem>
                 <AccordionItem value="harp-details">
-                  <AccordionTrigger className="text-lg font-semibold">HARP Details</AccordionTrigger>
-                  <AccordionContent className="pt-4">
-                    <div className="space-y-8">
+                  <AccordionTrigger className="text-lg font-semibold justify-start">HARP Details</AccordionTrigger>
+                  <AccordionContent className="pt-4 flex justify-center">
+                    <div className="space-y-4 w-full max-w-sm">
                       <FormField
                         control={form.control}
                         name="location"
                         render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="flex items-center gap-2">
+                          <FormItem className="grid grid-cols-3 items-center gap-4">
+                            <FormLabel className="text-right col-span-1 flex items-center justify-end gap-2">
                               Location
                               <AiSparkle className={cn("h-4 w-4 text-primary", isSuggesting && "animate-spin")}/>
                             </FormLabel>
-                            <FormControl>
+                            <FormControl className="col-span-2">
                               <Input placeholder="e.g., Main Hospital" {...field} />
                             </FormControl>
-                            <FormMessage />
+                             <div className="col-span-3">
+                                <FormMessage />
+                             </div>
                           </FormItem>
                         )}
                       />
@@ -279,15 +285,17 @@ export default function HarpForm() {
                         control={form.control}
                         name="department"
                         render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="flex items-center gap-2">
+                          <FormItem className="grid grid-cols-3 items-center gap-4">
+                            <FormLabel className="text-right col-span-1 flex items-center justify-end gap-2">
                               Department
                               <AiSparkle className={cn("h-4 w-4 text-primary", isSuggesting && "animate-spin")}/>
                             </FormLabel>
-                            <FormControl>
+                            <FormControl className="col-span-2">
                               <Input placeholder="e.g., Cardiology" {...field} />
                             </FormControl>
-                            <FormMessage />
+                             <div className="col-span-3">
+                                <FormMessage />
+                             </div>
                           </FormItem>
                         )}
                       />
@@ -295,15 +303,17 @@ export default function HarpForm() {
                         control={form.control}
                         name="block"
                         render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="flex items-center gap-2">
+                          <FormItem className="grid grid-cols-3 items-center gap-4">
+                            <FormLabel className="text-right col-span-1 flex items-center justify-end gap-2">
                               Block
                               <AiSparkle className={cn("h-4 w-4 text-primary", isSuggesting && "animate-spin")}/>
                             </FormLabel>
-                            <FormControl>
+                            <FormControl className="col-span-2">
                               <Input placeholder="e.g., A" {...field} />
                             </FormControl>
-                            <FormMessage />
+                             <div className="col-span-3">
+                                <FormMessage />
+                             </div>
                           </FormItem>
                         )}
                       />
@@ -311,15 +321,17 @@ export default function HarpForm() {
                         control={form.control}
                         name="floor"
                         render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="flex items-center gap-2">
+                          <FormItem className="grid grid-cols-3 items-center gap-4">
+                            <FormLabel className="text-right col-span-1 flex items-center justify-end gap-2">
                               Floor
                               <AiSparkle className={cn("h-4 w-4 text-primary", isSuggesting && "animate-spin")}/>
                             </FormLabel>
-                            <FormControl>
+                            <FormControl className="col-span-2">
                               <Input placeholder="e.g., 4" {...field} />
                             </FormControl>
-                            <FormMessage />
+                             <div className="col-span-3">
+                                <FormMessage />
+                             </div>
                           </FormItem>
                         )}
                       />
@@ -327,8 +339,8 @@ export default function HarpForm() {
                   </AccordionContent>
                 </AccordionItem>
                 <AccordionItem value="other-details">
-                  <AccordionTrigger className="text-lg font-semibold">Other Details</AccordionTrigger>
-                  <AccordionContent className="pt-4">
+                  <AccordionTrigger className="text-lg font-semibold justify-start">Other Details</AccordionTrigger>
+                  <AccordionContent className="pt-4 flex justify-center">
                     <p className="text-muted-foreground">Additional details can be added here in the future.</p>
                   </AccordionContent>
                 </AccordionItem>
@@ -369,3 +381,5 @@ export default function HarpForm() {
     </>
   );
 }
+
+    
