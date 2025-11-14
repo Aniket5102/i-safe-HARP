@@ -1,3 +1,4 @@
+
 import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
@@ -15,6 +16,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Home, Link, LayoutGrid, PenSquare, Settings } from 'lucide-react';
 import IdeagenLogo from '@/components/ideagen-logo';
+import NextLink from 'next/link';
 
 export const metadata: Metadata = {
   title: 'HARP Insight',
@@ -49,10 +51,14 @@ export default function RootLayout({
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                   <SidebarMenuItem>
-                    <SidebarMenuButton tooltip="Home" isActive={true} className="justify-start">
-                      <Home />
-                      <span className="group-data-[state=expanded]:inline-flex group-data-[state=collapsed]:hidden">Home</span>
-                    </SidebarMenuButton>
+                    <NextLink href="/" passHref>
+                      <SidebarMenuButton asChild tooltip="Home" isActive={false} className="justify-start">
+                        <a>
+                          <Home />
+                          <span className="group-data-[state=expanded]:inline-flex group-data-[state=collapsed]:hidden">Home</span>
+                        </a>
+                      </SidebarMenuButton>
+                    </NextLink>
                   </SidebarMenuItem>
                   <SidebarMenuItem>
                     <SidebarMenuButton tooltip="Modules" isActive={false} className="justify-start">
@@ -61,7 +67,7 @@ export default function RootLayout({
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                   <SidebarMenuItem>
-                    <SidebarMenuButton tooltip="Apps" isActive={false} className="justify-start">
+                    <SidebarMenuButton tooltip="Apps" isActive={true} className="justify-start">
                       <Link />
                       <span className="group-data-[state=expanded]:inline-flex group-data-[state=collapsed]:hidden">Apps</span>
                     </SidebarMenuButton>
