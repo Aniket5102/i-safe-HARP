@@ -1,4 +1,3 @@
-
 'use client';
 
 import {
@@ -23,11 +22,10 @@ import {
   CalendarDays,
   HardHat,
   ClipboardCheck,
-  Building,
   CheckCircle,
-  FileSignature
 } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 const modules = [
   { name: 'Calendar', icon: CalendarDays },
@@ -37,13 +35,13 @@ const modules = [
 ];
 
 const apps = [
-  { name: 'QUALITY SUSA', subtitle: 'SUSA Reporting...', icon: '/quality-susa-logo.png' },
-  { name: 'Quality Incident Repor...', icon: FileSignature, href: '#' },
-  { name: 'Permit To Work V2.0', icon: '/permit-to-work-logo.png', href: '#' },
-  { name: 'Permit To Work (Obsolete)', icon: '/permit-to-work-logo.png', href: '#' },
-  { name: 'Employee Check In', subtitle: 'Employee Self C...', icon: '/employee-check-in-logo.png', href: '#' },
-  { name: 'HARP', icon: '/harp-logo.png', href: '/harp' },
-  { name: 'BBS', icon: '/bbs-logo.png', href: '#' },
+  { name: 'QUALITY SUSA', subtitle: 'SUSA Reporting...', imageUrl: 'https://picsum.photos/seed/susa/200/200', imageHint: 'quality safety', href: '#' },
+  { name: 'Quality Incident Repor...', imageUrl: 'https://picsum.photos/seed/incident/200/200', imageHint: 'incident report', href: '#' },
+  { name: 'Permit To Work V2.0', imageUrl: 'https://picsum.photos/seed/permit/200/200', imageHint: 'work permit', href: '#' },
+  { name: 'Permit To Work (Obsolete)', imageUrl: 'https://picsum.photos/seed/obsolete/200/200', imageHint: 'work permit', href: '#' },
+  { name: 'Employee Check In', subtitle: 'Employee Self C...', imageUrl: 'https://picsum.photos/seed/employee/200/200', imageHint: 'employee check-in', href: '#' },
+  { name: 'HARP', imageUrl: 'https://picsum.photos/seed/harp/200/200', imageHint: 'hazard analysis', href: '/harp' },
+  { name: 'BBS', imageUrl: 'https://picsum.photos/seed/bbs/200/200', imageHint: 'behavioral safety', href: '#' },
 ];
 
 const quickLinks = {
@@ -193,11 +191,14 @@ function AppsCard() {
           {apps.map((app) => (
              <Link key={app.name} href={app.href || '#'} className="flex flex-col items-center text-center no-underline text-current">
               <div className="p-2 rounded-lg bg-gray-100 mb-2 h-20 w-20 flex items-center justify-center">
-                {typeof app.icon === 'string' ? (
-                  <img src={app.icon} alt={app.name} className="h-12 w-12 object-contain" />
-                ) : (
-                  <app.icon className="h-10 w-10 text-gray-600" />
-                )}
+                <Image 
+                  src={app.imageUrl} 
+                  alt={app.name} 
+                  width={200} 
+                  height={200} 
+                  className="h-16 w-16 object-cover rounded-md"
+                  data-ai-hint={app.imageHint}
+                />
               </div>
               <p className="text-xs font-semibold">{app.name}</p>
                {app.subtitle && <p className="text-xs text-gray-500">{app.subtitle}</p>}
