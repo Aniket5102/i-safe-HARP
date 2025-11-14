@@ -38,13 +38,13 @@ const modules = [
 ];
 
 const apps = [
-  { name: 'QUALITY SUSA', subtitle: 'SUSA Reporting...', imageUrl: 'https://picsum.photos/seed/factory-inspection/200/200', imageHint: 'quality audit', href: '#' },
-  { name: 'Quality Incident Repor...', imageUrl: 'https://picsum.photos/seed/assembly-line/200/200', imageHint: 'incident report', href: '#' },
-  { name: 'Permit To Work V2.0', imageUrl: 'https://picsum.photos/seed/engineering-drawing/200/200', imageHint: 'work permit', href: '#' },
-  { name: 'Permit To Work (Obsolete)', imageUrl: 'https://picsum.photos/seed/old-blueprint/200/200', imageHint: 'archive files', href: '#' },
-  { name: 'Employee Check In', subtitle: 'Employee Self C...', imageUrl: 'https://picsum.photos/seed/factory-worker/200/200', imageHint: 'employee checkin', href: '#' },
-  { name: 'HARP', imageUrl: 'https://picsum.photos/seed/safety-analysis/200/200', imageHint: 'hazard analysis', href: '/harp' },
-  { name: 'BBS', imageUrl: 'https://picsum.photos/seed/industrial-safety/200/200', imageHint: 'behavioral safety', href: '#' },
+  { name: 'QUALITY SUSA', subtitle: 'SUSA Reporting...', imageUrl: 'https://picsum.photos/seed/quality-assurance/200/200', imageHint: 'quality assurance', href: '#' },
+  { name: 'Quality Incident Repor...', imageUrl: 'https://picsum.photos/seed/incident-documentation/200/200', imageHint: 'incident documentation', href: '#' },
+  { name: 'Permit To Work V2.0', imageUrl: 'https://picsum.photos/seed/safety-permit/200/200', imageHint: 'safety permit', href: '#' },
+  { name: 'Permit To Work (Obsolete)', imageUrl: 'https://picsum.photos/seed/archive-documents/200/200', imageHint: 'archive documents', href: '#' },
+  { name: 'Employee Check In', subtitle: 'Employee Self C...', imageUrl: 'https://picsum.photos/seed/worker-check-in/200/200', imageHint: 'worker check in', href: '#' },
+  { name: 'HARP', imageUrl: 'https://picsum.photos/seed/risk-analysis/200/200', imageHint: 'risk analysis', href: '/harp' },
+  { name: 'BBS', imageUrl: 'https://picsum.photos/seed/safety-observation/200/200', imageHint: 'safety observation', href: '#' },
 ];
 
 const quickLinks = {

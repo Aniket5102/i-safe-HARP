@@ -223,11 +223,11 @@ export default function HarpForm() {
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <Accordion type="multiple" className="w-full">
+              <Accordion type="multiple" className="w-full" >
                 <AccordionItem value="general-details">
                   <AccordionTrigger className="text-lg font-semibold">General Details</AccordionTrigger>
-                  <AccordionContent className="pt-4 flex justify-center">
-                    <div className="space-y-4 w-full max-w-sm">
+                  <AccordionContent className="pt-4 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                    
                        <FormField
                         control={form.control}
                         name="harpId"
@@ -530,13 +530,13 @@ export default function HarpForm() {
                           </FormItem>
                         )}
                       />
-                    </div>
+                    
                   </AccordionContent>
                 </AccordionItem>
                 <AccordionItem value="harp-details">
                   <AccordionTrigger className="text-lg font-semibold">HARP Details</AccordionTrigger>
-                   <AccordionContent className="pt-4 flex justify-center">
-                    <div className="space-y-4 w-full max-w-sm">
+                   <AccordionContent className="pt-4 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                    
                       <FormField
                         control={form.control}
                         name="hazard"
@@ -611,13 +611,13 @@ export default function HarpForm() {
                           </FormItem>
                         )}
                       />
-                    </div>
+                    
                   </AccordionContent>
                 </AccordionItem>
                 <AccordionItem value="other-details">
                   <AccordionTrigger className="text-lg font-semibold">Other Details</AccordionTrigger>
-                  <AccordionContent className="pt-4 flex justify-center">
-                     <div className="space-y-4 w-full max-w-sm">
+                  <AccordionContent className="pt-4 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                     
                       <FormField
                         control={form.control}
                         name="otherObservation"
@@ -645,7 +645,7 @@ export default function HarpForm() {
                           <FormMessage />
                         </div>
                       </FormItem>
-                    </div>
+                    
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>
