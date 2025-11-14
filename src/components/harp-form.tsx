@@ -169,11 +169,23 @@ export default function HarpForm() {
   return (
     <>
       <Card ref={formRef} className="w-full shadow-2xl" id="harp-form-card">
-        <CardHeader>
-          <CardTitle className="font-headline text-2xl">HARP Details</CardTitle>
-          <CardDescription>
-            Fill in the form to record a new HARP entry.
-          </CardDescription>
+        <CardHeader className="flex flex-row items-start justify-between">
+          <div>
+            <CardTitle className="font-headline text-2xl">HARP Details</CardTitle>
+            <CardDescription>
+              Fill in the form to record a new HARP entry.
+            </CardDescription>
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={handleGenerateQrCode}>
+              <QrCode />
+              Generate QR Code
+            </Button>
+            <Button variant="outline" onClick={handleExportPdf}>
+              <FileDown />
+              Export as PDF
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -504,17 +516,7 @@ export default function HarpForm() {
             </form>
           </Form>
         </CardContent>
-        <CardFooter className="flex flex-col sm:flex-row justify-between gap-4">
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={handleGenerateQrCode}>
-              <QrCode />
-              Generate QR Code
-            </Button>
-            <Button variant="outline" onClick={handleExportPdf}>
-              <FileDown />
-              Export as PDF
-            </Button>
-          </div>
+        <CardFooter className="flex flex-col sm:flex-row justify-end gap-4">
           <Button type="submit" onClick={form.handleSubmit(onSubmit)} disabled={isSubmitting}>
             {isSubmitting ? <Loader2 className="animate-spin" /> : <Save />}
             Save HARP Data
@@ -537,5 +539,7 @@ export default function HarpForm() {
     </>
   );
 }
+
+    
 
     
