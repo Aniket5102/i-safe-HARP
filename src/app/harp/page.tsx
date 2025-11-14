@@ -10,7 +10,7 @@ export default function HarpPage() {
             <ScanSearch className="h-8 w-8" />
           </div>
           <h1 className="text-4xl md:text-5xl font-headline font-bold text-foreground">
-            HARP Insight
+            HARP Incident
           </h1>
         </header>
         <HarpForm />

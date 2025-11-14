@@ -184,7 +184,7 @@ export default function HarpForm() {
         imgWidth * ratio,
         imgHeight * ratio
       );
-      pdf.save(`harp-insight-${form.getValues("harpId") || 'export'}.pdf`);
+      pdf.save(`harp-incident-${form.getValues("harpId") || 'export'}.pdf`);
       toast({ title: "Success", description: "PDF export has started." });
     } catch (error) {
       toast({

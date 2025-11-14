@@ -14,8 +14,8 @@ import SidebarNav from '@/components/sidebar-nav';
 
 
 export const metadata: Metadata = {
-  title: 'HARP Insight',
-  description: 'Capture, manage, and analyze HARP data with AI-powered insights.',
+  title: 'HARP Incident',
+  description: 'Capture, manage, and analyze HARP data with AI-powered suggestions.',
 };
 
 export default function RootLayout({
