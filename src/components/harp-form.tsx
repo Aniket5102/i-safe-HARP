@@ -656,7 +656,7 @@ export default function HarpForm() {
         <CardFooter className="flex flex-col sm:flex-row justify-end gap-4">
           <Button type="submit" onClick={form.handleSubmit(onSubmit)} disabled={isSubmitting}>
             {isSubmitting ? <Loader2 className="animate-spin" /> : <Printer />}
-            Save HARP Data
+            Raise HARP Incident
           </Button>
         </CardFooter>
       </Card>
@@ -694,6 +694,8 @@ export default function HarpForm() {
   );
 }
  
+    
+
     
 
     
