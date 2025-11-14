@@ -3,7 +3,7 @@ import { ScanSearch } from 'lucide-react';
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-4 sm:p-8 md:p-12">
+    <main className="flex min-h-screen flex-col items-center justify-center p-4 sm:p-8 md:p-12 bg-gray-50">
       <div className="w-full max-w-4xl">
         <header className="mb-8 flex flex-col sm:flex-row items-center justify-center gap-4 text-center">
            <div className="bg-primary text-primary-foreground p-3 rounded-xl shadow-lg">

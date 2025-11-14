@@ -1,0 +1,37 @@
+import * as React from "react";
+
+const ISafeLogo = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 100 100"
+    width="100"
+    height="100"
+    {...props}
+  >
+    <path
+      fill="#34A853"
+      d="M50,10 C27.9,10 10,27.9 10,50 C10,72.1 27.9,90 50,90 C72.1,90 90,72.1 90,50 C90,27.9 72.1,10 50,10 z M50,82 C32.3,82 18,67.7 18,50 C18,32.3 32.3,18 50,18 C67.7,18 82,32.3 82,50 C82,67.7 67.7,82 50,82 z"
+    />
+    <path
+      fill="#FFFFFF"
+      d="M45,35 L55,35 L55,45 L60,45 L60,30 L40,30 L40,45 L45,45 L45,35 z"
+    />
+    <path
+      fill="#FFFFFF"
+      d="M42,50 C42,48.9 42.9,48 44,48 L56,48 C57.1,48 58,48.9 58,50 L58,65 C58,66.1 57.1,67 56,67 L44,67 C42.9,67 42,66.1 42,65 L42,50 z"
+    />
+    <text
+      x="50"
+      y="80"
+      textAnchor="middle"
+      fontFamily="sans-serif"
+      fontSize="12"
+      fill="#34A853"
+      fontWeight="bold"
+    >
+      i-safe
+    </text>
+  </svg>
+);
+
+export default ISafeLogo;
