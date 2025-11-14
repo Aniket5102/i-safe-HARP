@@ -14,7 +14,7 @@ const IdeagenLogo = (props: React.SVGProps<SVGSVGElement>) => (
       fontFamily="sans-serif"
       fontSize="14"
       fontWeight="bold"
-      fill="white"
+      fill="currentColor"
     >
       Ideagen
       <tspan baselineShift="super" fontSize="10">
