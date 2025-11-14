@@ -35,13 +35,13 @@ const modules = [
 ];
 
 const apps = [
-  { name: 'QUALITY SUSA', subtitle: 'SUSA Reporting...', imageUrl: 'https://picsum.photos/seed/susa/200/200', imageHint: 'quality inspection', href: '#' },
-  { name: 'Quality Incident Repor...', imageUrl: 'https://picsum.photos/seed/incident/200/200', imageHint: 'factory report', href: '#' },
-  { name: 'Permit To Work V2.0', imageUrl: 'https://picsum.photos/seed/permit/200/200', imageHint: 'industrial permit', href: '#' },
-  { name: 'Permit To Work (Obsolete)', imageUrl: 'https://picsum.photos/seed/obsolete/200/200', imageHint: 'archive document', href: '#' },
-  { name: 'Employee Check In', subtitle: 'Employee Self C...', imageUrl: 'https://picsum.photos/seed/employee/200/200', imageHint: 'worker entry', href: '#' },
-  { name: 'HARP', imageUrl: 'https://picsum.photos/seed/harp/200/200', imageHint: 'risk analysis', href: '/harp' },
-  { name: 'BBS', imageUrl: 'https://picsum.photos/seed/bbs/200/200', imageHint: 'safety observation', href: '#' },
+  { name: 'QUALITY SUSA', subtitle: 'SUSA Reporting...', imageUrl: 'https://picsum.photos/seed/factory-inspection/200/200', imageHint: 'quality audit', href: '#' },
+  { name: 'Quality Incident Repor...', imageUrl: 'https://picsum.photos/seed/incident-report/200/200', imageHint: 'worker safety', href: '#' },
+  { name: 'Permit To Work V2.0', imageUrl: 'https://picsum.photos/seed/work-permit/200/200', imageHint: 'construction permit', href: '#' },
+  { name: 'Permit To Work (Obsolete)', imageUrl: 'https://picsum.photos/seed/archive-docs/200/200', imageHint: 'old files', href: '#' },
+  { name: 'Employee Check In', subtitle: 'Employee Self C...', imageUrl: 'https://picsum.photos/seed/time-clock/200/200', imageHint: 'employee entry', href: '#' },
+  { name: 'HARP', imageUrl: 'https://picsum.photos/seed/safety-gear/200/200', imageHint: 'hazard analysis', href: '/harp' },
+  { name: 'BBS', imageUrl: 'https://picsum.photos/seed/factory-floor/200/200', imageHint: 'behavioral safety', href: '#' },
 ];
 
 const quickLinks = {
