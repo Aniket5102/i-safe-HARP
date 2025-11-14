@@ -51,12 +51,10 @@ export default function RootLayout({
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                   <SidebarMenuItem>
-                    <NextLink href="/" passHref>
-                      <SidebarMenuButton asChild tooltip="Home" isActive={false} className="justify-start">
-                        <a>
+                    <NextLink href="/" passHref legacyBehavior>
+                      <SidebarMenuButton as="a" tooltip="Home" isActive={false} className="justify-start">
                           <Home />
                           <span className="group-data-[state=expanded]:inline-flex group-data-[state=collapsed]:hidden">Home</span>
-                        </a>
                       </SidebarMenuButton>
                     </NextLink>
                   </SidebarMenuItem>
