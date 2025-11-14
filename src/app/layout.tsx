@@ -38,9 +38,7 @@ export default function RootLayout({
         <SidebarProvider>
           <Sidebar>
             <SidebarHeader>
-                <Button variant="ghost" size="icon" className="h-10 w-10">
-                    <Menu />
-                </Button>
+              <SidebarTrigger />
             </SidebarHeader>
             <SidebarContent>
               <SidebarMenu>
