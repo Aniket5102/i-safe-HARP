@@ -10,11 +10,9 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
-  SidebarTrigger,
-  SidebarInset,
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
-import { Home, Link, LayoutGrid, Menu, PenSquare, Settings } from 'lucide-react';
+import { Home, Link, LayoutGrid, PenSquare, Settings } from 'lucide-react';
 import IdeagenLogo from '@/components/ideagen-logo';
 
 export const metadata: Metadata = {
@@ -36,49 +34,49 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased">
         <SidebarProvider>
-          <Sidebar>
-            <SidebarHeader>
-            </SidebarHeader>
-            <SidebarContent>
-              <SidebarMenu>
-                <SidebarMenuItem>
-                  <SidebarMenuButton tooltip="Ideagen" isActive={false}>
-                    <IdeagenLogo className="h-6 w-6" />
-                    <span>Ideagen...</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton tooltip="Home" isActive={false}>
-                    <Home />
-                    <span>Home</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton tooltip="Modules" isActive={false}>
-                    <LayoutGrid />
-                    <span>Modules</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton tooltip="Apps" isActive={true}>
-                    <Link />
-                    <span>Apps</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton tooltip="Setup" isActive={false}>
-                    <Settings />
-                    <span>Setup</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              </SidebarMenu>
-            </SidebarContent>
-          </Sidebar>
-          <SidebarInset>
-            <Header />
-            {children}
-            <Toaster />
-          </SidebarInset>
+          <div className="flex">
+            <Sidebar className="border-r">
+              <SidebarContent>
+                <SidebarMenu>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton tooltip="Ideagen" isActive={false} className="justify-start">
+                      <IdeagenLogo className="h-6 w-6" />
+                      <span className="group-data-[state=expanded]:inline-flex group-data-[state=collapsed]:hidden">Ideagen...</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton tooltip="Home" isActive={true} className="justify-start">
+                      <Home />
+                      <span className="group-data-[state=expanded]:inline-flex group-data-[state=collapsed]:hidden">Home</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton tooltip="Modules" isActive={false} className="justify-start">
+                      <LayoutGrid />
+                      <span className="group-data-[state=expanded]:inline-flex group-data-[state=collapsed]:hidden">Modules</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton tooltip="Apps" isActive={false} className="justify-start">
+                      <Link />
+                      <span className="group-data-[state=expanded]:inline-flex group-data-[state=collapsed]:hidden">Apps</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton tooltip="Setup" isActive={false} className="justify-start">
+                      <Settings />
+                      <span className="group-data-[state=expanded]:inline-flex group-data-[state=collapsed]:hidden">Setup</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </SidebarMenu>
+              </SidebarContent>
+            </Sidebar>
+            <div className="flex-1 flex flex-col">
+              <Header />
+              {children}
+            </div>
+          </div>
+          <Toaster />
         </SidebarProvider>
       </body>
     </html>
