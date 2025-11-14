@@ -117,7 +117,8 @@ export default function HarpForm() {
 
   const handleGenerateQrCode = () => {
     const values = form.getValues();
-    setQrCodeValue(JSON.stringify(values));
+    const allValues = Object.fromEntries(Object.entries(values).filter(([key, value]) => value !== ''));
+    setQrCodeValue(JSON.stringify(allValues));
   };
 
   const handlePrintQrCode = () => {
@@ -235,7 +236,7 @@ export default function HarpForm() {
                         name="date"
                         render={({ field }) => (
                           <FormItem className="grid grid-cols-3 items-center gap-4">
-                            <FormLabel className="text-right col-span-1">Date*</FormLabel>
+                            <FormLabel className="text-right col-span-1">Date<span className="text-red-500">*</span></FormLabel>
                             <Popover>
                               <PopoverTrigger asChild>
                                 <FormControl className="col-span-2">
@@ -278,7 +279,7 @@ export default function HarpForm() {
                         name="location"
                         render={({ field }) => (
                           <FormItem className="grid grid-cols-3 items-center gap-4">
-                            <FormLabel className="text-right col-span-1">Location*</FormLabel>
+                            <FormLabel className="text-right col-span-1">Location<span className="text-red-500">*</span></FormLabel>
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                                 <FormControl className="col-span-2">
                                 <SelectTrigger>
@@ -300,7 +301,7 @@ export default function HarpForm() {
                         name="department"
                         render={({ field }) => (
                           <FormItem className="grid grid-cols-3 items-start gap-4">
-                            <FormLabel className="text-right col-span-1 pt-2">Department*</FormLabel>
+                            <FormLabel className="text-right col-span-1 pt-2">Department<span className="text-red-500">*</span></FormLabel>
                             <div className="col-span-2">
                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                                     <FormControl>
@@ -325,7 +326,7 @@ export default function HarpForm() {
                         name="block"
                         render={({ field }) => (
                           <FormItem className="grid grid-cols-3 items-start gap-4">
-                            <FormLabel className="text-right col-span-1 pt-2">Block*</FormLabel>
+                            <FormLabel className="text-right col-span-1 pt-2">Block<span className="text-red-500">*</span></FormLabel>
                             <div className="col-span-2">
                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                                     <FormControl>
@@ -350,7 +351,7 @@ export default function HarpForm() {
                         name="floor"
                         render={({ field }) => (
                            <FormItem className="grid grid-cols-3 items-start gap-4">
-                            <FormLabel className="text-right col-span-1 pt-2">Floor*</FormLabel>
+                            <FormLabel className="text-right col-span-1 pt-2">Floor<span className="text-red-500">*</span></FormLabel>
                             <div className="col-span-2">
                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                                     <FormControl>
@@ -375,7 +376,7 @@ export default function HarpForm() {
                         name="activity"
                         render={({ field }) => (
                           <FormItem className="grid grid-cols-3 items-center gap-4">
-                            <FormLabel className="text-right col-span-1">Activity*</FormLabel>
+                            <FormLabel className="text-right col-span-1">Activity<span className="text-red-500">*</span></FormLabel>
                             <FormControl className="col-span-2">
                               <Input placeholder="Enter activity" {...field} />
                             </FormControl>
@@ -390,7 +391,7 @@ export default function HarpForm() {
                         name="carriedOutBy"
                         render={({ field }) => (
                           <FormItem className="grid grid-cols-3 items-center gap-4">
-                            <FormLabel className="text-right col-span-1">Carried Out By*</FormLabel>
+                            <FormLabel className="text-right col-span-1">Carried Out By<span className="text-red-500">*</span></FormLabel>
                              <Select onValueChange={field.onChange} defaultValue={field.value}>
                                 <FormControl className="col-span-2">
                                 <SelectTrigger>
@@ -434,7 +435,7 @@ export default function HarpForm() {
                         name="employeeName"
                         render={({ field }) => (
                            <FormItem className="grid grid-cols-3 items-center gap-4">
-                            <FormLabel className="text-right col-span-1">Employee Name*</FormLabel>
+                            <FormLabel className="text-right col-span-1">Employee Name<span className="text-red-500">*</span></FormLabel>
                              <Select onValueChange={field.onChange} defaultValue={field.value}>
                                 <FormControl className="col-span-2">
                                 <SelectTrigger>
@@ -576,5 +577,7 @@ export default function HarpForm() {
     </>
   );
 }
+
+    
 
     
