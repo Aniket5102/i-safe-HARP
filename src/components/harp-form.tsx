@@ -117,16 +117,7 @@ export default function HarpForm() {
 
   const handleGenerateQrCode = () => {
     const values = form.getValues();
-    const valid = formSchema.safeParse(values);
-    if (valid.success) {
-      setQrCodeValue(JSON.stringify(values));
-    } else {
-      toast({
-        variant: "destructive",
-        title: "Invalid Data",
-        description: "Please fill in all required fields before generating a QR code.",
-      });
-    }
+    setQrCodeValue(JSON.stringify(values));
   };
 
   const handlePrintQrCode = () => {
