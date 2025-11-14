@@ -8,15 +8,10 @@ import {
   Sidebar,
   SidebarHeader,
   SidebarContent,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
   SidebarTrigger,
 } from '@/components/ui/sidebar';
-import { Button } from '@/components/ui/button';
-import { Home, Link, LayoutGrid, PenSquare, Settings } from 'lucide-react';
-import IdeagenLogo from '@/components/ideagen-logo';
-import NextLink from 'next/link';
+import SidebarNav from '@/components/sidebar-nav';
+
 
 export const metadata: Metadata = {
   title: 'HARP Insight',
@@ -43,40 +38,7 @@ export default function RootLayout({
                 <SidebarTrigger />
               </SidebarHeader>
               <SidebarContent>
-                <SidebarMenu>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton tooltip="Ideagen" isActive={false} className="justify-start">
-                      <IdeagenLogo className="h-6 w-6" />
-                      <span className="group-data-[state=expanded]:inline-flex group-data-[state=collapsed]:hidden">Ideagen...</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <NextLink href="/" legacyBehavior={false}>
-                      <SidebarMenuButton as="a" tooltip="Home" isActive={false} className="justify-start">
-                          <Home />
-                          <span className="group-data-[state=expanded]:inline-flex group-data-[state=collapsed]:hidden">Home</span>
-                      </SidebarMenuButton>
-                    </NextLink>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton tooltip="Modules" isActive={false} className="justify-start">
-                      <LayoutGrid />
-                      <span className="group-data-[state=expanded]:inline-flex group-data-[state=collapsed]:hidden">Modules</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton tooltip="Apps" isActive={true} className="justify-start">
-                      <Link />
-                      <span className="group-data-[state=expanded]:inline-flex group-data-[state=collapsed]:hidden">Apps</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton tooltip="Setup" isActive={false} className="justify-start">
-                      <Settings />
-                      <span className="group-data-[state=expanded]:inline-flex group-data-[state=collapsed]:hidden">Setup</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                </SidebarMenu>
+                <SidebarNav />
               </SidebarContent>
             </Sidebar>
             <div className="flex-1 flex flex-col">
