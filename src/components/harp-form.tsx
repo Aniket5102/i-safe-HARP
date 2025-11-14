@@ -180,7 +180,7 @@ export default function HarpForm() {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <Accordion type="multiple" defaultValue={['general-details']} className="w-full">
                 <AccordionItem value="general-details">
-                  <AccordionTrigger className="text-lg font-semibold justify-start">General Details</AccordionTrigger>
+                  <AccordionTrigger className="text-lg font-semibold">General Details</AccordionTrigger>
                   <AccordionContent className="pt-4 flex justify-center">
                     <div className="space-y-4 w-full max-w-sm">
                        <FormField
@@ -489,13 +489,13 @@ export default function HarpForm() {
                   </AccordionContent>
                 </AccordionItem>
                 <AccordionItem value="harp-details">
-                  <AccordionTrigger className="text-lg font-semibold justify-start">HARP Details</AccordionTrigger>
+                  <AccordionTrigger className="text-lg font-semibold">HARP Details</AccordionTrigger>
                    <AccordionContent className="pt-4 flex justify-center">
                     <p className="text-muted-foreground">HARP details can be added here in the future.</p>
                   </AccordionContent>
                 </AccordionItem>
                 <AccordionItem value="other-details">
-                  <AccordionTrigger className="text-lg font-semibold justify-start">Other Details</AccordionTrigger>
+                  <AccordionTrigger className="text-lg font-semibold">Other Details</AccordionTrigger>
                   <AccordionContent className="pt-4 flex justify-center">
                     <p className="text-muted-foreground">Additional details can be added here in the future.</p>
                   </AccordionContent>
@@ -537,3 +537,5 @@ export default function HarpForm() {
     </>
   );
 }
+
+    
