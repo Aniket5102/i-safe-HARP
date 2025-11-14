@@ -1,3 +1,4 @@
+
 "use client";
 
 import Image from "next/image";
@@ -28,7 +29,6 @@ export default function Header() {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center space-x-4">
-             <SidebarTrigger className="md:hidden" />
             <AsianPaintsLogo className="h-5" />
             <div className="border-l border-gray-300 h-6"></div>
             <div className="flex items-center space-x-2">
@@ -37,7 +37,7 @@ export default function Header() {
                 i-safe
               </span>
             </div>
-             <SidebarTrigger className="hidden md:flex" />
+             <SidebarTrigger />
           </div>
           <div className="flex items-center space-x-4">
             <Select>
