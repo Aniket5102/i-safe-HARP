@@ -38,7 +38,6 @@ export default function RootLayout({
         <SidebarProvider>
           <Sidebar>
             <SidebarHeader>
-              <SidebarTrigger />
             </SidebarHeader>
             <SidebarContent>
               <SidebarMenu>

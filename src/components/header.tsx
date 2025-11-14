@@ -37,6 +37,7 @@ export default function Header() {
                 i-safe
               </span>
             </div>
+             <SidebarTrigger className="hidden md:flex" />
           </div>
           <div className="flex items-center space-x-4">
             <Select>
