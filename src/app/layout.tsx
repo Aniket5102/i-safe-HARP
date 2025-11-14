@@ -10,6 +10,7 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
+  SidebarTrigger,
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
 import { Home, Link, LayoutGrid, PenSquare, Settings } from 'lucide-react';
@@ -36,6 +37,9 @@ export default function RootLayout({
         <SidebarProvider>
           <div className="flex">
             <Sidebar className="border-r">
+              <SidebarHeader>
+                <SidebarTrigger />
+              </SidebarHeader>
               <SidebarContent>
                 <SidebarMenu>
                   <SidebarMenuItem>
