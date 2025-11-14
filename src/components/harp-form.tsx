@@ -53,7 +53,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { useToast } from "@/hooks/use-toast";
-import { CalendarIcon, FileDown, Loader2, Printer, Download, X } from "lucide-react";
+import { CalendarIcon, FileDown, Loader2, Printer, Download, X, Upload } from "lucide-react";
 import { format } from "date-fns";
 import QRCode from "qrcode.react";
 import jsPDF from "jspdf";
@@ -79,6 +79,7 @@ const formSchema = z.object({
   accident: z.string().min(1, "Accident is required.").max(100),
   risk: z.string().min(1, "Risk is required.").max(100),
   prevention: z.string().min(1, "Prevention is required.").max(500),
+  otherObservation: z.string().max(500).optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -613,7 +614,35 @@ export default function HarpForm() {
                 <AccordionItem value="other-details">
                   <AccordionTrigger className="text-lg font-semibold">Other Details</AccordionTrigger>
                   <AccordionContent className="pt-4 flex justify-center">
-                    <p className="text-muted-foreground">Additional details can be added here in the future.</p>
+                     <div className="space-y-4 w-full max-w-sm">
+                      <FormField
+                        control={form.control}
+                        name="otherObservation"
+                        render={({ field }) => (
+                          <FormItem className="grid grid-cols-3 items-start gap-4">
+                            <FormLabel className="text-right col-span-1 pt-2">Other Observation/Support Required</FormLabel>
+                            <FormControl className="col-span-2">
+                              <Textarea placeholder="Enter your observations" {...field} />
+                            </FormControl>
+                            <div className="col-start-2 col-span-2">
+                              <FormMessage />
+                            </div>
+                          </FormItem>
+                        )}
+                      />
+                      <FormItem className="grid grid-cols-3 items-start gap-4">
+                        <FormLabel className="text-right col-span-1 pt-2">Upload Attachment(s) If Any</FormLabel>
+                        <div className="col-span-2">
+                          <FormControl>
+                            <Input type="file" />
+                          </FormControl>
+                          <FormDescription className="mt-1">
+                            Select/Drag and Drop Attachment.
+                          </FormDescription>
+                          <FormMessage />
+                        </div>
+                      </FormItem>
+                    </div>
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>
@@ -660,5 +689,4 @@ export default function HarpForm() {
     </>
   );
 }
-
-    
+ 
