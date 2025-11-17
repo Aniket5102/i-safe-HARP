@@ -232,12 +232,14 @@ export default function HarpForm() {
                         control={form.control}
                         name="harpId"
                         render={({ field }) => (
-                          <FormItem>
+                          <FormItem className="grid grid-cols-1 md:grid-cols-2 md:items-center">
                             <FormLabel>HARP ID #</FormLabel>
-                            <FormControl>
-                              <Input placeholder="Generated on incident creation" {...field} />
-                            </FormControl>
-                            <FormMessage />
+                            <div>
+                              <FormControl>
+                                <Input placeholder="Generated on incident creation" {...field} />
+                              </FormControl>
+                              <FormMessage className="mt-2" />
+                            </div>
                           </FormItem>
                         )}
                       />
@@ -245,8 +247,9 @@ export default function HarpForm() {
                         control={form.control}
                         name="date"
                         render={({ field }) => (
-                          <FormItem>
+                          <FormItem className="grid grid-cols-1 md:grid-cols-2 md:items-center">
                             <FormLabel>Date<span className="text-red-500">*</span></FormLabel>
+                            <div>
                             <Popover>
                               <PopoverTrigger asChild>
                                 <FormControl>
@@ -278,7 +281,8 @@ export default function HarpForm() {
                                 />
                               </PopoverContent>
                             </Popover>
-                            <FormMessage />
+                            <FormMessage className="mt-2" />
+                            </div>
                           </FormItem>
                         )}
                       />
@@ -286,8 +290,9 @@ export default function HarpForm() {
                         control={form.control}
                         name="location"
                         render={({ field }) => (
-                          <FormItem>
+                          <FormItem className="grid grid-cols-1 md:grid-cols-2 md:items-center">
                             <FormLabel>Location<span className="text-red-500">*</span></FormLabel>
+                            <div>
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                                 <FormControl>
                                 <SelectTrigger>
@@ -298,7 +303,8 @@ export default function HarpForm() {
                                 {locations.map(loc => <SelectItem key={loc} value={loc}>{loc}</SelectItem>)}
                                 </SelectContent>
                             </Select>
-                            <FormMessage />
+                            <FormMessage className="mt-2" />
+                            </div>
                           </FormItem>
                         )}
                       />
@@ -306,8 +312,9 @@ export default function HarpForm() {
                         control={form.control}
                         name="department"
                         render={({ field }) => (
-                          <FormItem>
+                          <FormItem className="grid grid-cols-1 md:grid-cols-2 md:items-center">
                             <FormLabel>Department<span className="text-red-500">*</span></FormLabel>
+                            <div>
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                                 <FormControl>
                                 <SelectTrigger>
@@ -318,10 +325,11 @@ export default function HarpForm() {
                                 {departments.map(dep => <SelectItem key={dep} value={dep}>{dep}</SelectItem>)}
                                 </SelectContent>
                             </Select>
-                            <FormDescription>
+                            <FormDescription className="mt-2">
                                 Select the Department specifically from the list.
                             </FormDescription>
-                            <FormMessage />
+                            <FormMessage className="mt-2" />
+                            </div>
                           </FormItem>
                         )}
                       />
@@ -329,8 +337,9 @@ export default function HarpForm() {
                         control={form.control}
                         name="block"
                         render={({ field }) => (
-                          <FormItem>
+                          <FormItem className="grid grid-cols-1 md:grid-cols-2 md:items-center">
                             <FormLabel>Block<span className="text-red-500">*</span></FormLabel>
+                             <div>
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                                 <FormControl>
                                 <SelectTrigger>
@@ -341,10 +350,11 @@ export default function HarpForm() {
                                 {blocks.map(b => <SelectItem key={b} value={b}>{b}</SelectItem>)}
                                 </SelectContent>
                             </Select>
-                            <FormDescription>
+                            <FormDescription className="mt-2">
                                 Select the Block specifically from the list.
                             </FormDescription>
-                            <FormMessage />
+                            <FormMessage className="mt-2" />
+                            </div>
                           </FormItem>
                         )}
                       />
@@ -352,8 +362,9 @@ export default function HarpForm() {
                         control={form.control}
                         name="floor"
                         render={({ field }) => (
-                           <FormItem>
+                           <FormItem className="grid grid-cols-1 md:grid-cols-2 md:items-center">
                             <FormLabel>Floor<span className="text-red-500">*</span></FormLabel>
+                             <div>
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                                 <FormControl>
                                 <SelectTrigger>
@@ -364,10 +375,11 @@ export default function HarpForm() {
                                 {floors.map(f => <SelectItem key={f} value={f}>{f}</SelectItem>)}
                                 </SelectContent>
                             </Select>
-                            <FormDescription>
+                            <FormDescription className="mt-2">
                                Select the Block specifically from the list.
                             </FormDescription>
-                            <FormMessage />
+                            <FormMessage className="mt-2" />
+                            </div>
                           </FormItem>
                         )}
                       />
@@ -375,12 +387,14 @@ export default function HarpForm() {
                         control={form.control}
                         name="activity"
                         render={({ field }) => (
-                          <FormItem>
+                          <FormItem className="grid grid-cols-1 md:grid-cols-2 md:items-center">
                             <FormLabel>Activity<span className="text-red-500">*</span></FormLabel>
+                            <div>
                             <FormControl>
                               <Input placeholder="Enter activity" {...field} />
                             </FormControl>
-                            <FormMessage />
+                            <FormMessage className="mt-2" />
+                            </div>
                           </FormItem>
                         )}
                       />
@@ -388,8 +402,9 @@ export default function HarpForm() {
                         control={form.control}
                         name="carriedOutBy"
                         render={({ field }) => (
-                          <FormItem>
+                          <FormItem className="grid grid-cols-1 md:grid-cols-2 md:items-center">
                             <FormLabel>Carried Out By<span className="text-red-500">*</span></FormLabel>
+                            <div>
                              <Select onValueChange={field.onChange} defaultValue={field.value}>
                                 <FormControl>
                                 <SelectTrigger>
@@ -400,7 +415,8 @@ export default function HarpForm() {
                                 {people.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
                                 </SelectContent>
                             </Select>
-                            <FormMessage />
+                            <FormMessage className="mt-2" />
+                            </div>
                           </FormItem>
                         )}
                       />
@@ -408,8 +424,9 @@ export default function HarpForm() {
                         control={form.control}
                         name="employeeType"
                         render={({ field }) => (
-                          <FormItem>
+                          <FormItem className="grid grid-cols-1 md:grid-cols-2 md:items-center">
                             <FormLabel>Employee Type<span className="text-red-500">*</span></FormLabel>
+                            <div>
                              <Select onValueChange={field.onChange} defaultValue={field.value}>
                                 <FormControl>
                                 <SelectTrigger>
@@ -420,7 +437,8 @@ export default function HarpForm() {
                                 {employeeTypes.map(et => <SelectItem key={et} value={et}>{et}</SelectItem>)}
                                 </SelectContent>
                             </Select>
-                            <FormMessage />
+                            <FormMessage className="mt-2" />
+                            </div>
                           </FormItem>
                         )}
                       />
@@ -428,8 +446,9 @@ export default function HarpForm() {
                         control={form.control}
                         name="employeeName"
                         render={({ field }) => (
-                           <FormItem>
+                           <FormItem className="grid grid-cols-1 md:grid-cols-2 md:items-center">
                             <FormLabel>Employee Name<span className="text-red-500">*</span></FormLabel>
+                            <div>
                              <Select onValueChange={field.onChange} defaultValue={field.value}>
                                 <FormControl>
                                 <SelectTrigger>
@@ -440,7 +459,8 @@ export default function HarpForm() {
                                 {people.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
                                 </SelectContent>
                             </Select>
-                            <FormMessage />
+                            <FormMessage className="mt-2" />
+                            </div>
                           </FormItem>
                         )}
                       />
@@ -448,8 +468,9 @@ export default function HarpForm() {
                         control={form.control}
                         name="employeeId"
                         render={({ field }) => (
-                          <FormItem>
+                          <FormItem className="grid grid-cols-1 md:grid-cols-2 md:items-center">
                             <FormLabel>Employee ID<span className="text-red-500">*</span></FormLabel>
+                            <div>
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                                 <FormControl>
                                 <SelectTrigger>
@@ -460,7 +481,8 @@ export default function HarpForm() {
                                 {employeeIds.map(id => <SelectItem key={id} value={id}>{id}</SelectItem>)}
                                 </SelectContent>
                             </Select>
-                            <FormMessage />
+                            <FormMessage className="mt-2" />
+                            </div>
                           </FormItem>
                         )}
                       />
@@ -468,8 +490,9 @@ export default function HarpForm() {
                         control={form.control}
                         name="designation"
                         render={({ field }) => (
-                          <FormItem>
+                          <FormItem className="grid grid-cols-1 md:grid-cols-2 md:items-center">
                             <FormLabel>Designation<span className="text-red-500">*</span></FormLabel>
+                            <div>
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                                 <FormControl>
                                 <SelectTrigger>
@@ -480,7 +503,8 @@ export default function HarpForm() {
                                 {designations.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}
                                 </SelectContent>
                             </Select>
-                            <FormMessage />
+                            <FormMessage className="mt-2" />
+                            </div>
                           </FormItem>
                         )}
                       />
@@ -488,8 +512,9 @@ export default function HarpForm() {
                         control={form.control}
                         name="employeeDepartment"
                         render={({ field }) => (
-                          <FormItem>
+                          <FormItem className="grid grid-cols-1 md:grid-cols-2 md:items-center">
                             <FormLabel>Employee Department<span className="text-red-500">*</span></FormLabel>
+                            <div>
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                                 <FormControl>
                                 <SelectTrigger>
@@ -500,7 +525,8 @@ export default function HarpForm() {
                                 {employeeDepartments.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}
                                 </SelectContent>
                             </Select>
-                            <FormMessage />
+                            <FormMessage className="mt-2" />
+                            </div>
                           </FormItem>
                         )}
                       />
@@ -515,8 +541,9 @@ export default function HarpForm() {
                         control={form.control}
                         name="hazard"
                         render={({ field }) => (
-                          <FormItem>
+                          <FormItem className="grid grid-cols-1 md:grid-cols-2 md:items-center">
                             <FormLabel>Hazard<span className="text-red-500">*</span></FormLabel>
+                            <div>
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl>
                                 <SelectTrigger>
@@ -527,7 +554,8 @@ export default function HarpForm() {
                                 {hazards.map(h => <SelectItem key={h} value={h}>{h}</SelectItem>)}
                               </SelectContent>
                             </Select>
-                            <FormMessage />
+                            <FormMessage className="mt-2" />
+                            </div>
                           </FormItem>
                         )}
                       />
@@ -535,12 +563,14 @@ export default function HarpForm() {
                         control={form.control}
                         name="accident"
                         render={({ field }) => (
-                          <FormItem>
+                          <FormItem className="grid grid-cols-1 md:grid-cols-2 md:items-center">
                             <FormLabel>Accident<span className="text-red-500">*</span></FormLabel>
+                            <div>
                             <FormControl>
                               <Input placeholder="Enter accident details" {...field} />
                             </FormControl>
-                            <FormMessage />
+                            <FormMessage className="mt-2" />
+                            </div>
                           </FormItem>
                         )}
                       />
@@ -548,8 +578,9 @@ export default function HarpForm() {
                         control={form.control}
                         name="risk"
                         render={({ field }) => (
-                          <FormItem>
+                          <FormItem className="grid grid-cols-1 md:grid-cols-2 md:items-center">
                             <FormLabel>Risk<span className="text-red-500">*</span></FormLabel>
+                            <div>
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl>
                                 <SelectTrigger>
@@ -560,7 +591,8 @@ export default function HarpForm() {
                                 {risks.map(r => <SelectItem key={r} value={r}>{r}</SelectItem>)}
                               </SelectContent>
                             </Select>
-                            <FormMessage />
+                            <FormMessage className="mt-2" />
+                            </div>
                           </FormItem>
                         )}
                       />
@@ -568,12 +600,14 @@ export default function HarpForm() {
                         control={form.control}
                         name="prevention"
                         render={({ field }) => (
-                          <FormItem>
+                          <FormItem className="grid grid-cols-1 md:grid-cols-2 md:items-start">
                             <FormLabel>Prevention<span className="text-red-500">*</span></FormLabel>
+                            <div>
                             <FormControl>
                               <Textarea placeholder="Describe prevention measures" {...field} />
                             </FormControl>
-                            <FormMessage />
+                            <FormMessage className="mt-2" />
+                            </div>
                           </FormItem>
                         )}
                       />
@@ -588,24 +622,28 @@ export default function HarpForm() {
                         control={form.control}
                         name="otherObservation"
                         render={({ field }) => (
-                          <FormItem>
+                          <FormItem className="grid grid-cols-1 md:grid-cols-2 md:items-start">
                             <FormLabel>Other Observation/Support Required</FormLabel>
+                            <div>
                             <FormControl>
                               <Textarea placeholder="Enter your observations" {...field} />
                             </FormControl>
-                            <FormMessage />
+                            <FormMessage className="mt-2" />
+                            </div>
                           </FormItem>
                         )}
                       />
-                      <FormItem>
+                      <FormItem className="grid grid-cols-1 md:grid-cols-2 md:items-center">
                         <FormLabel>Upload Attachment(s) If Any</FormLabel>
+                        <div>
                         <FormControl>
                           <Input type="file" />
                         </FormControl>
-                        <FormDescription>
+                        <FormDescription className="mt-2">
                           Select/Drag and Drop Attachment.
                         </FormDescription>
-                        <FormMessage />
+                        <FormMessage className="mt-2" />
+                        </div>
                       </FormItem>
                     
                   </AccordionContent>
