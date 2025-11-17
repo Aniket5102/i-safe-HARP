@@ -77,7 +77,7 @@ const formSchema = z.object({
   hazard: z.string().min(1, "Hazard is required.").max(100),
   accident: z.string().min(1, "Accident is required.").max(100),
   risk: z.string().min(1, "Risk is required.").max(100),
-  prevention: z.string().min(1, "Prevention is required.").max(500),
+  prevention: z.string().min(1, "Prevention is required.").max(100),
   otherObservation: z.string().max(500).optional(),
 });
 
