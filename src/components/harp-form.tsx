@@ -123,32 +123,35 @@ export default function HarpForm() {
     }
 
     setIsSubmitting(true);
-    try {
-        const docData = {
-            ...values,
-            otherObservation: values.otherObservation || null,
-            harpId: `HARP-${Date.now()}`,
-            createdAt: serverTimestamp()
-        };
+    
+    const docData = {
+        ...values,
+        otherObservation: values.otherObservation || null,
+        harpId: `HARP-${Date.now()}`,
+        createdAt: serverTimestamp()
+    };
 
-        const incidentsCollection = collection(firestore, 'harp-incidents');
-        await addDoc(incidentsCollection, docData);
-
+    const incidentsCollection = collection(firestore, 'harp-incidents');
+    
+    addDoc(incidentsCollection, docData)
+      .then(() => {
         toast({
             title: "Success!",
             description: "HARP data has been saved.",
         });
         form.reset();
-    } catch (error) {
+      })
+      .catch((error) => {
         console.error("Error adding document: ", error);
         toast({
             variant: "destructive",
             title: "Uh oh! Something went wrong.",
             description: "There was a problem with your request.",
         });
-    } finally {
+      })
+      .finally(() => {
         setIsSubmitting(false);
-    }
+      });
   }
 
   const handleGenerateQrCode = () => {
@@ -705,3 +708,5 @@ export default function HarpForm() {
     </>
   );
 }
+
+    
