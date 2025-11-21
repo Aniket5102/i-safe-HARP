@@ -15,16 +15,18 @@ let auth: Auth;
 let firestore: Firestore;
 
 function initializeFirebase() {
-  if (getApps().length === 0) {
-    firebaseApp = initializeApp(firebaseConfig);
-  } else {
-    firebaseApp = getApp();
+  if (typeof window !== 'undefined') {
+    if (getApps().length === 0) {
+      firebaseApp = initializeApp(firebaseConfig);
+    } else {
+      firebaseApp = getApp();
+    }
+    auth = getAuth(firebaseApp);
+    firestore = getFirestore(firebaseApp);
   }
-  auth = getAuth(firebaseApp);
-  firestore = getFirestore(firebaseApp);
-
-  return { firebaseApp, auth, firestore };
 }
+
+initializeFirebase();
 
 // Export a function to get the initialized instances
 export function getFirebase() {
