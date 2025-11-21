@@ -1,7 +1,7 @@
 
 'use client';
 
-import { createContext, useContext, ReactNode } from 'react';
+import { createContext, useContext, ReactNode, useEffect, useState } from 'react';
 import { getFirebase } from '.';
 import { FirebaseApp } from 'firebase/app';
 import { Auth } from 'firebase/auth';
@@ -20,9 +20,21 @@ const FirebaseContext = createContext<FirebaseContextType>({
 });
 
 export const FirebaseProvider = ({ children }: { children: ReactNode }) => {
-  const { firebaseApp, auth, firestore } = getFirebase();
+  const [firebaseInstances, setFirebaseInstances] = useState<FirebaseContextType>({
+    firebaseApp: null,
+    auth: null,
+    firestore: null,
+  });
+
+  useEffect(() => {
+    // getFirebase initializes and returns the instances.
+    // We do this in a useEffect to ensure it runs only on the client.
+    const { firebaseApp, auth, firestore } = getFirebase();
+    setFirebaseInstances({ firebaseApp, auth, firestore });
+  }, []);
+
   return (
-    <FirebaseContext.Provider value={{ firebaseApp, auth, firestore }}>
+    <FirebaseContext.Provider value={firebaseInstances}>
       {children}
     </FirebaseContext.Provider>
   );
@@ -39,6 +51,8 @@ export const useFirebase = () => {
 export const useFirebaseApp = () => {
     const { firebaseApp } = useFirebase();
     if (!firebaseApp) {
+        // This might be thrown on initial server render, but will be available on client.
+        // Or if there is a legitimate error.
         throw new Error('Firebase App not available.');
     }
     return firebaseApp;
