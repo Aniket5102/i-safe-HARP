@@ -11,6 +11,7 @@ import {
   SidebarTrigger,
 } from '@/components/ui/sidebar';
 import SidebarNav from '@/components/sidebar-nav';
+import { FirebaseClientProvider } from '@/firebase/client-provider';
 
 
 export const metadata: Metadata = {
@@ -31,23 +32,25 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400;1-700&family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased">
-        <SidebarProvider>
-          <div className="flex">
-            <Sidebar className="border-r">
-              <SidebarHeader>
-                <SidebarTrigger />
-              </SidebarHeader>
-              <SidebarContent>
-                <SidebarNav />
-              </SidebarContent>
-            </Sidebar>
-            <div className="flex-1 flex flex-col">
-              <Header />
-              {children}
+        <FirebaseClientProvider>
+          <SidebarProvider>
+            <div className="flex">
+              <Sidebar className="border-r">
+                <SidebarHeader>
+                  <SidebarTrigger />
+                </SidebarHeader>
+                <SidebarContent>
+                  <SidebarNav />
+                </SidebarContent>
+              </Sidebar>
+              <div className="flex-1 flex flex-col">
+                <Header />
+                {children}
+              </div>
             </div>
-          </div>
-          <Toaster />
-        </SidebarProvider>
+            <Toaster />
+          </SidebarProvider>
+        </FirebaseClientProvider>
       </body>
     </html>
   );
