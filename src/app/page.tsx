@@ -39,30 +39,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { App, apps } from '@/lib/apps-data';
 
 const modules = [
   { name: 'Calendar', icon: CalendarDays },
   { name: 'Inspections & Audits', icon: FileText },
   { name: 'Incident Management', icon: HardHat },
   { name: 'Risk Assessment', icon: ClipboardCheck },
-];
-
-type App = {
-  name: string;
-  subtitle?: string;
-  imageUrl: string;
-  imageHint: string;
-  href: string;
-};
-
-const apps: App[] = [
-  { name: 'QUALITY SUSA', subtitle: 'SUSA Reporting...', imageUrl: 'https://picsum.photos/seed/quality-assurance/200/200', imageHint: 'quality assurance', href: '#' },
-  { name: 'Quality Incident Repor...', imageUrl: 'https://picsum.photos/seed/incident-documentation/200/200', imageHint: 'incident documentation', href: '#' },
-  { name: 'Permit To Work V2.0', imageUrl: 'https://picsum.photos/seed/safety-permit/200/200', imageHint: 'safety permit', href: '#' },
-  { name: 'Permit To Work (Obsolete)', imageUrl: 'https://picsum.photos/seed/archive-documents/200/200', imageHint: 'archive documents', href: '#' },
-  { name: 'Employee Check In', subtitle: 'Employee Self C...', imageUrl: 'https://picsum.photos/seed/worker-check-in/200/200', imageHint: 'worker check in', href: '#' },
-  { name: 'HARP', imageUrl: 'https://picsum.photos/seed/risk-analysis/200/200', imageHint: 'risk analysis', href: '/harp' },
-  { name: 'BBS', imageUrl: 'https://picsum.photos/seed/safety-observation/200/200', imageHint: 'safety observation', href: '#' },
 ];
 
 const quickLinks = {

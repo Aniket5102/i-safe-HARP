@@ -8,7 +8,7 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
 } from '@/components/ui/sidebar';
-import { Home, Link, LayoutGrid, PenSquare, Settings } from 'lucide-react';
+import { Home, Link as LinkIcon, LayoutGrid, Settings } from 'lucide-react';
 import IdeagenLogo from '@/components/ideagen-logo';
 
 export default function SidebarNav() {
@@ -17,7 +17,7 @@ export default function SidebarNav() {
   const menuItems = [
     { href: '/', icon: Home, label: 'Home', tooltip: 'Home' },
     { href: '/modules', icon: LayoutGrid, label: 'Modules', tooltip: 'Modules' },
-    { href: '/apps', icon: Link, label: 'Apps', tooltip: 'Apps' },
+    { href: '/apps', icon: LinkIcon, label: 'Apps', tooltip: 'Apps' },
     { href: '/setup', icon: Settings, label: 'Setup', tooltip: 'Setup' },
   ];
 
