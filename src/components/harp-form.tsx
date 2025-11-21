@@ -124,13 +124,13 @@ export default function HarpForm() {
 
     setIsSubmitting(true);
     try {
-        const incidentsCollection = collection(firestore, 'harp-incidents');
         const docData = {
             ...values,
-            harpId: `HARP-${Date.now()}`, // Temporary unique ID
+            harpId: `HARP-${Date.now()}`,
             createdAt: serverTimestamp()
         };
 
+        const incidentsCollection = collection(firestore, 'harp-incidents');
         await addDoc(incidentsCollection, docData);
 
         toast({
@@ -665,7 +665,7 @@ export default function HarpForm() {
           </Form>
         </CardContent>
         <CardFooter className="flex flex-col sm:flex-row justify-end gap-4">
-          <Button type="submit" onClick={form.handleSubmit(onSubmit)} disabled={isSubmitting}>
+          <Button type="submit" onClick={form.handleSubmit(onSubmit)} disabled={isSubmitting || !firestore}>
             {isSubmitting ? <Loader2 className="animate-spin" /> : <Printer />}
             Raise HARP Incident
           </Button>

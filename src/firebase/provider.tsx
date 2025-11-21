@@ -50,26 +50,16 @@ export const useFirebase = () => {
 
 export const useFirebaseApp = () => {
     const { firebaseApp } = useFirebase();
-    if (!firebaseApp) {
-        // This might be thrown on initial server render, but will be available on client.
-        // Or if there is a legitimate error.
-        throw new Error('Firebase App not available.');
-    }
+    // This might be null on initial server render, but will be available on client.
     return firebaseApp;
 };
 
 export const useAuth = () => {
     const { auth } = useFirebase();
-    if (!auth) {
-        throw new Error('Firebase Auth not available.');
-    }
     return auth;
 };
 
 export const useFirestore = () => {
     const { firestore } = useFirebase();
-    if (!firestore) {
-        throw new Error('Firestore not available.');
-    }
     return firestore;
 };
