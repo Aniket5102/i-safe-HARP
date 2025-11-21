@@ -415,8 +415,10 @@ interface AppOptionsDialogProps {
 }
 
 function AppOptionsDialog({ app, isOpen, onOpenChange }: AppOptionsDialogProps) {
+  const dataHref = app.name.toLowerCase().includes('harp') ? '/harp/data' : `${app.href}/data`;
+  
   const options = [
-    { name: 'Data', icon: Database, href: `${app.href}/data` },
+    { name: 'Data', icon: Database, href: dataHref },
     { name: 'Modify', icon: PenSquare, href: `${app.href}/modify` },
     { name: 'New', icon: PlusCircle, href: app.href },
   ];
