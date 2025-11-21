@@ -59,9 +59,10 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import Image from "next/image";
 import { Textarea } from "./ui/textarea";
+import { useFirestore } from "@/firebase";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
 const formSchema = z.object({
-  harpId: z.string().max(100).optional(),
   date: z.date({ required_error: "A date is required." }),
   location: z.string().min(1, "Location is required.").max(100),
   department: z.string().min(1, "Department is required.").max(100),
@@ -97,6 +98,7 @@ const risks = ["Medium", "high", "low"];
 
 export default function HarpForm() {
   const { toast } = useToast();
+  const firestore = useFirestore();
   const formRef = React.useRef<HTMLDivElement>(null);
   const qrCodeRef = React.useRef<HTMLDivElement>(null);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
@@ -105,22 +107,47 @@ export default function HarpForm() {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-        harpId: "",
         activity: "",
         accident: "Exposure to chemical while charging",
     },
   });
 
   async function onSubmit(values: FormValues) {
+    if (!firestore) {
+        toast({
+            variant: "destructive",
+            title: "Error",
+            description: "Firestore is not available. Please try again later.",
+        });
+        return;
+    }
+
     setIsSubmitting(true);
-    console.log(values);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setIsSubmitting(false);
-    toast({
-      title: "Success!",
-      description: "HARP data has been saved.",
-    });
+    try {
+        const incidentsCollection = collection(firestore, 'harp-incidents');
+        const docData = {
+            ...values,
+            harpId: `HARP-${Date.now()}`, // Temporary unique ID
+            createdAt: serverTimestamp()
+        };
+
+        await addDoc(incidentsCollection, docData);
+
+        toast({
+            title: "Success!",
+            description: "HARP data has been saved.",
+        });
+        form.reset();
+    } catch (error) {
+        console.error("Error adding document: ", error);
+        toast({
+            variant: "destructive",
+            title: "Uh oh! Something went wrong.",
+            description: "There was a problem with your request.",
+        });
+    } finally {
+        setIsSubmitting(false);
+    }
   }
 
   const handleGenerateQrCode = () => {
@@ -142,7 +169,7 @@ export default function HarpForm() {
       const imgData = canvas.toDataURL("image/png");
       const link = document.createElement('a');
       link.href = imgData;
-      link.download = `harp-qr-code-${form.getValues("harpId") || 'export'}.png`;
+      link.download = `harp-qr-code.png`;
       link.click();
       toast({ title: "Success", description: "QR Code download has started." });
     } catch (error) {
@@ -184,7 +211,7 @@ export default function HarpForm() {
         imgWidth * ratio,
         imgHeight * ratio
       );
-      pdf.save(`harp-incident-${form.getValues("harpId") || 'export'}.pdf`);
+      pdf.save(`harp-incident.pdf`);
       toast({ title: "Success", description: "PDF export has started." });
     } catch (error) {
       toast({
@@ -223,26 +250,11 @@ export default function HarpForm() {
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <Accordion type="multiple" className="w-full" >
+              <Accordion type="multiple" className="w-full" defaultValue={["general-details", "harp-details", "other-details"]} >
                 <AccordionItem value="general-details">
                   <AccordionTrigger className="text-lg font-semibold">General Details</AccordionTrigger>
                   <AccordionContent className="pt-4 grid grid-cols-1 gap-y-4">
                     
-                       <FormField
-                        control={form.control}
-                        name="harpId"
-                        render={({ field }) => (
-                          <FormItem className="grid grid-cols-1 md:grid-cols-2 md:items-center">
-                            <FormLabel>HARP ID #</FormLabel>
-                            <div>
-                              <FormControl>
-                                <Input placeholder="Generated on incident creation" {...field} />
-                              </FormControl>
-                              <FormMessage className="mt-2" />
-                            </div>
-                          </FormItem>
-                        )}
-                      />
                       <FormField
                         control={form.control}
                         name="date"
@@ -692,9 +704,3 @@ export default function HarpForm() {
     </>
   );
 }
- 
-    
-
-    
-
-    
