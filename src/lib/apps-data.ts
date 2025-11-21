@@ -25,7 +25,7 @@ export const apps: App[] = [
   { 
     name: 'Permit To Work V2.0',
     subtitle: 'Permit To Work v2.0',
-    imageUrl: 'https://picsum.photos/seed/safety-permit/200/200', 
+    imageUrl: 'https://picsum.photos/seed/safety-permit/200/200',
     imageHint: 'safety permit', 
     href: '#' 
   },
@@ -34,7 +34,7 @@ export const apps: App[] = [
     subtitle: 'Permit To Work (Obsolete)',
     imageUrl: 'https://picsum.photos/seed/archive-documents/200/200', 
     imageHint: 'archive documents', 
-    href: '#' 
+    href: '#'
   },
   { 
     name: 'Employee Check In', 
