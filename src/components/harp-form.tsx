@@ -126,6 +126,7 @@ export default function HarpForm() {
     try {
         const docData = {
             ...values,
+            otherObservation: values.otherObservation || null,
             harpId: `HARP-${Date.now()}`,
             createdAt: serverTimestamp()
         };
