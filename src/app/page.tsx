@@ -25,10 +25,20 @@ import {
   ClipboardCheck,
   CheckCircle,
   X,
+  Database,
+  PenSquare,
+  PlusCircle,
 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Input } from '@/components/ui/input';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 const modules = [
   { name: 'Calendar', icon: CalendarDays },
@@ -37,7 +47,15 @@ const modules = [
   { name: 'Risk Assessment', icon: ClipboardCheck },
 ];
 
-const apps = [
+type App = {
+  name: string;
+  subtitle?: string;
+  imageUrl: string;
+  imageHint: string;
+  href: string;
+};
+
+const apps: App[] = [
   { name: 'QUALITY SUSA', subtitle: 'SUSA Reporting...', imageUrl: 'https://picsum.photos/seed/quality-assurance/200/200', imageHint: 'quality assurance', href: '#' },
   { name: 'Quality Incident Repor...', imageUrl: 'https://picsum.photos/seed/incident-documentation/200/200', imageHint: 'incident documentation', href: '#' },
   { name: 'Permit To Work V2.0', imageUrl: 'https://picsum.photos/seed/safety-permit/200/200', imageHint: 'safety permit', href: '#' },
@@ -67,6 +85,7 @@ export default function HomePage() {
     apps: false,
     quickLinks: false,
   });
+  const [selectedApp, setSelectedApp] = useState<App | null>(null);
 
   const handleSearchChange = (card: keyof typeof searchTerms, value: string) => {
     setSearchTerms(prev => ({ ...prev, [card]: value }));
@@ -123,10 +142,22 @@ export default function HomePage() {
               onSearchChange={(value) => handleSearchChange('apps', value)}
               showSearch={showSearch.apps}
               onToggleSearch={() => toggleSearch('apps')}
+              onAppClick={setSelectedApp}
             />
           </div>
         </div>
       </div>
+      {selectedApp && (
+        <AppOptionsDialog
+          app={selectedApp}
+          isOpen={!!selectedApp}
+          onOpenChange={(isOpen) => {
+            if (!isOpen) {
+              setSelectedApp(null);
+            }
+          }}
+        />
+      )}
     </div>
   );
 }
@@ -279,7 +310,11 @@ function ModulesCard({ searchTerm, onSearchChange, showSearch, onToggleSearch }:
   );
 }
 
-function AppsCard({ searchTerm, onSearchChange, showSearch, onToggleSearch }: CardSearchProps) {
+interface AppsCardProps extends CardSearchProps {
+  onAppClick: (app: App) => void;
+}
+
+function AppsCard({ searchTerm, onSearchChange, showSearch, onToggleSearch, onAppClick }: AppsCardProps) {
   const filteredApps = apps.filter(app =>
     app.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     app.subtitle?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -314,7 +349,7 @@ function AppsCard({ searchTerm, onSearchChange, showSearch, onToggleSearch }: Ca
       <CardContent>
         <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
           {filteredApps.map((app) => (
-             <Link key={app.name} href={app.href || '#'} className="flex flex-col items-center text-center no-underline text-current">
+             <button key={app.name} onClick={() => onAppClick(app)} className="flex flex-col items-center text-center no-underline text-current cursor-pointer hover:bg-gray-100 rounded-lg p-2 transition-colors">
               <div className="p-2 rounded-lg bg-gray-100 mb-2 h-20 w-20 flex items-center justify-center">
                 <Image 
                   src={app.imageUrl} 
@@ -327,7 +362,7 @@ function AppsCard({ searchTerm, onSearchChange, showSearch, onToggleSearch }: Ca
               </div>
               <p className="text-xs font-semibold">{app.name}</p>
                {app.subtitle && <p className="text-xs text-gray-500">{app.subtitle}</p>}
-            </Link>
+            </button>
           ))}
         </div>
       </CardContent>
@@ -386,5 +421,40 @@ function QuickLinksCard({ searchTerm, onSearchChange, showSearch, onToggleSearch
         </div>
       </CardContent>
     </Card>
+  );
+}
+
+
+interface AppOptionsDialogProps {
+  app: App;
+  isOpen: boolean;
+  onOpenChange: (isOpen: boolean) => void;
+}
+
+function AppOptionsDialog({ app, isOpen, onOpenChange }: AppOptionsDialogProps) {
+  const options = [
+    { name: 'Data', icon: Database, href: `${app.href}/data` },
+    { name: 'Modify', icon: PenSquare, href: `${app.href}/modify` },
+    { name: 'New', icon: PlusCircle, href: app.href },
+  ];
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-xs">
+        <DialogHeader>
+          <DialogTitle>{app.name}</DialogTitle>
+        </DialogHeader>
+        <div className="flex flex-col space-y-2">
+          {options.map((option) => (
+            <Link key={option.name} href={option.href} passHref>
+              <Button variant="outline" className="w-full justify-start text-base p-6 bg-blue-50 border-blue-200 hover:bg-blue-100">
+                <option.icon className="mr-3 h-5 w-5 text-blue-600" />
+                {option.name}
+              </Button>
+            </Link>
+          ))}
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
