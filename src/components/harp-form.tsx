@@ -61,6 +61,7 @@ import Image from "next/image";
 import { Textarea } from "./ui/textarea";
 import { useFirestore } from "@/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { useRouter } from 'next/navigation';
 
 const formSchema = z.object({
   date: z.date({ required_error: "A date is required." }),
@@ -99,6 +100,7 @@ const risks = ["Medium", "high", "low"];
 export default function HarpForm() {
   const { toast } = useToast();
   const firestore = useFirestore();
+  const router = useRouter();
   const formRef = React.useRef<HTMLDivElement>(null);
   const qrCodeRef = React.useRef<HTMLDivElement>(null);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
@@ -112,7 +114,7 @@ export default function HarpForm() {
     },
   });
 
-  async function onSubmit(values: FormValues) {
+  function onSubmit(values: FormValues) {
     if (!firestore) {
         toast({
             variant: "destructive",
@@ -237,7 +239,7 @@ export default function HarpForm() {
             </CardDescription>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline">
+            <Button variant="outline" onClick={() => router.back()}>
               <ChevronLeft />
               Back
             </Button>
@@ -708,5 +710,3 @@ export default function HarpForm() {
     </>
   );
 }
-
-    
