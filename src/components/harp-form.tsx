@@ -136,6 +136,12 @@ export default function HarpForm() {
     const incidentsCollection = collection(firestore, 'harp-incidents');
     
     addDoc(incidentsCollection, docData)
+      .then((docRef) => {
+        toast({
+            title: "Success!",
+            description: `HARP Incident has been raised with incident ID: ${docData.harpId}`,
+        });
+      })
       .catch((error) => {
         console.error("Error adding document: ", error);
         toast({
@@ -146,13 +152,8 @@ export default function HarpForm() {
       })
       .finally(() => {
         setIsSubmitting(false);
+        form.reset();
       });
-      
-    toast({
-        title: "Success!",
-        description: "HARP data has been saved.",
-    });
-    form.reset();
   }
 
   const handleGenerateQrCode = () => {
