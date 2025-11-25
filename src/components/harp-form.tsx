@@ -136,25 +136,26 @@ export default function HarpForm() {
 
     const incidentsCollection = collection(firestore, 'harp-incidents');
     
+    // Show toast immediately for a better user experience
+    toast({
+        title: "Success!",
+        description: `HARP Incident has been raised with incident ID: ${docData.harpId}`,
+    });
+    
     addDoc(incidentsCollection, docData)
-      .then((docRef) => {
-        toast({
-            title: "Success!",
-            description: `HARP Incident has been raised with incident ID: ${docData.harpId}`,
-        });
-      })
       .catch((error) => {
         console.error("Error adding document: ", error);
+        // If there's an error, show a destructive toast.
         toast({
             variant: "destructive",
             title: "Uh oh! Something went wrong.",
-            description: "There was a problem with your request.",
+            description: "There was a problem saving your incident in the background.",
         });
-      })
-      .finally(() => {
-        setIsSubmitting(false);
-        form.reset();
       });
+
+    // Reset form and submitting state immediately
+    form.reset();
+    setIsSubmitting(false);
   }
 
   const handleGenerateQrCode = () => {
