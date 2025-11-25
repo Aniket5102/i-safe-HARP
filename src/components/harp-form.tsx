@@ -105,6 +105,7 @@ export default function HarpForm() {
   const qrCodeRef = React.useRef<HTMLDivElement>(null);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [qrCodeValue, setQrCodeValue] = React.useState<string | null>(null);
+  const [isDatePickerOpen, setIsDatePickerOpen] = React.useState(false);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -268,7 +269,7 @@ export default function HarpForm() {
                           <FormItem className="grid grid-cols-1 md:grid-cols-2 md:items-center">
                             <FormLabel>Date<span className="text-red-500">*</span></FormLabel>
                             <div>
-                            <Popover>
+                            <Popover open={isDatePickerOpen} onOpenChange={setIsDatePickerOpen}>
                               <PopoverTrigger asChild>
                                 <FormControl>
                                   <Button
@@ -291,7 +292,10 @@ export default function HarpForm() {
                                 <Calendar
                                   mode="single"
                                   selected={field.value}
-                                  onSelect={field.onChange}
+                                  onSelect={(date) => {
+                                      field.onChange(date);
+                                      setIsDatePickerOpen(false);
+                                  }}
                                   disabled={(date) =>
                                     date > new Date() || date < new Date("1900-01-01")
                                   }
