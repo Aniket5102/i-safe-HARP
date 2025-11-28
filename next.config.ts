@@ -27,7 +27,7 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'picsum.photos',
         port: '',
-        pathname: '/**',
+pathname: '/**',
       },
       {
         protocol: 'https'
@@ -51,6 +51,12 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'www.freelogovectors.net',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'img.freepik.com',
         port: '',
         pathname: '/**',
       }
