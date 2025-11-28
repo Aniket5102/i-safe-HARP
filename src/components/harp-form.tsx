@@ -669,15 +669,15 @@ export default function HarpForm() {
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>
+              <div className="flex flex-col sm:flex-row justify-end gap-4 pt-4">
+                <Button type="submit" disabled={isSubmitting || !firestore}>
+                  {isSubmitting ? <Loader2 className="animate-spin" /> : <Printer />}
+                  Raise HARP Incident
+                </Button>
+              </div>
             </form>
           </Form>
         </CardContent>
-        <CardFooter className="flex flex-col sm:flex-row justify-end gap-4">
-          <Button type="submit" onClick={form.handleSubmit(onSubmit)} disabled={isSubmitting || !firestore}>
-            {isSubmitting ? <Loader2 className="animate-spin" /> : <Printer />}
-            Raise HARP Incident
-          </Button>
-        </CardFooter>
       </Card>
       
       <Dialog open={!!qrCodeValue} onOpenChange={(open) => !open && setQrCodeValue(null)}>
