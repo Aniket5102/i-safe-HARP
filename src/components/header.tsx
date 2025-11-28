@@ -71,7 +71,7 @@ export default function Header() {
         </div>
       </div>
       <div
-        style={{ backgroundColor: '#C7D8EF' }}
+        style={{ backgroundColor: '#0d9488' }}
         className="h-12 flex items-center"
       >
         <div className="container mx-auto px-4 flex justify-between items-center">
