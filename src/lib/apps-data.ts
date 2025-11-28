@@ -11,7 +11,7 @@ export const apps: App[] = [
   { 
     name: 'QUALITY SUSA', 
     subtitle: 'SUSA Reporting for i-Safe Quality Team', 
-    imageUrl: 'https://storage.googleapis.com/project-spark-previews-prod/2a07c393-274e-4b72-9114-6330a11c1d00/image_0.png',
+    imageUrl: 'https://picsum.photos/seed/quality-susa/200/200',
     imageHint: 'quality safety logo', 
     href: '#' 
   },
