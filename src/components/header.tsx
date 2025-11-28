@@ -19,7 +19,6 @@ import {
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import AsianPaintsLogo from "./asian-paints-logo";
-import ISafeLogo from "./i-safe-logo";
 
 export default function Header() {
   return (
@@ -29,7 +28,11 @@ export default function Header() {
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
               <AsianPaintsLogo />
-              <ISafeLogo className="h-10 w-10" />
+              <img
+                src="https://img.freepik.com/premium-vector/safety-first-logo-design-shield-helmet-construction-safely-workplace-factory-logo-banner_521317-1381.jpg"
+                alt="i-safe Logo"
+                className="h-10 w-10"
+              />
               <span className="text-lg font-light text-gray-600 tracking-wider">
                 i-safe
               </span>
@@ -82,4 +85,3 @@ export default function Header() {
       </div>
     </header>
   );
-}
