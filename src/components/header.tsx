@@ -71,7 +71,7 @@ export default function Header() {
         </div>
       </div>
       <div
-        style={{ backgroundColor: 'hsl(var(--royal-glitter))' }}
+        style={{ backgroundColor: '#3F51B5' }}
         className="h-12 flex items-center"
       >
         <div className="container mx-auto px-4 flex justify-between items-center">
