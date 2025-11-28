@@ -1,9 +1,8 @@
 
 import * as React from "react";
-import Image from "next/image";
 
-const AsianPaintsLogo = (props: React.SVGProps<SVGSVGElement>) => (
-  <Image
+const AsianPaintsLogo = (props: React.ImgHTMLAttributes<HTMLImageElement>) => (
+  <img
     src="https://upload.wikimedia.org/wikipedia/commons/c/c3/Asian_Paints_Logo.svg"
     alt="Asian Paints Logo"
     width={130}
