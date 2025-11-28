@@ -12,7 +12,6 @@ import {
   SidebarMenuSubItem,
 } from '@/components/ui/sidebar';
 import { Home, Link as LinkIcon, LayoutGrid, Settings, ChevronsUpDown, FileText, Calendar, HardHat, BarChart, Shield, ListTodo, Building, Wrench, Lock, Cog } from 'lucide-react';
-import AsianPaintsLogo from '@/components/asian-paints-logo';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useState } from 'react';
 
@@ -40,13 +39,6 @@ export default function SidebarNav() {
 
   return (
     <SidebarMenu>
-      <SidebarMenuItem>
-        <SidebarMenuButton tooltip="Asian Paints" isActive={false} className="justify-start">
-          <AsianPaintsLogo className="h-6 w-auto" />
-          <span className="group-data-[state=expanded]:inline-flex group-data-[state=collapsed]:hidden">Asian Paints</span>
-        </SidebarMenuButton>
-      </SidebarMenuItem>
-      
       <SidebarMenuItem>
           <NextLink href={'/'}>
             <SidebarMenuButton as="a" tooltip={'Home'} isActive={pathname === '/'} className="justify-start">
@@ -89,7 +81,7 @@ export default function SidebarNav() {
       
       <SidebarMenuItem>
           <NextLink href={'/apps'}>
-            <SidebarMenuButton as="a" tooltip={'Apps'} isActive={pathname === '/apps'} className="justify-start">
+            <SidebarMenuButton as="a" tooltip={'Apps'} isActive={pathname.startsWith('/apps')} className="justify-start">
               <LinkIcon />
               <span className="group-data-[state=expanded]:inline-flex group-data-[state=collapsed]:hidden">Apps</span>
             </SidebarMenuButton>
