@@ -707,7 +707,7 @@ export default function HarpForm() {
               {qrCodeValue && <QRCode value={qrCodeValue} size={256} style={{ height: "auto", maxWidth: "100%", width: "100%" }} />}
             </div>
             <p className="text-center mt-4 text-sm text-muted-foreground">
-              Scan Using Ideagen EHS Mobile App
+              Scan Using Asian Paints EHS Mobile App
             </p>
           </div>
         </DialogContent>

@@ -12,7 +12,7 @@ import {
   SidebarMenuSubItem,
 } from '@/components/ui/sidebar';
 import { Home, Link as LinkIcon, LayoutGrid, Settings, ChevronsUpDown, FileText, Calendar, HardHat, BarChart, Shield, ListTodo, Building, Wrench, Lock, Cog } from 'lucide-react';
-import IdeagenLogo from '@/components/ideagen-logo';
+import AsianPaintsLogo from '@/components/asian-paints-logo';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useState } from 'react';
 
@@ -41,9 +41,9 @@ export default function SidebarNav() {
   return (
     <SidebarMenu>
       <SidebarMenuItem>
-        <SidebarMenuButton tooltip="Ideagen" isActive={false} className="justify-start">
-          <IdeagenLogo className="h-6 w-6" />
-          <span className="group-data-[state=expanded]:inline-flex group-data-[state=collapsed]:hidden">Ideagen...</span>
+        <SidebarMenuButton tooltip="Asian Paints" isActive={false} className="justify-start">
+          <AsianPaintsLogo className="h-6 w-auto" />
+          <span className="group-data-[state=expanded]:inline-flex group-data-[state=collapsed]:hidden">Asian Paints</span>
         </SidebarMenuButton>
       </SidebarMenuItem>
       
@@ -75,12 +75,10 @@ export default function SidebarNav() {
            <SidebarMenuSub>
             {modules.map((item) => (
               <SidebarMenuSubItem key={item.name}>
-                <NextLink href={item.href} passHref>
-                  <SidebarMenuSubButton asChild isActive={pathname === item.href}>
-                    <>
-                      <item.icon />
-                      <span>{item.name}</span>
-                    </>
+                <NextLink href={item.href}>
+                  <SidebarMenuSubButton isActive={pathname === item.href}>
+                    <item.icon />
+                    <span>{item.name}</span>
                   </SidebarMenuSubButton>
                 </NextLink>
               </SidebarMenuSubItem>
@@ -117,12 +115,10 @@ export default function SidebarNav() {
            <SidebarMenuSub>
             {setupItems.map((item) => (
               <SidebarMenuSubItem key={item.name}>
-                <NextLink href={item.href} passHref>
-                  <SidebarMenuSubButton asChild isActive={pathname === item.href}>
-                    <>
-                      <item.icon />
-                      <span>{item.name}</span>
-                    </>
+                <NextLink href={item.href}>
+                  <SidebarMenuSubButton isActive={pathname === item.href}>
+                    <item.icon />
+                    <span>{item.name}</span>
                   </SidebarMenuSubButton>
                 </NextLink>
               </SidebarMenuSubItem>
