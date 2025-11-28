@@ -75,8 +75,8 @@ export default function SidebarNav() {
            <SidebarMenuSub>
             {modules.map((item) => (
               <SidebarMenuSubItem key={item.name}>
-                <NextLink href={item.href} legacyBehavior={false}>
-                  <SidebarMenuSubButton as="a" isActive={pathname === item.href}>
+                <NextLink href={item.href} legacyBehavior passHref>
+                  <SidebarMenuSubButton isActive={pathname === item.href}>
                     <item.icon />
                     <span>{item.name}</span>
                   </SidebarMenuSubButton>
@@ -115,8 +115,8 @@ export default function SidebarNav() {
            <SidebarMenuSub>
             {setupItems.map((item) => (
               <SidebarMenuSubItem key={item.name}>
-                <NextLink href={item.href} legacyBehavior={false}>
-                  <SidebarMenuSubButton as="a" isActive={pathname === item.href}>
+                <NextLink href={item.href} legacyBehavior passHref>
+                  <SidebarMenuSubButton isActive={pathname === item.href}>
                     <item.icon />
                     <span>{item.name}</span>
                   </SidebarMenuSubButton>
