@@ -1,7 +1,6 @@
 
 "use client";
 
-import Image from "next/image";
 import {
   Select,
   SelectContent,
@@ -71,7 +70,7 @@ export default function Header() {
           </div>
         </div>
       </div>
-      <div className="bg-[#3F51B5] h-12 flex items-center">
+      <div className="bg-royal-glitter h-12 flex items-center">
         <div className="container mx-auto px-4 flex justify-between items-center">
           <div className="flex items-center space-x-2 text-white">
             <LayoutGrid size={20} />
