@@ -71,17 +71,16 @@ export default function Header() {
         </div>
       </div>
       <div
-        style={{ backgroundColor: '#0d9488' }}
-        className="h-12 flex items-center"
+        className="bg-primary text-primary-foreground h-12 flex items-center"
       >
         <div className="container mx-auto px-4 flex justify-between items-center">
-          <div className="flex items-center space-x-2 text-white">
+          <div className="flex items-center space-x-2">
             <LayoutGrid size={20} />
             <span className="font-medium">Apps</span>
           </div>
           <div className="flex items-center space-x-2">
-            <span className="text-white text-xs">powered by</span>
-            <span className="text-white font-semibold">Asian Paints - Systems</span>
+            <span className="text-xs">powered by</span>
+            <span className="font-semibold">Asian Paints - Systems</span>
           </div>
         </div>
       </div>
