@@ -1,3 +1,4 @@
+
 import * as React from "react";
 
 const IdeagenLogo = (props: React.SVGProps<SVGSVGElement>) => (

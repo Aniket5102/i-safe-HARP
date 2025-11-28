@@ -20,7 +20,6 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import AsianPaintsLogo from "./asian-paints-logo";
 import ISafeLogo from "./i-safe-logo";
-import IdeagenLogo from "./ideagen-logo";
 
 export default function Header() {
   return (
@@ -77,7 +76,7 @@ export default function Header() {
           </div>
           <div className="flex items-center space-x-2">
             <span className="text-white text-xs">powered by</span>
-            <IdeagenLogo className="h-6" />
+            <span className="text-white font-semibold">Asian Paints - Systems</span>
           </div>
         </div>
       </div>
