@@ -29,7 +29,7 @@ export default function Header() {
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
               <AsianPaintsLogo />
-              <ISafeLogo className="h-8 w-8" />
+              <ISafeLogo />
               <span className="text-lg font-light text-gray-600 tracking-wider">
                 i-safe
               </span>
