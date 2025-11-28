@@ -15,18 +15,14 @@ export default function HarpDataPage() {
   const [loading, setLoading] = useState(true);
   const firestore = useFirestore();
 
-  const incidentsCollection = useMemo(() => {
-    if (!firestore) return null;
-    return collection(firestore, 'harp-incidents');
-  }, [firestore]);
-
   useEffect(() => {
-    if (!incidentsCollection) {
-      setLoading(false);
+    if (!firestore) {
+      // Firestore is not yet available, do nothing.
       return;
-    };
+    }
 
     setLoading(true);
+    const incidentsCollection = collection(firestore, 'harp-incidents');
     const unsubscribe = onSnapshot(incidentsCollection as Query<DocumentData>, (snapshot) => {
       const incidentsData = snapshot.docs.map(doc => {
         const docData = doc.data();
@@ -44,7 +40,7 @@ export default function HarpDataPage() {
     });
 
     return () => unsubscribe();
-  }, [incidentsCollection]);
+  }, [firestore]);
 
   return (
     <div className="bg-gray-50 min-h-screen p-4 sm:p-6 lg:p-8">

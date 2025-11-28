@@ -24,24 +24,29 @@ export default function HarpIncidentDetailsPage() {
   const { id } = params;
 
   useEffect(() => {
-    if (!firestore || !id) return;
-
     const fetchIncident = async () => {
-      setLoading(true);
-      const docRef = doc(firestore, 'harp-incidents', id as string);
-      const docSnap = await getDoc(docRef);
+      if (!firestore || !id) return;
 
-      if (docSnap.exists()) {
-        const data = docSnap.data() as DocumentData;
-        setIncident({ 
-            id: docSnap.id, 
-            ...data,
-            date: data.date?.toDate ? data.date.toDate() : new Date(data.date),
-        });
-      } else {
-        console.log('No such document!');
+      setLoading(true);
+      try {
+        const docRef = doc(firestore, 'harp-incidents', id as string);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          const data = docSnap.data() as DocumentData;
+          setIncident({
+              id: docSnap.id,
+              ...data,
+              date: data.date?.toDate ? data.date.toDate() : new Date(data.date),
+          });
+        } else {
+          console.log('No such document!');
+        }
+      } catch (error) {
+          console.error("Error fetching incident:", error);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     fetchIncident();
