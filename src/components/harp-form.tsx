@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -128,28 +129,31 @@ export default function HarpForm() {
     setIsSubmitting(true);
     const harpId = `HARP-${Date.now()}`;
     
-    const incidentsCollection = collection(firestore, 'harp-incidents');
-    addDoc(incidentsCollection, {
-      ...values,
-      harpId,
-      otherObservation: values.otherObservation || null,
-      createdAt: serverTimestamp(),
-    }).then(() => {
-        toast({
-            title: 'Success!',
-            description: `HARP Incident has been raised with incident ID: ${harpId}`,
+    // Optimistic UI update
+    toast({
+        title: 'Success!',
+        description: `HARP Incident has been raised with incident ID: ${harpId}`,
+    });
+    form.reset();
+    setIsSubmitting(false);
+
+    try {
+        const incidentsCollection = collection(firestore, 'harp-incidents');
+        await addDoc(incidentsCollection, {
+          ...values,
+          harpId,
+          otherObservation: values.otherObservation || null,
+          createdAt: serverTimestamp(),
         });
-        form.reset();
-    }).catch((error) => {
+    } catch (error) {
         console.error('Error adding document: ', error);
+        // Optionally, inform the user that the background save failed
         toast({
             variant: 'destructive',
             title: 'Uh oh! Something went wrong.',
-            description: 'There was a problem saving your incident. Please try again.',
+            description: 'Your incident was not saved. Please try again.',
         });
-    }).finally(() => {
-        setIsSubmitting(false);
-    });
+    }
   }
 
   const handleGenerateQrCode = () => {
