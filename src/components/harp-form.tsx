@@ -115,47 +115,44 @@ export default function HarpForm() {
     },
   });
 
-  function onSubmit(values: FormValues) {
+  async function onSubmit(values: FormValues) {
     if (!firestore) {
-        toast({
-            variant: "destructive",
-            title: "Error",
-            description: "Firestore is not available. Please try again later.",
-        });
-        return;
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Firestore is not available. Please try again later.',
+      });
+      return;
     }
 
     setIsSubmitting(true);
+    const harpId = `HARP-${Date.now()}`;
     
-    const docData = {
+    try {
+      const incidentsCollection = collection(firestore, 'harp-incidents');
+      await addDoc(incidentsCollection, {
         ...values,
+        harpId,
         otherObservation: values.otherObservation || null,
-        harpId: `HARP-${Date.now()}`,
-        createdAt: serverTimestamp()
-    };
-
-    const incidentsCollection = collection(firestore, 'harp-incidents');
-    
-    // Show toast immediately for a better user experience
-    toast({
-        title: "Success!",
-        description: `HARP Incident has been raised with incident ID: ${docData.harpId}`,
-    });
-    
-    addDoc(incidentsCollection, docData)
-      .catch((error) => {
-        console.error("Error adding document: ", error);
-        // If there's an error, show a destructive toast.
-        toast({
-            variant: "destructive",
-            title: "Uh oh! Something went wrong.",
-            description: "There was a problem saving your incident in the background.",
-        });
+        createdAt: serverTimestamp(),
       });
 
-    // Reset form and submitting state immediately
-    form.reset();
-    setIsSubmitting(false);
+      toast({
+        title: 'Success!',
+        description: `HARP Incident has been raised with incident ID: ${harpId}`,
+      });
+
+      form.reset();
+    } catch (error) {
+      console.error('Error adding document: ', error);
+      toast({
+        variant: 'destructive',
+        title: 'Uh oh! Something went wrong.',
+        description: 'There was a problem saving your incident. Please try again.',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   const handleGenerateQrCode = () => {
