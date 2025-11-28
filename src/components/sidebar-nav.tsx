@@ -48,7 +48,7 @@ export default function SidebarNav() {
       </SidebarMenuItem>
       
       <SidebarMenuItem>
-          <NextLink href={'/'} legacyBehavior={false}>
+          <NextLink href={'/'}>
             <SidebarMenuButton as="a" tooltip={'Home'} isActive={pathname === '/'} className="justify-start">
               <Home />
               <span className="group-data-[state=expanded]:inline-flex group-data-[state=collapsed]:hidden">Home</span>
@@ -75,10 +75,12 @@ export default function SidebarNav() {
            <SidebarMenuSub>
             {modules.map((item) => (
               <SidebarMenuSubItem key={item.name}>
-                <NextLink href={item.href} legacyBehavior passHref>
-                  <SidebarMenuSubButton isActive={pathname === item.href}>
-                    <item.icon />
-                    <span>{item.name}</span>
+                <NextLink href={item.href} passHref>
+                  <SidebarMenuSubButton asChild isActive={pathname === item.href}>
+                    <>
+                      <item.icon />
+                      <span>{item.name}</span>
+                    </>
                   </SidebarMenuSubButton>
                 </NextLink>
               </SidebarMenuSubItem>
@@ -88,7 +90,7 @@ export default function SidebarNav() {
       </Collapsible>
       
       <SidebarMenuItem>
-          <NextLink href={'/apps'} legacyBehavior={false}>
+          <NextLink href={'/apps'}>
             <SidebarMenuButton as="a" tooltip={'Apps'} isActive={pathname === '/apps'} className="justify-start">
               <LinkIcon />
               <span className="group-data-[state=expanded]:inline-flex group-data-[state=collapsed]:hidden">Apps</span>
@@ -115,10 +117,12 @@ export default function SidebarNav() {
            <SidebarMenuSub>
             {setupItems.map((item) => (
               <SidebarMenuSubItem key={item.name}>
-                <NextLink href={item.href} legacyBehavior passHref>
-                  <SidebarMenuSubButton isActive={pathname === item.href}>
-                    <item.icon />
-                    <span>{item.name}</span>
+                <NextLink href={item.href} passHref>
+                  <SidebarMenuSubButton asChild isActive={pathname === item.href}>
+                    <>
+                      <item.icon />
+                      <span>{item.name}</span>
+                    </>
                   </SidebarMenuSubButton>
                 </NextLink>
               </SidebarMenuSubItem>
