@@ -128,31 +128,28 @@ export default function HarpForm() {
     setIsSubmitting(true);
     const harpId = `HARP-${Date.now()}`;
     
-    try {
-      const incidentsCollection = collection(firestore, 'harp-incidents');
-      await addDoc(incidentsCollection, {
-        ...values,
-        harpId,
-        otherObservation: values.otherObservation || null,
-        createdAt: serverTimestamp(),
-      });
-
-      toast({
-        title: 'Success!',
-        description: `HARP Incident has been raised with incident ID: ${harpId}`,
-      });
-
-      form.reset();
-    } catch (error) {
-      console.error('Error adding document: ', error);
-      toast({
-        variant: 'destructive',
-        title: 'Uh oh! Something went wrong.',
-        description: 'There was a problem saving your incident. Please try again.',
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+    const incidentsCollection = collection(firestore, 'harp-incidents');
+    addDoc(incidentsCollection, {
+      ...values,
+      harpId,
+      otherObservation: values.otherObservation || null,
+      createdAt: serverTimestamp(),
+    }).then(() => {
+        toast({
+            title: 'Success!',
+            description: `HARP Incident has been raised with incident ID: ${harpId}`,
+        });
+        form.reset();
+    }).catch((error) => {
+        console.error('Error adding document: ', error);
+        toast({
+            variant: 'destructive',
+            title: 'Uh oh! Something went wrong.',
+            description: 'There was a problem saving your incident. Please try again.',
+        });
+    }).finally(() => {
+        setIsSubmitting(false);
+    });
   }
 
   const handleGenerateQrCode = () => {
@@ -291,7 +288,7 @@ export default function HarpForm() {
                                   mode="single"
                                   selected={field.value}
                                   onSelect={(date) => {
-                                      field.onChange(date);
+                                      if (date) field.onChange(date);
                                       setIsDatePickerOpen(false);
                                   }}
                                   disabled={(date) =>
