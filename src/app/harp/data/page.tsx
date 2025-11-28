@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { collection, onSnapshot, Query, DocumentData } from 'firebase/firestore';
 import { useFirestore } from '@/firebase';
 import { columns, HarpIncident } from './columns';
@@ -42,6 +42,16 @@ export default function HarpDataPage() {
     return () => unsubscribe();
   }, [firestore]);
 
+  const renderContent = () => {
+    if (!firestore) {
+        return <div className="text-center p-8">Connecting to Firebase...</div>;
+    }
+    if (loading) {
+        return <div className="text-center p-8">Loading incidents...</div>;
+    }
+    return <DataTable columns={columns} data={data} />;
+  }
+
   return (
     <div className="bg-gray-50 min-h-screen p-4 sm:p-6 lg:p-8">
       <div className="max-w-screen-2xl mx-auto">
@@ -64,7 +74,7 @@ export default function HarpDataPage() {
         <div className="bg-white p-4 rounded-lg shadow">
             <div className="flex justify-between items-center mb-4">
                 <div className="flex items-center gap-4">
-                    <p className="text-sm text-muted-foreground">Total Records : {data.length}</p>
+                    <p className="text-sm text-muted-foreground">Total Records : {loading ? '...' : data.length}</p>
                 </div>
                 <div className="flex items-center gap-2">
                     <Button variant="outline">
@@ -73,11 +83,7 @@ export default function HarpDataPage() {
                     </Button>
                 </div>
             </div>
-          {loading ? (
-            <div className="text-center p-8">Loading incidents...</div>
-          ) : (
-            <DataTable columns={columns} data={data} />
-          )}
+            {renderContent()}
         </div>
       </div>
     </div>

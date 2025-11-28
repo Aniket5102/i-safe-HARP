@@ -62,6 +62,40 @@ export default function HarpIncidentDetailsPage() {
     return value?.toString() || 'N/A';
   }
 
+  const renderContent = () => {
+    if (!firestore) {
+        return (
+            <div className="flex justify-center items-center p-8">
+                <p>Connecting to Firebase...</p>
+            </div>
+        )
+    }
+    if (loading) {
+        return (
+            <div className="flex justify-center items-center p-8">
+                <Loader2 className="animate-spin h-8 w-8 text-primary" />
+            </div>
+        )
+    }
+    if (incident) {
+        return (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 text-sm">
+            {Object.entries(incident).map(([key, value]) => {
+                if (key === 'id') return null; // Don't display the document id
+                const label = key.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase());
+                return (
+                    <div key={key} className="grid grid-cols-2 items-center">
+                        <strong className="text-muted-foreground">{label}:</strong>
+                        <span>{renderValue(value)}</span>
+                    </div>
+                )
+            })}
+          </div>
+        )
+    }
+    return <p className="text-center text-muted-foreground">Incident not found.</p>;
+  }
+
   return (
     <div className="bg-gray-50 min-h-screen p-4 sm:p-6 lg:p-8">
       <div className="max-w-4xl mx-auto">
@@ -75,32 +109,13 @@ export default function HarpIncidentDetailsPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Incident ID: {incident?.harpId || 'Loading...'}</CardTitle>
+            <CardTitle>Incident ID: {incident?.harpId || (loading ? 'Loading...' : id)}</CardTitle>
             <CardDescription>
               Detailed information for the selected HARP incident.
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {loading ? (
-              <div className="flex justify-center items-center p-8">
-                <Loader2 className="animate-spin h-8 w-8 text-primary" />
-              </div>
-            ) : incident ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 text-sm">
-                {Object.entries(incident).map(([key, value]) => {
-                    if (key === 'id') return null; // Don't display the document id
-                    const label = key.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase());
-                    return (
-                        <div key={key} className="grid grid-cols-2 items-center">
-                            <strong className="text-muted-foreground">{label}:</strong>
-                            <span>{renderValue(value)}</span>
-                        </div>
-                    )
-                })}
-              </div>
-            ) : (
-              <p className="text-center text-muted-foreground">Incident not found.</p>
-            )}
+            {renderContent()}
           </CardContent>
         </Card>
       </div>
