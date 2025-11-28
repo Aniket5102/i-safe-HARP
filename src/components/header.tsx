@@ -1,3 +1,4 @@
+
 "use client";
 
 import Image from "next/image";
@@ -27,9 +28,8 @@ export default function Header() {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center space-x-4">
-            <AsianPaintsLogo />
-            <div className="border-l border-gray-300 h-6"></div>
             <div className="flex items-center space-x-2">
+              <AsianPaintsLogo />
               <ISafeLogo className="h-8 w-8" />
               <span className="text-lg font-light text-gray-600 tracking-wider">
                 i-safe
