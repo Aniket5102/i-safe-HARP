@@ -40,7 +40,7 @@ export default function SidebarNav() {
   return (
     <SidebarMenu>
       <SidebarMenuItem>
-          <NextLink href={'/'}>
+          <NextLink href={'/'} passHref>
             <SidebarMenuButton as="a" tooltip={'Home'} isActive={pathname === '/'} className="justify-start">
               <Home />
               <span className="group-data-[state=expanded]:inline-flex group-data-[state=collapsed]:hidden">Home</span>
@@ -67,8 +67,8 @@ export default function SidebarNav() {
            <SidebarMenuSub>
             {modules.map((item) => (
               <SidebarMenuSubItem key={item.name}>
-                <NextLink href={item.href}>
-                  <SidebarMenuSubButton isActive={pathname === item.href}>
+                <NextLink href={item.href} passHref>
+                  <SidebarMenuSubButton as="a" isActive={pathname === item.href}>
                     <item.icon />
                     <span>{item.name}</span>
                   </SidebarMenuSubButton>
@@ -80,7 +80,7 @@ export default function SidebarNav() {
       </Collapsible>
       
       <SidebarMenuItem>
-          <NextLink href={'/apps'}>
+          <NextLink href={'/apps'} passHref>
             <SidebarMenuButton as="a" tooltip={'Apps'} isActive={pathname.startsWith('/apps')} className="justify-start">
               <LinkIcon />
               <span className="group-data-[state=expanded]:inline-flex group-data-[state=collapsed]:hidden">Apps</span>
@@ -107,8 +107,8 @@ export default function SidebarNav() {
            <SidebarMenuSub>
             {setupItems.map((item) => (
               <SidebarMenuSubItem key={item.name}>
-                <NextLink href={item.href}>
-                  <SidebarMenuSubButton isActive={pathname === item.href}>
+                <NextLink href={item.href} passHref>
+                  <SidebarMenuSubButton as="a" isActive={pathname === item.href}>
                     <item.icon />
                     <span>{item.name}</span>
                   </SidebarMenuSubButton>
