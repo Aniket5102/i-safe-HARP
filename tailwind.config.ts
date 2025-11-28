@@ -11,8 +11,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        body: ['PT Sans', 'sans-serif'],
-        headline: ['Space Grotesk', 'sans-serif'],
+        body: ['Quicksand', 'sans-serif'],
+        headline: ['Quicksand', 'sans-serif'],
         code: ['monospace'],
       },
       colors: {
