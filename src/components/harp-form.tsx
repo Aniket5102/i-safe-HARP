@@ -93,7 +93,22 @@ const floors = ["RH Reactor Floor", "EH Reactor Floor", "SPB Floor", "WPB Floor"
 const people = ["Sai", "Manmohan", "Ashish", "Tanmay", "Aniket", "Shriyash"];
 const employeeTypes = ["APL Employee", "APG", "PPGAP", "APPPG"];
 const employeeIds = ["P00126717", "P00126718"];
-const designations = ["EXECUTIVE I - PRODUCTION", "EXECUTIVE I - QUALITY", "Sr. EXECUTIVE I - PRODUCTION", "Sr. EXECUTIVE I - QUALITY", "EXECUTIVE II - PRODUCTION"];
+const designations = [
+    "Executive I - Production",
+    "Executive II - Production",
+    "Senior Executive - Production",
+    "Assistant Manager - Production",
+    "Manager - Production",
+    "Senior Manager - Production",
+    "Executive I - Quality",
+    "Executive II - Quality",
+    "Senior Executive - Quality",
+    "Assistant Manager - Quality",
+    "Manager - Quality",
+    "Senior Manager - Quality",
+    "Associate General Manager - Manufacturing",
+    "General Manager - Manufacturing"
+];
 const employeeDepartments = ["PRODUCTION", "QUALITY"];
 const hazards = ["Chemical Hazards", "Chemical Splash", "eyes", "face", "body"];
 const risks = ["Medium", "high", "low"];
