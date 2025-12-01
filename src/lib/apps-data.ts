@@ -53,8 +53,8 @@ export const apps: App[] = [
   { 
     name: 'HARP',
     subtitle: 'Personal Risk Assessment',
-    imageUrl: 'https://picsum.photos/seed/risk-analysis/200/200', 
-    imageHint: 'risk analysis', 
+    imageUrl: 'https://1.bp.blogspot.com/-CReOKJSBrQo/X8trFT6wFmI/AAAAAAAAEvs/1ryF9Le7aH8fUoRU0BAIVkeDStOFn1liACLcBGAsYHQ/w1200-h630-p-k-no-nu/risk-assessment.png', 
+    imageHint: 'risk assessment', 
     href: '/harp' 
   },
   { 
@@ -67,7 +67,7 @@ export const apps: App[] = [
   {
     name: 'Test HARP',
     subtitle: 'This is to be used for HARP Report Development',
-    imageUrl: 'https://picsum.photos/seed/report-development/200/200',
+    imageUrl: 'https://1.bp.blogspot.com/-CReOKJSBrQo/X8trFT6wFmI/AAAAAAAAEvs/1ryF9Le7aH8fUoRU0BAIVkeDStOFn1liACLcBGAsYHQ/w1200-h630-p-k-no-nu/risk-assessment.png',
     imageHint: 'report development',
     href: '/harp'
   }

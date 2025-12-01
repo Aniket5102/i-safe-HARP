@@ -59,6 +59,12 @@ pathname: '/**',
         hostname: 'img.freepik.com',
         port: '',
         pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: '1.bp.blogspot.com',
+        port: '',
+        pathname: '/**',
       }
     ],
   },
