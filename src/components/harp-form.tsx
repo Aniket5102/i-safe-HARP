@@ -144,30 +144,34 @@ export default function HarpForm() {
     setIsSubmitting(true);
     const harpId = `HARP-${Date.now()}`;
     
+    // Optimistic UI update
+    toast({
+        title: 'Success!',
+        description: `HARP Incident has been raised with incident ID: ${harpId}`,
+    });
+    form.reset();
+    setIsSubmitting(false);
+
     try {
         const incidentsCollection = collection(firestore, 'harp-incidents');
-        await addDoc(incidentsCollection, {
+        // Asynchronous operation in the background
+        addDoc(incidentsCollection, {
           ...values,
           harpId,
           otherObservation: values.otherObservation || null,
           createdAt: serverTimestamp(),
         });
 
-        toast({
-            title: 'Success!',
-            description: `HARP Incident has been raised with incident ID: ${harpId}`,
-        });
-        form.reset();
-
     } catch (error) {
         console.error('Error adding document: ', error);
+        // If the background operation fails, inform the user.
         toast({
             variant: 'destructive',
             title: 'Uh oh! Something went wrong.',
             description: 'Your incident was not saved. Please try again.',
         });
-    } finally {
-        setIsSubmitting(false);
+        // Optionally, you could re-populate the form with the values
+        // form.reset(values); 
     }
   }
 
