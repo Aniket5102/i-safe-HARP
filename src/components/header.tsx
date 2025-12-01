@@ -71,7 +71,7 @@ export default function Header() {
         </div>
       </div>
       <div
-        className="bg-primary text-primary-foreground h-12 flex items-center"
+        className="bg-teal-600 text-primary-foreground h-12 flex items-center"
       >
         <div className="container mx-auto px-4 flex justify-between items-center">
           <div className="flex items-center space-x-2">
