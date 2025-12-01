@@ -8,7 +8,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Loader2 } from 'lucide-react';
-import { format } from 'date-fns';
+import { format, isValid } from 'date-fns';
 
 type HarpIncident = {
     id: string;
@@ -34,12 +34,21 @@ export default function HarpIncidentDetailsPage() {
 
         if (docSnap.exists()) {
           const data = docSnap.data() as DocumentData;
+          
+          const formattedData: DocumentData = {};
+          for (const key in data) {
+            if (data[key] && typeof data[key].toDate === 'function') {
+              formattedData[key] = data[key].toDate();
+            } else {
+              formattedData[key] = data[key];
+            }
+          }
+
           setIncident({
               id: docSnap.id,
-              ...data,
-              date: data.date?.toDate ? data.date.toDate() : new Date(data.date),
-              createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(data.createdAt),
+              ...formattedData,
           });
+
         } else {
           console.log('No such document!');
         }
@@ -56,15 +65,24 @@ export default function HarpIncidentDetailsPage() {
   }, [firestore, id]);
 
   const renderValue = (value: any) => {
-    if (value instanceof Date) {
+    if (value instanceof Date && isValid(value)) {
       return format(value, 'PPP p');
     }
-    if(typeof value === 'object' && value !== null) {
-        // Avoid rendering complex objects directly
-        return '[Object]';
+    if (value === null || value === undefined) {
+      return 'N/A';
     }
-    return value?.toString() || 'N/A';
+    if(typeof value === 'object' && value !== null) {
+        return JSON.stringify(value);
+    }
+    return value.toString();
   }
+  
+  const displayOrder = [
+    'harpId', 'date', 'location', 'department', 'block', 'floor', 
+    'activity', 'carriedOutBy', 'employeeType', 'employeeName', 
+    'employeeId', 'designation', 'employeeDepartment', 'hazard', 
+    'accident', 'risk', 'prevention', 'otherObservation', 'createdAt'
+  ];
 
   const renderContent = () => {
     if (!firestore) {
@@ -82,10 +100,20 @@ export default function HarpIncidentDetailsPage() {
         )
     }
     if (incident) {
+        // Create a sorted list of entries based on the desired order
+        const sortedEntries = displayOrder
+            .map(key => ([key, incident[key]]))
+            .filter(([, value]) => value !== undefined && key !== 'id');
+
+        // Append any fields from the incident that are not in the displayOrder
+        const remainingEntries = Object.entries(incident)
+            .filter(([key]) => !displayOrder.includes(key) && key !== 'id');
+
+        const allEntries = [...sortedEntries, ...remainingEntries];
+
         return (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 text-sm">
-            {Object.entries(incident).map(([key, value]) => {
-                if (key === 'id') return null; // Don't display the document id
+            {allEntries.map(([key, value]) => {
                 const label = key.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase());
                 return (
                     <div key={key} className="grid grid-cols-2 items-center">

@@ -16,9 +16,17 @@ export type HarpIncident = {
   floor: string;
   block: string;
   activity: string;
+  carriedOutBy: string;
+  employeeType: string;
   employeeName: string;
+  employeeId: string;
+  designation: string;
+  employeeDepartment: string;
   hazard: string;
+  accident: string;
   risk: string;
+  prevention: string;
+  otherObservation?: string;
 };
 
 export const columns: ColumnDef<HarpIncident>[] = [
@@ -59,8 +67,11 @@ export const columns: ColumnDef<HarpIncident>[] = [
     },
     cell: ({ row }) => {
         const date = row.getValue('date') as Date;
-        // Ensure date is a valid Date object before formatting
-        return date ? <span>{format(new Date(date), 'PP')}</span> : <span>Invalid Date</span>;
+        try {
+          return date ? <span>{format(new Date(date), 'PP')}</span> : <span>N/A</span>;
+        } catch (error) {
+          return <span>Invalid Date</span>;
+        }
     }
   },
   {
