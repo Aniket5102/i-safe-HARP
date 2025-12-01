@@ -90,7 +90,7 @@ const locations = ["Patancheru", "Khandala", "Rohtak", "Vizag", "Mysuru", "Kasna
 const departments = ["Production Department", "Quality Department", "Admin Department"];
 const blocks = ["RH House", "EH House", "SPB", "WPB"];
 const floors = ["RH Reactor Floor", "EH Reactor Floor", "SPB Floor", "WPB Floor"];
-const people = ["Sai", "Manmohan", "Ashish", "Tanmay", "Aniket", "Sahriyash"];
+const people = ["Sai", "Manmohan", "Ashish", "Tanmay", "Aniket", "Shriyash"];
 const employeeTypes = ["APL Employee", "APG", "PPGAP", "APPPG"];
 const employeeIds = ["P00126717", "P00126718"];
 const designations = ["EXECUTIVE I - PRODUCTION", "EXECUTIVE I - QUALITY", "Sr. EXECUTIVE I - PRODUCTION", "Sr. EXECUTIVE I - QUALITY", "EXECUTIVE II - PRODUCTION"];
@@ -713,3 +713,5 @@ export default function HarpForm() {
     </>
   );
 }
+
+    
