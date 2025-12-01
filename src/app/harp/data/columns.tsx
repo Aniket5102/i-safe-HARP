@@ -5,6 +5,7 @@ import { ColumnDef } from '@tanstack/react-table';
 import { ArrowUpDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { format } from 'date-fns';
 
 export type HarpIncident = {
   id: string;
@@ -15,6 +16,9 @@ export type HarpIncident = {
   floor: string;
   block: string;
   activity: string;
+  employeeName: string;
+  hazard: string;
+  risk: string;
 };
 
 export const columns: ColumnDef<HarpIncident>[] = [
@@ -55,7 +59,8 @@ export const columns: ColumnDef<HarpIncident>[] = [
     },
     cell: ({ row }) => {
         const date = row.getValue('date') as Date;
-        return <span>{date.toLocaleDateString()}</span>;
+        // Ensure date is a valid Date object before formatting
+        return date ? <span>{format(new Date(date), 'PP')}</span> : <span>Invalid Date</span>;
     }
   },
   {
@@ -67,15 +72,15 @@ export const columns: ColumnDef<HarpIncident>[] = [
     header: 'Department',
   },
   {
-    accessorKey: 'floor',
-    header: 'Floor',
+    accessorKey: 'employeeName',
+    header: 'Employee Name',
   },
   {
-    accessorKey: 'block',
-    header: 'Block',
+    accessorKey: 'hazard',
+    header: 'Hazard',
   },
   {
-    accessorKey: 'activity',
-    header: 'Activity',
+    accessorKey: 'risk',
+    header: 'Risk',
   },
 ];

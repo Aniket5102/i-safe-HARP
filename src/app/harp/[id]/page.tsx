@@ -38,6 +38,7 @@ export default function HarpIncidentDetailsPage() {
               id: docSnap.id,
               ...data,
               date: data.date?.toDate ? data.date.toDate() : new Date(data.date),
+              createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(data.createdAt),
           });
         } else {
           console.log('No such document!');
@@ -49,15 +50,18 @@ export default function HarpIncidentDetailsPage() {
       }
     };
 
-    fetchIncident();
+    if(firestore) {
+      fetchIncident();
+    }
   }, [firestore, id]);
 
   const renderValue = (value: any) => {
     if (value instanceof Date) {
-      return format(value, 'PPP');
+      return format(value, 'PPP p');
     }
     if(typeof value === 'object' && value !== null) {
-        return JSON.stringify(value);
+        // Avoid rendering complex objects directly
+        return '[Object]';
     }
     return value?.toString() || 'N/A';
   }
