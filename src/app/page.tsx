@@ -164,8 +164,8 @@ function ModulesCard() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {modules.map((module) => (
             <div key={module.name} className="flex flex-col items-center text-center p-4 rounded-lg hover:bg-accent transition-colors duration-200 cursor-pointer">
-              <div className="p-4 rounded-full bg-gradient-to-br from-primary to-blue-400 mb-3 shadow-md">
-                 <module.icon className="h-7 w-7 text-white" />
+              <div className="p-4 rounded-full bg-primary/10 mb-3 shadow-md">
+                 <module.icon className="h-7 w-7 text-primary" />
               </div>
               <p className="text-sm font-semibold text-foreground">{module.name}</p>
             </div>
@@ -195,13 +195,13 @@ function AppsCard({ onAppClick }: AppsCardProps) {
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
           {displayedApps.map((app) => (
              <button key={app.name} onClick={() => onAppClick(app)} className="flex flex-col items-center text-center no-underline text-current cursor-pointer hover:bg-accent rounded-lg p-2 transition-colors">
-              <div className="p-1 rounded-lg bg-gray-100 mb-2 h-16 w-16 flex items-center justify-center">
+              <div className="p-1 rounded-lg bg-accent mb-2 h-16 w-16 flex items-center justify-center">
                 <Image 
                   src={app.imageUrl} 
                   alt={app.name} 
                   width={200} 
                   height={200} 
-                  className="h-14 w-14 object-cover rounded-md"
+                  className="h-14 w-14 object-contain rounded-md"
                   data-ai-hint={app.imageHint}
                 />
               </div>
@@ -265,8 +265,8 @@ function AppOptionsDialog({ app, isOpen, onOpenChange }: AppOptionsDialogProps) 
         <div className="flex flex-col space-y-2">
           {options.map((option) => (
             <Link key={option.name} href={option.href} passHref>
-              <Button variant="outline" className="w-full justify-start text-base p-6 bg-blue-50 border-blue-200 hover:bg-blue-100">
-                <option.icon className="mr-3 h-5 w-5 text-blue-600" />
+              <Button variant="outline" className="w-full justify-start text-base p-6 bg-accent border-primary/20 hover:bg-primary/10">
+                <option.icon className="mr-3 h-5 w-5 text-primary" />
                 {option.name}
               </Button>
             </Link>
