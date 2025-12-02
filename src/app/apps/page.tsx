@@ -120,5 +120,3 @@ function AppOptionsDialog({ app, isOpen, onOpenChange }: AppOptionsDialogProps) 
     </Dialog>
   );
 }
-
-    

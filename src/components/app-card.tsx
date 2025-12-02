@@ -74,5 +74,3 @@ export default function AppCard({ app, onCardClick }: AppCardProps) {
     </Card>
   );
 }
-
-    
