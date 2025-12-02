@@ -30,15 +30,15 @@ export default function AppsPage() {
 
   return (
     <>
-      <div className="bg-gray-50 min-h-screen p-4 sm:p-6 lg:p-8">
+      <div className="bg-background min-h-screen p-4 sm:p-6 lg:p-8">
         <div className="max-w-7xl mx-auto">
-          <header className="mb-8 bg-white p-6 rounded-lg shadow-md flex items-center justify-between">
+          <header className="mb-8 bg-card p-6 rounded-lg shadow-md flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-800">Apps</h1>
-              <p className="text-gray-500 mt-1">Discover and manage your applications.</p>
+              <h1 className="text-3xl font-bold text-foreground">Apps</h1>
+              <p className="text-muted-foreground mt-1">Discover and manage your applications.</p>
             </div>
             <div className="relative max-w-sm">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
               <Input
                 type="text"
                 placeholder="Search Apps..."
@@ -51,7 +51,7 @@ export default function AppsPage() {
 
           {searchTerm === '' && (
             <div className="mb-12">
-              <h2 className="text-xl font-semibold mb-4 text-gray-700">Recently Used Apps</h2>
+              <h2 className="text-xl font-semibold mb-4 text-foreground">Recently Used Apps</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {recentlyUsedApps.map((app) => (
                   <AppCard key={app.name} app={app} onCardClick={setSelectedApp} />
@@ -61,7 +61,7 @@ export default function AppsPage() {
           )}
 
           <div>
-            <h2 className="text-xl font-semibold mb-4 text-gray-700">{searchTerm ? 'Search Results' : 'All Apps'}</h2>
+            <h2 className="text-xl font-semibold mb-4 text-foreground">{searchTerm ? 'Search Results' : 'All Apps'}</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {filteredApps.map((app) => (
                 <AppCard key={app.name} app={app} onCardClick={setSelectedApp} />
@@ -111,8 +111,8 @@ function AppOptionsDialog({ app, isOpen, onOpenChange }: AppOptionsDialogProps) 
         <div className="flex flex-col space-y-2">
           {options.map((option) => (
             <Link key={option.name} href={option.href} passHref>
-              <Button variant="outline" className="w-full justify-start text-base p-6 bg-blue-50 border-blue-200 hover:bg-blue-100">
-                <option.icon className="mr-3 h-5 w-5 text-blue-600" />
+              <Button variant="outline" className="w-full justify-start text-base p-6 bg-accent border-primary/20 hover:bg-primary/10">
+                <option.icon className="mr-3 h-5 w-5 text-primary" />
                 {option.name}
               </Button>
             </Link>

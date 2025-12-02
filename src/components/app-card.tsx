@@ -23,7 +23,7 @@ export default function AppCard({ app, onCardClick }: AppCardProps) {
 
   return (
     <Card 
-      className="shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col group cursor-pointer"
+      className="bg-card shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col group cursor-pointer"
       onClick={(e) => {
         // Prevent card click when an action button is clicked
         if ((e.target as HTMLElement).closest('a')) return;
@@ -42,14 +42,14 @@ export default function AppCard({ app, onCardClick }: AppCardProps) {
                     data-ai-hint={app.imageHint}
                 />
                 <div className="flex-1">
-                  <h3 className="font-semibold text-sm leading-tight">{app.name}</h3>
+                  <h3 className="font-semibold text-sm leading-tight text-foreground">{app.name}</h3>
                   {app.subtitle && (
-                    <p className="text-xs text-gray-500 mt-1">{app.subtitle}</p>
+                    <p className="text-xs text-muted-foreground mt-1">{app.subtitle}</p>
                   )}
                 </div>
             </div>
             <Button variant="ghost" size="icon" className="h-8 w-8 opacity-50 group-hover:opacity-100">
-                <MoreHorizontal size={20} className="text-gray-500" />
+                <MoreHorizontal size={20} className="text-muted-foreground" />
             </Button>
         </div>
         
@@ -60,7 +60,7 @@ export default function AppCard({ app, onCardClick }: AppCardProps) {
               <Link key={action.name} href={action.href} passHref>
                 <Button 
                   variant="ghost" 
-                  className="flex flex-col h-auto p-2 text-gray-500 hover:bg-primary/10 hover:text-primary transition-colors duration-200"
+                  className="flex flex-col h-auto p-2 text-muted-foreground hover:bg-accent hover:text-primary transition-colors duration-200"
                   onClick={(e) => e.stopPropagation()} // Stop propagation to prevent card click
                 >
                   <action.icon size={20} />
