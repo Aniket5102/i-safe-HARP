@@ -18,10 +18,12 @@ import {
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import AsianPaintsLogo from "./asian-paints-logo";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
 
 export default function Header() {
   return (
-    <header className="bg-white shadow-md">
+    <header className="bg-white shadow-md sticky top-0 z-40">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center space-x-4">
@@ -65,19 +67,19 @@ export default function Header() {
             </div>
             <Avatar className="h-9 w-9">
               <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-              <AvatarFallback className="bg-cyan-200 text-cyan-800 font-bold">AK</AvatarFallback>
+              <AvatarFallback className="bg-primary/20 text-primary font-bold">AK</AvatarFallback>
             </Avatar>
           </div>
         </div>
       </div>
       <div
-        className="bg-teal-600 text-primary-foreground h-12 flex items-center"
+        className="bg-primary/90 text-primary-foreground"
       >
-        <div className="container mx-auto px-4 flex justify-between items-center">
-          <div className="flex items-center space-x-2">
-            <LayoutGrid size={20} />
-            <span className="font-medium">Apps</span>
-          </div>
+        <div className="container mx-auto px-4 flex justify-between items-center h-12">
+            <Link href="/apps" className="flex items-center space-x-2 p-2 rounded-md hover:bg-primary/100 transition-colors">
+              <LayoutGrid size={20} />
+              <span className="font-medium">Apps</span>
+            </Link>
           <div className="flex items-center space-x-2">
             <span className="text-xs">powered by</span>
             <span className="font-semibold">Asian Paints - Systems</span>
