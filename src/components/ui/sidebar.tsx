@@ -230,7 +230,7 @@ const Sidebar = React.forwardRef<
       <div
         ref={ref}
         className={cn(
-          "group hidden md:flex flex-col text-sidebar-foreground transition-all duration-300 ease-in-out",
+          "group hidden md:flex flex-col text-sidebar-foreground transition-all duration-300 ease-in-out bg-sidebar",
           open ? "w-[var(--sidebar-width)]" : "w-[var(--sidebar-width-icon)]",
           className
         )}
@@ -306,20 +306,19 @@ SidebarRail.displayName = "SidebarRail"
 
 const SidebarInset = React.forwardRef<
   HTMLDivElement,
-  React.ComponentProps<"main">
+  React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => {
   return (
-    <main
+    <div
       ref={ref}
       className={cn(
-        "relative flex min-h-svh flex-1 flex-col bg-background",
-        "md:peer-data-[variant=inset]:m-2 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow",
+        "relative flex-1 flex-col bg-background",
         className
       )}
       {...props}
     />
-  )
-})
+  );
+});
 SidebarInset.displayName = "SidebarInset"
 
 const SidebarInput = React.forwardRef<
