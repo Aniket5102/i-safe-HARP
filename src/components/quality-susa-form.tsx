@@ -110,29 +110,27 @@ export default function QualitySusaForm() {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      locationName: "Sriperumbudur",
-      department: "Production Department",
-      block: "Manufacturing block",
-      areaFloor: "Charge hopper floor",
-      observerName: "VASANTH R",
-      observerType: "APL Employee",
-      employeeId: "00132461",
-      designation: "EXECUTIVE I - PLANT ENGINEERING",
-      employeeDepartment: "ENGINEERING",
-      employeeBlock: "Manufacturing block",
+      locationName: "",
+      department: "",
+      block: "",
+      areaFloor: "",
+      observerName: "",
+      observerType: "",
+      employeeId: "",
+      designation: "",
+      employeeDepartment: "",
+      employeeBlock: "",
       sbtDbtOther: "",
-      observationGoal: "1",
-      
-      dateOfObservation: new Date(),
-      timeOfObservation: format(new Date(), "HH:mm"),
-      shift: "1st Shift (6:30 - 14:30)",
-      observedType: "Technician",
-      qualityKeyActivity: "calibration",
-      qualityActName: "Weighing scales are calibrated and status is available",
-      isActComplied: "Yes",
-      descriptionOfAct: "After changing the indicator, Ensured calibration status before handover the equipment.",
-      keyQualityBehaviour: "I will always ensure timely calibration is done following right procedure",
-      susaStatus: "Closed",
+      observationGoal: "",
+      timeOfObservation: "",
+      shift: "",
+      observedType: "",
+      qualityKeyActivity: "",
+      qualityActName: "",
+      isActComplied: "",
+      descriptionOfAct: "",
+      keyQualityBehaviour: "",
+      susaStatus: "Open",
     },
   });
 
@@ -703,7 +701,7 @@ export default function QualitySusaForm() {
                             render={({ field }) => (
                             <FormItem>
                                 <FormLabel>SUSA Status<span className="text-red-500">*</span></FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <Select onValueChange={field.onChange} value={field.value} defaultValue={field.value} disabled>
                                     <FormControl>
                                         <SelectTrigger>
                                             <SelectValue placeholder="Select status" />
