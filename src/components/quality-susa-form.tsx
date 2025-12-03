@@ -32,7 +32,6 @@ import {
 import {
   Dialog,
   DialogContent,
-  DialogClose,
 } from "@/components/ui/dialog";
 import {
   Accordion,
@@ -741,11 +740,6 @@ export default function QualitySusaForm() {
             <Button variant="ghost" className="hover:bg-primary/80" onClick={handleDownloadQrCode}>
               <Download className="mr-2 h-4 w-4" /> Download
             </Button>
-            <DialogClose asChild>
-              <Button variant="ghost" className="hover:bg-primary/80">
-                <X className="h-4 w-4" />
-              </Button>
-            </DialogClose>
           </div>
           <div className="p-6" ref={qrCodeRef}>
             <div className="flex items-center justify-center space-x-4 mb-4">
