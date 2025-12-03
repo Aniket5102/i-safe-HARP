@@ -8,5 +8,11 @@ service cloud.firestore {
     match /harp-incidents/{incidentId} {
       allow read, write: if true;
     }
+
+    // Allow public read and write access to the quality-susa-incidents collection
+    // This is for development purposes and should be secured before production.
+    match /quality-susa-incidents/{incidentId} {
+      allow read, write: if true;
+    }
   }
 }

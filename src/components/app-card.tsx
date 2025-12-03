@@ -15,9 +15,11 @@ interface AppCardProps {
 
 export default function AppCard({ app, onCardClick }: AppCardProps) {
   
+  const dataHref = `${app.href}/data`;
+
   const actionButtons = [
     { name: 'Modify', icon: PenSquare, href: `${app.href}/modify` },
-    { name: 'Data', icon: Database, href: app.name.toLowerCase().includes('harp') ? '/harp/data' : `${app.href}/data` },
+    { name: 'Data', icon: Database, href: dataHref },
     { name: 'New', icon: PlusCircle, href: app.href },
   ];
 

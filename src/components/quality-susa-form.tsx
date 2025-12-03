@@ -40,7 +40,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { useToast } from "@/hooks/use-toast";
-import { ChevronLeft, FileDown, Loader2, Printer, Download, CalendarIcon } from "lucide-react";
+import { ChevronLeft, Loader2, Printer, Download, CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import QRCode from "qrcode.react";
 import html2canvas from "html2canvas";
@@ -49,6 +49,8 @@ import AsianPaintsLogo from "./asian-paints-logo";
 import { Textarea } from "./ui/textarea";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Calendar } from "./ui/calendar";
+import { useFirestore } from "@/firebase";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
 const formSchema = z.object({
   locationName: z.string().min(1, "Location is required."),
@@ -79,10 +81,10 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 const locations = ["Sriperumbudur", "Patancheru", "Khandala", "Rohtak", "Vizag", "Mysuru", "Kasna", "Ankleshwar", "Sripi"];
-const departments = ["Production Department", "Quality Department", "Admin Department"];
-const blocks = ["Manufacturing block", "RH House", "EH House", "SPB", "WPB"];
-const floors = ["Charge hopper floor", "RH Reactor Floor", "EH Reactor Floor", "SPB Floor", "WPB Floor"];
-const observers = ["VASANTH R", "Sai", "Manmohan", "Ashish", "Tanmay", "Aniket", "Shriyash"];
+const departments = ["Production Department", "Quality Department", "Admin Department", "Manufacturing Department", "Quality Assurance Department"];
+const blocks = ["Manufacturing block", "RH House", "EH House", "SPB", "WPB", "POLYMER BLOCK", "MAIN QA Block"];
+const floors = ["Charge hopper floor", "RH Reactor Floor", "EH Reactor Floor", "SPB Floor", "WPB Floor", "GROUND FLOOR", "Manufacturing Area", "MAIN QA AREA"];
+const observers = ["VASANTH R", "Sai", "Manmohan", "Ashish", "Tanmay", "Aniket", "Shriyash", "Lohith M", "ERNET PAUL J", "SAIRAM G"];
 const observerTypes = ["APL Employee", "APG", "PPGAP", "APPPG"];
 const employeeIds = ["00132461", "P00126717", "P00126718"];
 const designations = ["EXECUTIVE I - PLANT ENGINEERING", "Executive I - Production", "Manager - Production"];
@@ -99,6 +101,7 @@ const susaStatuses = ["Open", "Closed"];
 export default function QualitySusaForm() {
   const { toast } = useToast();
   const router = useRouter();
+  const firestore = useFirestore();
   const formRef = React.useRef<HTMLDivElement>(null);
   const qrCodeRef = React.useRef<HTMLDivElement>(null);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
@@ -132,22 +135,52 @@ export default function QualitySusaForm() {
     },
   });
 
-  const bbqReferenceNumber = `QUALITYSUSA${format(new Date(), 'yyyyMMddHHmmss')}`;
+  const [bbqReferenceNumber, setBbqReferenceNumber] = React.useState('');
+  
+  React.useEffect(() => {
+    setBbqReferenceNumber(`QUALITYSUSA${format(new Date(), 'yyyyMMddHHmmss')}`);
+  }, [form.formState.isSubmitSuccessful]);
+
 
   async function onSubmit(values: FormValues) {
+    if (!firestore) {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Firestore is not available. Please try again later.',
+      });
+      return;
+    }
     setIsSubmitting(true);
-    // Here you would typically send the data to your backend/database
-    console.log({ bbqReferenceNumber, ...values });
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    try {
+        const docToSave = {
+            ...values,
+            bbqReferenceNumber,
+            createdAt: serverTimestamp(),
+        };
 
-    setIsSubmitting(false);
-    toast({
-        title: 'Success!',
-        description: `QUALITY SUSA has been raised with reference ID: ${bbqReferenceNumber}`,
-    });
-    form.reset();
+        await addDoc(collection(firestore, 'quality-susa-incidents'), docToSave);
+        
+        toast({
+            title: 'Success!',
+            description: `QUALITY SUSA has been raised with reference ID: ${bbqReferenceNumber}`,
+        });
+        
+        form.reset();
+        // After successful submission, generate a new reference number for the next form.
+        setBbqReferenceNumber(`QUALITYSUSA${format(new Date(), 'yyyyMMddHHmmss')}`);
+
+    } catch (error) {
+        console.error('Error adding document: ', error);
+        toast({
+            variant: 'destructive',
+            title: 'Uh oh! Something went wrong.',
+            description: 'Your incident was not saved. Please try again.',
+        });
+    } finally {
+        setIsSubmitting(false);
+    }
   }
 
   const handleGenerateQrCode = () => {
@@ -711,5 +744,3 @@ export default function QualitySusaForm() {
     </>
   );
 }
-
-    
