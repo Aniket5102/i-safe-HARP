@@ -142,7 +142,7 @@ const SidebarProvider = React.forwardRef<
               } as React.CSSProperties
             }
             className={cn(
-              "group/sidebar-wrapper flex min-h-svh w-full has-[[data-variant=inset]]:bg-sidebar",
+              "group/sidebar-wrapper w-full",
               className
             )}
             ref={ref}
@@ -230,8 +230,9 @@ const Sidebar = React.forwardRef<
       <div
         ref={ref}
         className={cn(
-          "group hidden md:flex flex-col text-sidebar-foreground transition-all duration-300 ease-in-out bg-sidebar",
+          "group fixed top-0 h-screen z-50 hidden md:flex flex-col text-sidebar-foreground transition-all duration-300 ease-in-out bg-sidebar",
           open ? "w-[var(--sidebar-width)]" : "w-[var(--sidebar-width-icon)]",
+          side === 'left' ? 'left-0' : 'right-0',
           className
         )}
         data-state={state}
@@ -308,11 +309,17 @@ const SidebarInset = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => {
+  const { state, isMobile } = useSidebar();
+  if (isMobile) {
+    return <div ref={ref} className={cn("bg-background", className)} {...props} />;
+  }
+  
   return (
     <div
       ref={ref}
       className={cn(
-        "relative flex-1 flex-col bg-background",
+        "bg-background transition-all duration-300 ease-in-out",
+        state === 'expanded' ? "ml-[var(--sidebar-width)]" : "ml-[var(--sidebar-width-icon)]",
         className
       )}
       {...props}
@@ -750,5 +757,3 @@ export {
   SidebarTrigger,
   useSidebar,
 }
-
-    

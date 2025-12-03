@@ -35,7 +35,7 @@ export default function RootLayout({
       <body className="font-body antialiased">
         <FirebaseClientProvider>
           <SidebarProvider defaultOpen={false}>
-            <div className="flex">
+            <div className="relative min-h-screen">
               <Sidebar>
                 <SidebarHeader>
                   <SidebarTrigger />
@@ -46,7 +46,9 @@ export default function RootLayout({
               </Sidebar>
               <SidebarInset>
                 <Header />
-                {children}
+                <main className="flex-1 p-4 sm:p-6 lg:p-8">
+                  {children}
+                </main>
               </SidebarInset>
             </div>
             <Toaster />
