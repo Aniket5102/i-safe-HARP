@@ -40,10 +40,9 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { useToast } from "@/hooks/use-toast";
-import { ChevronLeft, FileDown, Loader2, Printer, Download, X, CalendarIcon } from "lucide-react";
+import { ChevronLeft, FileDown, Loader2, Printer, Download, CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import QRCode from "qrcode.react";
-import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { useRouter } from 'next/navigation';
 import AsianPaintsLogo from "./asian-paints-logo";
@@ -181,47 +180,6 @@ export default function QualitySusaForm() {
       });
     }
   };
-
-
-  const handleExportPdf = async () => {
-    const formElement = formRef.current;
-    if (!formElement) return;
-
-    try {
-      const canvas = await html2canvas(formElement, { scale: 2 });
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF({
-        orientation: "portrait",
-        unit: "pt",
-        format: "a4",
-      });
-
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
-      const imgWidth = canvas.width;
-      const imgHeight = canvas.height;
-      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
-      const imgX = (pdfWidth - imgWidth * ratio) / 2;
-      const imgY = 30;
-
-      pdf.addImage(
-        imgData,
-        "PNG",
-        imgX,
-        imgY,
-        imgWidth * ratio,
-        imgHeight * ratio
-      );
-      pdf.save(`quality-susa.pdf`);
-      toast({ title: "Success", description: "PDF export has started." });
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "PDF Export Error",
-        description: "An error occurred while generating the PDF.",
-      });
-    }
-  };
   
   const sbtDbtOtherValue = form.watch('sbtDbtOther');
   const descriptionOfActValue = form.watch('descriptionOfAct');
@@ -241,10 +199,6 @@ export default function QualitySusaForm() {
             <Button variant="outline" onClick={handleGenerateQrCode}>
               <Printer />
               Print QR Code
-            </Button>
-            <Button variant="outline" onClick={handleExportPdf}>
-              <FileDown />
-              Export
             </Button>
           </div>
         </CardHeader>
@@ -757,3 +711,5 @@ export default function QualitySusaForm() {
     </>
   );
 }
+
+    
