@@ -63,6 +63,8 @@ const formSchema = z.object({
   designation: z.string().min(1, "Designation is required."),
   employeeDepartment: z.string().min(1, "Employee Department is required."),
   employeeBlock: z.string().min(1, "Employee Block is required."),
+  sbtDbtOther: z.string().max(100, "Must be 100 characters or less").optional(),
+  observationGoal: z.string().optional(),
   taskActivityObserved: z.string().min(1, "Task/Activity is required."),
   noOfPeopleObserved: z.string().min(1, "Number of people is required."),
   shift: z.string().min(1, "Shift is required."),
@@ -108,6 +110,7 @@ const employeeIds = ["00132461", "P00126717", "P00126718"];
 const designations = ["EXECUTIVE I - PLANT ENGINEERING", "Executive I - Production", "Manager - Production"];
 const employeeDepartments = ["ENGINEERING", "PRODUCTION", "QUALITY"];
 const shifts = ["General Shift", "Shift A", "Shift B", "Shift C"];
+const observationGoals = ["1", "2", "3", "4", "5"];
 
 const ppeItems = [
     { id: "ppeEyesAndFace", label: "Eyes & Face" },
@@ -141,6 +144,8 @@ export default function QualitySusaForm() {
       designation: "EXECUTIVE I - PLANT ENGINEERING",
       employeeDepartment: "ENGINEERING",
       employeeBlock: "Manufacturing block",
+      sbtDbtOther: "",
+      observationGoal: "1",
       taskActivityObserved: "",
       noOfPeopleObserved: "1",
       shift: "General Shift",
@@ -259,6 +264,8 @@ export default function QualitySusaForm() {
       });
     }
   };
+  
+  const sbtDbtOtherValue = form.watch('sbtDbtOther');
   
   return (
     <>
@@ -500,6 +507,40 @@ export default function QualitySusaForm() {
                           </FormItem>
                         )}
                       />
+                      <FormField
+                          control={form.control}
+                          name="sbtDbtOther"
+                          render={({ field }) => (
+                              <FormItem>
+                                  <FormLabel>SBT/DBT/Other</FormLabel>
+                                  <FormControl>
+                                      <Input placeholder="Enter details" {...field} maxLength={100} />
+                                  </FormControl>
+                                  <FormDescription>{100 - (sbtDbtOtherValue?.length || 0)} Characters Left</FormDescription>
+                                  <FormMessage />
+                              </FormItem>
+                          )}
+                      />
+                      <FormField
+                          control={form.control}
+                          name="observationGoal"
+                          render={({ field }) => (
+                              <FormItem>
+                                  <FormLabel>No. of Observation per month [GOAL]</FormLabel>
+                                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                      <FormControl>
+                                          <SelectTrigger>
+                                              <SelectValue placeholder="Select a goal" />
+                                          </SelectTrigger>
+                                      </FormControl>
+                                      <SelectContent>
+                                          {observationGoals.map(g => <SelectItem key={g} value={g}>{g}</SelectItem>)}
+                                      </SelectContent>
+                                  </Select>
+                                  <FormMessage />
+                              </FormItem>
+                          )}
+                      />
                   </AccordionContent>
                 </AccordionItem>
                 <AccordionItem value="observation-details">
@@ -710,5 +751,7 @@ export default function QualitySusaForm() {
     </>
   );
 }
+
+    
 
     
