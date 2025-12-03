@@ -62,7 +62,7 @@ export const apps: App[] = [
     subtitle: 'Behavioral Based Safety',
     imageUrl: 'https://picsum.photos/seed/safety-observation/200/200', 
     imageHint: 'safety observation', 
-    href: '#' 
+    href: '/bbs' 
   },
   {
     name: 'Test HARP',
