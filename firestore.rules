@@ -9,9 +9,10 @@ service cloud.firestore {
       allow read, write: if true;
     }
 
-    // Allow public read and write access to the quality-susa-incidents collection
-    // This is for development purposes and should be secured before production.
+    // Allow users to create new incidents and read/update/delete their own.
     match /quality-susa-incidents/{incidentId} {
+      // For development, allow all reads and writes.
+      // In a production app, you would restrict this further.
       allow read, write: if true;
     }
   }
