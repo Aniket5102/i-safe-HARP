@@ -49,7 +49,6 @@ import html2canvas from "html2canvas";
 import { useRouter } from 'next/navigation';
 import AsianPaintsLogo from "./asian-paints-logo";
 import { Textarea } from "./ui/textarea";
-import { Checkbox } from "./ui/checkbox";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Calendar } from "./ui/calendar";
 
@@ -77,33 +76,6 @@ const formSchema = z.object({
   descriptionOfAct: z.string().min(1, "Description is required.").max(4000),
   keyQualityBehaviour: z.string().min(1, "Key Quality Behaviour is required."),
   susaStatus: z.string().min(1, "SUSA Status is required."),
-  
-  bodyPostureBending: z.boolean().default(false),
-  bodyPostureTwisting: z.boolean().default(false),
-  bodyPostureReaching: z.boolean().default(false),
-  bodyPostureLifting: z.boolean().default(false),
-  bodyPosturePushing: z.boolean().default(false),
-  bodyPosturePulling: z.boolean().default(false),
-
-  toolsAndEquipmentSelection: z.boolean().default(false),
-  toolsAndEquipmentUse: z.boolean().default(false),
-  toolsAndEquipmentCondition: z.boolean().default(false),
-
-  ppeEyesAndFace: z.boolean().default(false),
-  ppeHead: z.boolean().default(false),
-  ppeHands: z.boolean().default(false),
-  ppeRespiratory: z.boolean().default(false),
-  ppeHearing: z.boolean().default(false),
-  ppeFoot: z.boolean().default(false),
-  ppeBody: z.boolean().default(false),
-
-  procedureAvailability: z.boolean().default(false),
-  procedureFollowing: z.boolean().default(false),
-  procedureUnderstanding: z.boolean().default(false),
-  
-  safeActs: z.string().optional(),
-  unsafeActs: z.string().optional(),
-  otherObservations: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -125,17 +97,6 @@ const qualityActNames = ["Weighing scales are calibrated and status is available
 const actCompliedOptions = ["Yes", "No"];
 const keyQualityBehaviours = ["I will always ensure timely calibration is done following right procedure"];
 const susaStatuses = ["Open", "Closed"];
-
-const ppeItems = [
-    { id: "ppeEyesAndFace", label: "Eyes & Face" },
-    { id: "ppeHead", label: "Head" },
-    { id: "ppeHands", label: "Hands" },
-    { id: "ppeRespiratory", label: "Respiratory" },
-    { id: "ppeHearing", label: "Hearing" },
-    { id: "ppeFoot", label: "Foot" },
-    { id: "ppeBody", label: "Body" },
-] as const;
-
 
 export default function QualitySusaForm() {
   const { toast } = useToast();
@@ -172,29 +133,6 @@ export default function QualitySusaForm() {
       descriptionOfAct: "After changing the indicator, Ensured calibration status before handover the equipment.",
       keyQualityBehaviour: "I will always ensure timely calibration is done following right procedure",
       susaStatus: "Closed",
-
-      bodyPostureBending: false,
-      bodyPostureTwisting: false,
-      bodyPostureReaching: false,
-      bodyPostureLifting: false,
-      bodyPosturePushing: false,
-      bodyPosturePulling: false,
-      toolsAndEquipmentSelection: false,
-      toolsAndEquipmentUse: false,
-      toolsAndEquipmentCondition: false,
-      ppeEyesAndFace: false,
-      ppeHead: false,
-      ppeHands: false,
-      ppeRespiratory: false,
-      ppeHearing: false,
-      ppeFoot: false,
-      ppeBody: false,
-      procedureAvailability: false,
-      procedureFollowing: false,
-      procedureUnderstanding: false,
-      safeActs: "",
-      unsafeActs: "",
-      otherObservations: ""
     },
   });
 
@@ -567,7 +505,7 @@ export default function QualitySusaForm() {
                       />
                   </AccordionContent>
                 </AccordionItem>
-                <AccordionItem value="observation-details">
+                <AccordionItem value="observation-details"  className="border-b-0">
                     <AccordionTrigger className="text-lg font-semibold">Observation Details</AccordionTrigger>
                     <AccordionContent className="pt-4 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
                       <FormField
@@ -781,104 +719,6 @@ export default function QualitySusaForm() {
                         />
                     </AccordionContent>
                 </AccordionItem>
-
-                <AccordionItem value="body-posture">
-                    <AccordionTrigger className="text-lg font-semibold">Body Posture, Tools & PPE</AccordionTrigger>
-                    <AccordionContent className="pt-4 space-y-6">
-                        <div>
-                            <FormLabel className="text-base font-medium">Body Posture / Ergonomics</FormLabel>
-                            <div className="p-4 mt-2 border rounded-md grid grid-cols-2 md:grid-cols-3 gap-4">
-                                <FormField control={form.control} name="bodyPostureBending" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">Bending</FormLabel></FormItem>)} />
-                                <FormField control={form.control} name="bodyPostureTwisting" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">Twisting</FormLabel></FormItem>)} />
-                                <FormField control={form.control} name="bodyPostureReaching" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">Reaching</FormLabel></FormItem>)} />
-                                <FormField control={form.control} name="bodyPostureLifting" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">Lifting</FormLabel></FormItem>)} />
-                                <FormField control={form.control} name="bodyPosturePushing" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">Pushing</FormLabel></FormItem>)} />
-                                <FormField control={form.control} name="bodyPosturePulling" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">Pulling</FormLabel></FormItem>)} />
-                            </div>
-                        </div>
-                        <div>
-                            <FormLabel className="text-base font-medium">Tools and Equipment</FormLabel>
-                            <div className="p-4 mt-2 border rounded-md grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <FormField control={form.control} name="toolsAndEquipmentSelection" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">Selection</FormLabel></FormItem>)} />
-                                <FormField control={form.control} name="toolsAndEquipmentUse" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">Use</FormLabel></FormItem>)} />
-                                <FormField control={form.control} name="toolsAndEquipmentCondition" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">Condition</FormLabel></FormItem>)} />
-                            </div>
-                        </div>
-                         <div>
-                            <FormLabel className="text-base font-medium">Personal Protective Equipment (PPE)</FormLabel>
-                            <div className="p-4 mt-2 border rounded-md grid grid-cols-2 md:grid-cols-3 gap-4">
-                                {ppeItems.map(item => (
-                                <FormField
-                                    key={item.id}
-                                    control={form.control}
-                                    name={item.id}
-                                    render={({ field }) => (
-                                    <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                                        <FormControl>
-                                        <Checkbox checked={field.value} onCheckedChange={field.onChange} />
-                                        </FormControl>
-                                        <FormLabel className="font-normal">{item.label}</FormLabel>
-                                    </FormItem>
-                                    )}
-                                />
-                                ))}
-                            </div>
-                        </div>
-                    </AccordionContent>
-                </AccordionItem>
-
-                 <AccordionItem value="procedures-and-other-details" className="border-b-0">
-                    <AccordionTrigger className="text-lg font-semibold">Procedures and Other Details</AccordionTrigger>
-                    <AccordionContent className="pt-4 space-y-6">
-                       <div>
-                            <FormLabel className="text-base font-medium">Procedures</FormLabel>
-                            <div className="p-4 mt-2 border rounded-md grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <FormField control={form.control} name="procedureAvailability" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">Availability / Adequacy</FormLabel></FormItem>)} />
-                                <FormField control={form.control} name="procedureFollowing" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">Following</FormLabel></FormItem>)} />
-                                <FormField control={form.control} name="procedureUnderstanding" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">Understanding</FormLabel></FormItem>)} />
-                            </div>
-                        </div>
-                        <FormField
-                            control={form.control}
-                            name="safeActs"
-                            render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Safe Acts / Conditions</FormLabel>
-                                <FormControl>
-                                <Textarea placeholder="Describe any safe acts or conditions observed..." {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="unsafeActs"
-                            render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Unsafe Acts / Conditions</FormLabel>
-                                <FormControl>
-                                <Textarea placeholder="Describe any unsafe acts or conditions observed..." {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="otherObservations"
-                            render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Other Observations</FormLabel>
-                                <FormControl>
-                                <Textarea placeholder="Describe any other observations..." {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                            )}
-                        />
-                    </AccordionContent>
-                </AccordionItem>
               </Accordion>
               <CardFooter className="flex flex-col sm:flex-row justify-end gap-4 pt-8 px-0">
                 <Button type="button" variant="outline" onClick={() => form.reset()}>
@@ -925,5 +765,3 @@ export default function QualitySusaForm() {
     </>
   );
 }
-
-    
