@@ -9,6 +9,7 @@ import {
   SidebarHeader,
   SidebarContent,
   SidebarTrigger,
+  SidebarInset,
 } from '@/components/ui/sidebar';
 import SidebarNav from '@/components/sidebar-nav';
 import { FirebaseClientProvider } from '@/firebase/client-provider';
@@ -35,7 +36,7 @@ export default function RootLayout({
         <FirebaseClientProvider>
           <SidebarProvider defaultOpen={false}>
             <div className="flex">
-              <Sidebar className="border-r">
+              <Sidebar>
                 <SidebarHeader>
                   <SidebarTrigger />
                 </SidebarHeader>
@@ -43,10 +44,10 @@ export default function RootLayout({
                   <SidebarNav />
                 </SidebarContent>
               </Sidebar>
-              <div className="flex-1 flex flex-col">
+              <SidebarInset>
                 <Header />
                 {children}
-              </div>
+              </SidebarInset>
             </div>
             <Toaster />
           </SidebarProvider>
