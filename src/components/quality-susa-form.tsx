@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -139,6 +140,12 @@ export default function QualitySusaForm() {
   
   React.useEffect(() => {
     setBbqReferenceNumber(`QUALITYSUSA${format(new Date(), 'yyyyMMddHHmmss')}`);
+  }, []);
+
+  React.useEffect(() => {
+    if (form.formState.isSubmitSuccessful) {
+      setBbqReferenceNumber(`QUALITYSUSA${format(new Date(), 'yyyyMMddHHmmss')}`);
+    }
   }, [form.formState.isSubmitSuccessful]);
 
 
@@ -151,34 +158,41 @@ export default function QualitySusaForm() {
       });
       return;
     }
+
     setIsSubmitting(true);
-    
+
+    const docToSave = {
+        ...values,
+        bbqReferenceNumber,
+        createdAt: serverTimestamp(),
+    };
+
     try {
-        const docToSave = {
-            ...values,
-            bbqReferenceNumber,
-            createdAt: serverTimestamp(),
-        };
-
-        await addDoc(collection(firestore, 'quality-susa-incidents'), docToSave);
-        
-        toast({
-            title: 'Success!',
-            description: `QUALITY SUSA has been raised with reference ID: ${bbqReferenceNumber}`,
-        });
-        
-        form.reset();
-        // After successful submission, generate a new reference number for the next form.
-        setBbqReferenceNumber(`QUALITYSUSA${format(new Date(), 'yyyyMMddHHmmss')}`);
-
-    } catch (error) {
-        console.error('Error adding document: ', error);
-        toast({
+      addDoc(collection(firestore, 'quality-susa-incidents'), docToSave)
+        .catch((error) => {
+          console.error('Error adding document: ', error);
+          toast({
             variant: 'destructive',
             title: 'Uh oh! Something went wrong.',
             description: 'Your incident was not saved. Please try again.',
+          });
         });
-    } finally {
+      
+      toast({
+          title: 'Success!',
+          description: `QUALITY SUSA has been raised with reference ID: ${bbqReferenceNumber}`,
+      });
+      
+      form.reset();
+      setIsSubmitting(false);
+
+    } catch (error) {
+        console.error('Error during submission process: ', error);
+        toast({
+            variant: 'destructive',
+            title: 'Uh oh! An unexpected error occurred.',
+            description: 'Please try again.',
+        });
         setIsSubmitting(false);
     }
   }
@@ -708,7 +722,7 @@ export default function QualitySusaForm() {
                 <Button type="button" variant="outline" onClick={() => form.reset()}>
                   Clear Form
                 </Button>
-                <Button type="submit" disabled={isSubmitting}>
+                <Button type="submit" disabled={isSubmitting || !firestore}>
                   {isSubmitting ? <Loader2 className="animate-spin" /> : <Printer />}
                   Submit
                 </Button>
@@ -744,3 +758,5 @@ export default function QualitySusaForm() {
     </>
   );
 }
+
+    
