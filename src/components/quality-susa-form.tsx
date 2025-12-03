@@ -52,6 +52,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Calendar } from "./ui/calendar";
 import { useFirestore } from "@/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { errorEmitter } from '@/firebase/error-emitter';
+import { FirestorePermissionError } from '@/firebase/errors';
 
 const formSchema = z.object({
   locationName: z.string().min(1, "Location is required."),
@@ -168,14 +170,16 @@ export default function QualitySusaForm() {
     };
 
     try {
-      addDoc(collection(firestore, 'quality-susa-incidents'), docToSave)
-        .catch((error) => {
-          console.error('Error adding document: ', error);
-          toast({
-            variant: 'destructive',
-            title: 'Uh oh! Something went wrong.',
-            description: 'Your incident was not saved. Please try again.',
-          });
+      const incidentsCollection = collection(firestore, 'quality-susa-incidents');
+
+      addDoc(incidentsCollection, docToSave)
+        .catch(async (serverError) => {
+            const permissionError = new FirestorePermissionError({
+              path: incidentsCollection.path,
+              operation: 'create',
+              requestResourceData: docToSave,
+            });
+            errorEmitter.emit('permission-error', permissionError);
         });
       
       toast({
@@ -184,7 +188,6 @@ export default function QualitySusaForm() {
       });
       
       form.reset();
-      setIsSubmitting(false);
 
     } catch (error) {
         console.error('Error during submission process: ', error);
@@ -193,6 +196,7 @@ export default function QualitySusaForm() {
             title: 'Uh oh! An unexpected error occurred.',
             description: 'Please try again.',
         });
+    } finally {
         setIsSubmitting(false);
     }
   }
@@ -758,5 +762,3 @@ export default function QualitySusaForm() {
     </>
   );
 }
-
-    

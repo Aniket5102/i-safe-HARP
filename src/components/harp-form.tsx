@@ -59,6 +59,8 @@ import { useFirestore } from "@/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { useRouter } from 'next/navigation';
 import AsianPaintsLogo from "./asian-paints-logo";
+import { errorEmitter } from '@/firebase/error-emitter';
+import { FirestorePermissionError } from '@/firebase/errors';
 
 const formSchema = z.object({
   date: z.date({ required_error: "A date is required." }),
@@ -140,34 +142,40 @@ export default function HarpForm() {
     setIsSubmitting(true);
     const harpId = `HARP-${Date.now()}`;
     
-    // Optimistic UI update
-    toast({
-        title: 'Success!',
-        description: `HARP Incident has been raised with incident ID: ${harpId}`,
-    });
-    form.reset();
-    setIsSubmitting(false);
-
     try {
         const incidentsCollection = collection(firestore, 'harp-incidents');
-        // Asynchronous operation in the background
-        addDoc(incidentsCollection, {
+        const docToSave = {
           ...values,
           harpId,
           otherObservation: values.otherObservation || null,
           createdAt: serverTimestamp(),
+        };
+
+        addDoc(incidentsCollection, docToSave)
+          .catch(async (serverError) => {
+            const permissionError = new FirestorePermissionError({
+              path: incidentsCollection.path,
+              operation: 'create',
+              requestResourceData: docToSave,
+            });
+            errorEmitter.emit('permission-error', permissionError);
+          });
+        
+        toast({
+            title: 'Success!',
+            description: `HARP Incident has been raised with incident ID: ${harpId}`,
         });
 
+        form.reset();
     } catch (error) {
-        console.error('Error adding document: ', error);
-        // If the background operation fails, inform the user.
+        console.error('Error during submission process: ', error);
         toast({
             variant: 'destructive',
-            title: 'Uh oh! Something went wrong.',
-            description: 'Your incident was not saved. Please try again.',
+            title: 'Uh oh! An unexpected error occurred.',
+            description: 'Please try again.',
         });
-        // Optionally, you could re-populate the form with the values
-        // form.reset(values); 
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
