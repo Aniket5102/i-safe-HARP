@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -42,7 +41,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { useToast } from "@/hooks/use-toast";
-import { ChevronLeft, FileDown, Loader2, Printer, Download, X } from "lucide-react";
+import { ChevronLeft, FileDown, Loader2, Printer, Download, X, CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import QRCode from "qrcode.react";
 import jsPDF from "jspdf";
@@ -51,6 +50,8 @@ import { useRouter } from 'next/navigation';
 import AsianPaintsLogo from "./asian-paints-logo";
 import { Textarea } from "./ui/textarea";
 import { Checkbox } from "./ui/checkbox";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { Calendar } from "./ui/calendar";
 
 const formSchema = z.object({
   locationName: z.string().min(1, "Location is required."),
@@ -65,10 +66,17 @@ const formSchema = z.object({
   employeeBlock: z.string().min(1, "Employee Block is required."),
   sbtDbtOther: z.string().max(100, "Must be 100 characters or less").optional(),
   observationGoal: z.string().optional(),
-  taskActivityObserved: z.string().min(1, "Task/Activity is required."),
-  noOfPeopleObserved: z.string().min(1, "Number of people is required."),
+  
+  dateOfObservation: z.date({ required_error: "A date is required." }),
+  timeOfObservation: z.string().min(1, "Time is required."),
   shift: z.string().min(1, "Shift is required."),
-  reactionsOfPeople: z.string().optional(),
+  observedType: z.string().min(1, "Observed Type is required."),
+  qualityKeyActivity: z.string().min(1, "Quality Key Activity is required."),
+  qualityActName: z.string().min(1, "Quality Act Name is required."),
+  isActComplied: z.string().min(1, "This field is required."),
+  descriptionOfAct: z.string().min(1, "Description is required.").max(4000),
+  keyQualityBehaviour: z.string().min(1, "Key Quality Behaviour is required."),
+  susaStatus: z.string().min(1, "SUSA Status is required."),
   
   bodyPostureBending: z.boolean().default(false),
   bodyPostureTwisting: z.boolean().default(false),
@@ -109,8 +117,14 @@ const observerTypes = ["APL Employee", "APG", "PPGAP", "APPPG"];
 const employeeIds = ["00132461", "P00126717", "P00126718"];
 const designations = ["EXECUTIVE I - PLANT ENGINEERING", "Executive I - Production", "Manager - Production"];
 const employeeDepartments = ["ENGINEERING", "PRODUCTION", "QUALITY"];
-const shifts = ["General Shift", "Shift A", "Shift B", "Shift C"];
+const shifts = ["General Shift", "Shift A", "Shift B", "Shift C", "1st Shift (6:30 - 14:30)"];
 const observationGoals = ["1", "2", "3", "4", "5"];
+const observedTypes = ["Technician"];
+const qualityKeyActivities = ["calibration"];
+const qualityActNames = ["Weighing scales are calibrated and status is available"];
+const actCompliedOptions = ["Yes", "No"];
+const keyQualityBehaviours = ["I will always ensure timely calibration is done following right procedure"];
+const susaStatuses = ["Open", "Closed"];
 
 const ppeItems = [
     { id: "ppeEyesAndFace", label: "Eyes & Face" },
@@ -130,6 +144,7 @@ export default function QualitySusaForm() {
   const qrCodeRef = React.useRef<HTMLDivElement>(null);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [qrCodeValue, setQrCodeValue] = React.useState<string | null>(null);
+  const [isDatePickerOpen, setIsDatePickerOpen] = React.useState(false);
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -146,10 +161,18 @@ export default function QualitySusaForm() {
       employeeBlock: "Manufacturing block",
       sbtDbtOther: "",
       observationGoal: "1",
-      taskActivityObserved: "",
-      noOfPeopleObserved: "1",
-      shift: "General Shift",
-      reactionsOfPeople: "",
+      
+      dateOfObservation: new Date(),
+      timeOfObservation: format(new Date(), "HH:mm"),
+      shift: "1st Shift (6:30 - 14:30)",
+      observedType: "Technician",
+      qualityKeyActivity: "calibration",
+      qualityActName: "Weighing scales are calibrated and status is available",
+      isActComplied: "Yes",
+      descriptionOfAct: "After changing the indicator, Ensured calibration status before handover the equipment.",
+      keyQualityBehaviour: "I will always ensure timely calibration is done following right procedure",
+      susaStatus: "Closed",
+
       bodyPostureBending: false,
       bodyPostureTwisting: false,
       bodyPostureReaching: false,
@@ -266,6 +289,7 @@ export default function QualitySusaForm() {
   };
   
   const sbtDbtOtherValue = form.watch('sbtDbtOther');
+  const descriptionOfActValue = form.watch('descriptionOfAct');
   
   return (
     <>
@@ -546,27 +570,55 @@ export default function QualitySusaForm() {
                 <AccordionItem value="observation-details">
                     <AccordionTrigger className="text-lg font-semibold">Observation Details</AccordionTrigger>
                     <AccordionContent className="pt-4 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-                        <FormField
-                            control={form.control}
-                            name="taskActivityObserved"
-                            render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Task/Activity Observed<span className="text-red-500">*</span></FormLabel>
-                                <FormControl>
-                                <Input placeholder="Enter the observed task" {...field} />
-                                </FormControl>
-                                <FormMessage />
+                      <FormField
+                          control={form.control}
+                          name="dateOfObservation"
+                          render={({ field }) => (
+                            <FormItem className="flex flex-col">
+                              <FormLabel>Date of Observation<span className="text-red-500">*</span></FormLabel>
+                              <Popover open={isDatePickerOpen} onOpenChange={setIsDatePickerOpen}>
+                                <PopoverTrigger asChild>
+                                  <FormControl>
+                                    <Button
+                                      variant={"outline"}
+                                      className={cn(
+                                        "w-full pl-3 text-left font-normal",
+                                        !field.value && "text-muted-foreground"
+                                      )}
+                                    >
+                                      {field.value ? (
+                                        format(field.value, "PPP")
+                                      ) : (
+                                        <span>Pick a date</span>
+                                      )}
+                                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                    </Button>
+                                  </FormControl>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-auto p-0" align="start">
+                                  <Calendar
+                                    mode="single"
+                                    selected={field.value}
+                                    onSelect={(date) => {
+                                        if (date) field.onChange(date);
+                                        setIsDatePickerOpen(false);
+                                    }}
+                                    initialFocus
+                                  />
+                                </PopoverContent>
+                              </Popover>
+                              <FormMessage className="mt-2" />
                             </FormItem>
-                            )}
+                          )}
                         />
-                        <FormField
+                         <FormField
                             control={form.control}
-                            name="noOfPeopleObserved"
+                            name="timeOfObservation"
                             render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Number of People Observed<span className="text-red-500">*</span></FormLabel>
+                                <FormLabel>Time of Observation<span className="text-red-500">*</span></FormLabel>
                                 <FormControl>
-                                <Input type="number" placeholder="e.g., 1" {...field} />
+                                    <Input type="time" {...field} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -588,19 +640,141 @@ export default function QualitySusaForm() {
                                         {shifts.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
                                     </SelectContent>
                                 </Select>
+                                <FormDescription>Please select the Shift from the drop down list</FormDescription>
                                 <FormMessage />
                             </FormItem>
                             )}
                         />
-                         <FormField
+                        <FormField
                             control={form.control}
-                            name="reactionsOfPeople"
+                            name="observedType"
                             render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Reactions of People</FormLabel>
+                                <FormLabel>Observed Type<span className="text-red-500">*</span></FormLabel>
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                    <FormControl>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select observed type" />
+                                        </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                        {observedTypes.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                                    </SelectContent>
+                                </Select>
+                                <FormMessage />
+                            </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="qualityKeyActivity"
+                            render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Quality Key Activity<span className="text-red-500">*</span></FormLabel>
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                    <FormControl>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select activity" />
+                                        </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                        {qualityKeyActivities.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                                    </SelectContent>
+                                </Select>
+                                <FormMessage />
+                            </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="qualityActName"
+                            render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Quality Act Name<span className="text-red-500">*</span></FormLabel>
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                    <FormControl>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select act name" />
+                                        </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                        {qualityActNames.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                                    </SelectContent>
+                                </Select>
+                                <FormMessage />
+                            </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="isActComplied"
+                            render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Is Act Complied<span className="text-red-500">*</span></FormLabel>
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                    <FormControl>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select an option" />
+                                        </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                        {actCompliedOptions.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                                    </SelectContent>
+                                </Select>
+                                <FormMessage />
+                            </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="descriptionOfAct"
+                            render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Description of Act<span className="text-red-500">*</span></FormLabel>
                                 <FormControl>
-                                    <Input placeholder="Note any reactions" {...field} />
+                                <Textarea placeholder="Enter description" {...field} maxLength={4000} />
                                 </FormControl>
+                                <FormDescription>{4000 - (descriptionOfActValue?.length || 0)} Characters Left</FormDescription>
+                                <FormMessage />
+                            </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="keyQualityBehaviour"
+                            render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Key Quality Behaviour<span className="text-red-500">*</span></FormLabel>
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                    <FormControl>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select behaviour" />
+                                        </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                        {keyQualityBehaviours.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                                    </SelectContent>
+                                </Select>
+                                <FormMessage />
+                            </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="susaStatus"
+                            render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>SUSA Status<span className="text-red-500">*</span></FormLabel>
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                    <FormControl>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select status" />
+                                        </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                        {susaStatuses.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                                    </SelectContent>
+                                </Select>
                                 <FormMessage />
                             </FormItem>
                             )}
@@ -751,7 +925,5 @@ export default function QualitySusaForm() {
     </>
   );
 }
-
-    
 
     
