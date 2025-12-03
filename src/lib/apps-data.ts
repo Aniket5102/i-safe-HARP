@@ -13,7 +13,7 @@ export const apps: App[] = [
     subtitle: 'SUSA Reporting for i-Safe Quality Team', 
     imageUrl: 'https://picsum.photos/seed/quality-susa/200/200',
     imageHint: 'quality safety logo', 
-    href: '#' 
+    href: '/quality-susa' 
   },
   { 
     name: 'Quality Incident Reporting', 
