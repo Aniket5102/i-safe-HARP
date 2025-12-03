@@ -33,7 +33,7 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased">
         <FirebaseClientProvider>
-          <SidebarProvider>
+          <SidebarProvider defaultOpen={false}>
             <div className="flex">
               <Sidebar className="border-r">
                 <SidebarHeader>
