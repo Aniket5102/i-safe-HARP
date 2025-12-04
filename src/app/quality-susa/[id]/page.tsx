@@ -37,7 +37,6 @@ export default function QualitySusaIncidentDetailsPage() {
           
           const formattedData: DocumentData = {};
           for (const key in data) {
-            // Check for Firestore Timestamp and convert to JS Date
             if (data[key] && typeof data[key].toDate === 'function') {
               formattedData[key] = data[key].toDate();
             } else {
@@ -78,14 +77,10 @@ export default function QualitySusaIncidentDetailsPage() {
     return value.toString();
   }
   
-  // Define a sensible order for displaying fields
   const displayOrder = [
-    'bbqReferenceNumber', 'dateOfObservation', 'timeOfObservation', 'locationName', 
-    'department', 'block', 'areaFloor', 'shift', 'observerName', 'observerType',
-    'employeeId', 'designation', 'employeeDepartment', 'employeeBlock', 
-    'sbtDbtOther', 'observationGoal', 'observedType', 'qualityKeyActivity', 
-    'qualityActName', 'isActComplied', 'descriptionOfAct', 'keyQualityBehaviour', 
-    'susaStatus', 'createdAt'
+    'bbqReferenceNumber', 'locationName', 'department', 'block', 'areaFloor',
+    'observerName', 'observerType', 'employeeId', 'designation', 
+    'employeeDepartment', 'employeeBlock', 'createdAt'
   ];
 
   const renderContent = () => {
@@ -106,7 +101,7 @@ export default function QualitySusaIncidentDetailsPage() {
     if (incident) {
         const sortedEntries = displayOrder
             .map(key => ([key, incident[key]]))
-            .filter(([, value]) => value !== undefined && key !== 'id');
+            .filter(([, value]) => value !== undefined);
 
         const remainingEntries = Object.entries(incident)
             .filter(([key]) => !displayOrder.includes(key) && key !== 'id');
@@ -156,5 +151,3 @@ export default function QualitySusaIncidentDetailsPage() {
     </div>
   );
 }
-
-    

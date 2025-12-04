@@ -41,17 +41,14 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { useToast } from "@/hooks/use-toast";
-import { ChevronLeft, Loader2, Printer, Download, CalendarIcon } from "lucide-react";
+import { ChevronLeft, Loader2, Printer, Download } from "lucide-react";
 import { format } from "date-fns";
 import QRCode from "qrcode.react";
 import html2canvas from "html2canvas";
 import { useRouter } from 'next/navigation';
 import AsianPaintsLogo from "./asian-paints-logo";
-import { Textarea } from "./ui/textarea";
-import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
-import { Calendar } from "./ui/calendar";
 import { useFirestore, useAuth } from "@/firebase";
-import { collection, addDoc, serverTimestamp, CollectionReference } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
 const formSchema = z.object({
   locationName: z.string().min(1, "Location is required."),
@@ -64,40 +61,20 @@ const formSchema = z.object({
   designation: z.string().min(1, "Designation is required."),
   employeeDepartment: z.string().min(1, "Employee Department is required."),
   employeeBlock: z.string().min(1, "Employee Block is required."),
-  sbtDbtOther: z.string().max(100, "Must be 100 characters or less").optional(),
-  observationGoal: z.string().optional(),
-  
-  dateOfObservation: z.date({ required_error: "A date is required." }),
-  timeOfObservation: z.string().min(1, "Time is required."),
-  shift: z.string().min(1, "Shift is required."),
-  observedType: z.string().min(1, "Observed Type is required."),
-  qualityKeyActivity: z.string().min(1, "Quality Key Activity is required."),
-  qualityActName: z.string().min(1, "Quality Act Name is required."),
-  isActComplied: z.string().min(1, "This field is required."),
-  descriptionOfAct: z.string().min(1, "Description is required.").max(4000),
-  keyQualityBehaviour: z.string().min(1, "Key Quality Behaviour is required."),
-  susaStatus: z.string().min(1, "SUSA Status is required."),
 });
 
 type FormValues = z.infer<typeof formSchema>;
 
-const locations = ["Sriperumbudur", "Patancheru", "Khandala", "Rohtak", "Vizag", "Mysuru", "Kasna", "Ankleshwar", "Sripi"];
-const departments = ["Production Department", "Quality Department", "Admin Department", "Manufacturing Department", "Quality Assurance Department"];
-const blocks = ["Manufacturing block", "RH House", "EH House", "SPB", "WPB", "POLYMER BLOCK", "MAIN QA Block"];
-const floors = ["Charge hopper floor", "RH Reactor Floor", "EH Reactor Floor", "SPB Floor", "WPB Floor", "GROUND FLOOR", "Manufacturing Area", "MAIN QA AREA"];
-const observers = ["VASANTH R", "Sai", "Manmohan", "Ashish", "Tanmay", "Aniket", "Shriyash", "Lohith M", "ERNET PAUL J", "SAIRAM G"];
+const locations = ["Kasna", "Sriperumbudur", "Patancheru", "Khandala", "Rohtak", "Vizag", "Mysuru", "Ankleshwar"];
+const departments = ["Production Department", "Quality Department", "Admin Department"];
+const blocks = ["Resin House (RH) Block", "EH House", "SPB", "WPB"];
+const floors = ["RH Reactor Floor", "EH Reactor Floor", "SPB Floor", "WPB Floor"];
+const observers = ["RAVISINGH.", "Sai", "Manmohan", "Ashish", "Tanmay", "Aniket"];
 const observerTypes = ["APL Employee", "APG", "PPGAP", "APPPG"];
-const employeeIds = ["00132461", "P00126717", "P00126718"];
-const designations = ["EXECUTIVE I - PLANT ENGINEERING", "Executive I - Production", "Manager - Production"];
-const employeeDepartments = ["ENGINEERING", "PRODUCTION", "QUALITY"];
-const shifts = ["General Shift", "Shift A", "Shift B", "Shift C", "1st Shift (6:30 - 14:30)"];
-const observationGoals = ["1", "2", "3", "4", "5"];
-const observedTypes = ["Technician"];
-const qualityKeyActivities = ["calibration"];
-const qualityActNames = ["Weighing scales are calibrated and status is available"];
-const actCompliedOptions = ["Yes", "No"];
-const keyQualityBehaviours = ["I will always ensure timely calibration is done following right procedure"];
-const susaStatuses = ["Open", "Closed"];
+const employeeIds = ["00133029", "P00126717", "P00126718"];
+const designations = ["EXECUTIVE I - PRODUCTION", "Executive II - Production", "Manager - Production"];
+const employeeDepartments = ["PRODUCTION", "QUALITY", "ENGINEERING"];
+
 
 export default function QualitySusaForm() {
   const { toast } = useToast();
@@ -108,35 +85,22 @@ export default function QualitySusaForm() {
   const qrCodeRef = React.useRef<HTMLDivElement>(null);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [qrCodeValue, setQrCodeValue] = React.useState<string | null>(null);
-  const [isDatePickerOpen, setIsDatePickerOpen] = React.useState(false);
   
   const [bbqReferenceNumber, setBbqReferenceNumber] = React.useState('');
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      locationName: "Khandala",
-      department: "Quality Assurance Department",
-      block: "MAIN QA Block",
-      areaFloor: "MAIN QA AREA",
-      observerName: "Aniket",
+      locationName: "Kasna",
+      department: "Production Department",
+      block: "Resin House (RH) Block",
+      areaFloor: "RH Reactor Floor",
+      observerName: "RAVISINGH.",
       observerType: "APL Employee",
-      employeeId: "P00126717",
-      designation: "Manager - Production",
+      employeeId: "00133029",
+      designation: "EXECUTIVE I - PRODUCTION",
       employeeDepartment: "PRODUCTION",
-      employeeBlock: "SPB",
-      sbtDbtOther: "NA",
-      observationGoal: "3",
-      dateOfObservation: new Date(),
-      timeOfObservation: format(new Date(), 'HH:mm'),
-      shift: "General Shift",
-      observedType: "Technician",
-      qualityKeyActivity: "calibration",
-      qualityActName: "Weighing scales are calibrated and status is available",
-      isActComplied: "Yes",
-      descriptionOfAct: "The act was complied with correctly.",
-      keyQualityBehaviour: "I will always ensure timely calibration is done following right procedure",
-      susaStatus: "Open",
+      employeeBlock: "Resin House (RH) Block",
     },
   });
   
@@ -157,6 +121,7 @@ export default function QualitySusaForm() {
     setIsSubmitting(true);
     
     const newBbqReferenceNumber = `QUALITYSUSA${format(new Date(), 'yyyyMMddHHmmss')}`;
+    setBbqReferenceNumber(newBbqReferenceNumber);
     
     const incidentData = {
       ...values,
@@ -217,9 +182,6 @@ export default function QualitySusaForm() {
     }
   };
   
-  const sbtDbtOtherValue = form.watch('sbtDbtOther');
-  const descriptionOfActValue = form.watch('descriptionOfAct');
-  
   return (
     <>
       <Card ref={formRef} className="w-full shadow-2xl" id="quality-susa-form-card">
@@ -241,8 +203,8 @@ export default function QualitySusaForm() {
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <Accordion type="multiple" className="w-full" defaultValue={["general-details", "observation-details"]}>
-                <AccordionItem value="general-details">
+              <Accordion type="multiple" className="w-full" defaultValue={["general-details"]}>
+                <AccordionItem value="general-details" className="border-b-0">
                   <AccordionTrigger className="text-lg font-semibold">General Details</AccordionTrigger>
                   <AccordionContent className="pt-4 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
                       <FormItem>
@@ -456,255 +418,7 @@ export default function QualitySusaForm() {
                           </FormItem>
                         )}
                       />
-                      <FormField
-                          control={form.control}
-                          name="sbtDbtOther"
-                          render={({ field }) => (
-                              <FormItem>
-                                  <FormLabel>SBT/DBT/Other</FormLabel>
-                                  <FormControl>
-                                      <Input placeholder="Enter details" {...field} maxLength={100} />
-                                  </FormControl>
-                                  <FormDescription>{100 - (sbtDbtOtherValue?.length || 0)} Characters Left</FormDescription>
-                                  <FormMessage />
-                              </FormItem>
-                          )}
-                      />
-                      <FormField
-                          control={form.control}
-                          name="observationGoal"
-                          render={({ field }) => (
-                              <FormItem>
-                                  <FormLabel>No. of Observation per month [GOAL]</FormLabel>
-                                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                      <FormControl>
-                                          <SelectTrigger>
-                                              <SelectValue placeholder="Select a goal" />
-                                          </SelectTrigger>
-                                      </FormControl>
-                                      <SelectContent>
-                                          {observationGoals.map(g => <SelectItem key={g} value={g}>{g}</SelectItem>)}
-                                      </SelectContent>
-                                  </Select>
-                                  <FormMessage />
-                              </FormItem>
-                          )}
-                      />
                   </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="observation-details"  className="border-b-0">
-                    <AccordionTrigger className="text-lg font-semibold">Observation Details</AccordionTrigger>
-                    <AccordionContent className="pt-4 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-                      <FormField
-                          control={form.control}
-                          name="dateOfObservation"
-                          render={({ field }) => (
-                            <FormItem className="flex flex-col">
-                              <FormLabel>Date of Observation<span className="text-red-500">*</span></FormLabel>
-                              <Popover open={isDatePickerOpen} onOpenChange={setIsDatePickerOpen}>
-                                <PopoverTrigger asChild>
-                                  <FormControl>
-                                    <Button
-                                      variant={"outline"}
-                                      className={cn(
-                                        "w-full pl-3 text-left font-normal",
-                                        !field.value && "text-muted-foreground"
-                                      )}
-                                    >
-                                      {field.value ? (
-                                        format(field.value, "PPP")
-                                      ) : (
-                                        <span>Pick a date</span>
-                                      )}
-                                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                    </Button>
-                                  </FormControl>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-auto p-0" align="start">
-                                  <Calendar
-                                    mode="single"
-                                    selected={field.value}
-                                    onSelect={(date) => {
-                                        if (date) field.onChange(date);
-                                        setIsDatePickerOpen(false);
-                                    }}
-                                    initialFocus
-                                  />
-                                </PopoverContent>
-                              </Popover>
-                              <FormMessage className="mt-2" />
-                            </FormItem>
-                          )}
-                        />
-                         <FormField
-                            control={form.control}
-                            name="timeOfObservation"
-                            render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Time of Observation<span className="text-red-500">*</span></FormLabel>
-                                <FormControl>
-                                    <Input type="time" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="shift"
-                            render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Shift<span className="text-red-500">*</span></FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                    <FormControl>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select shift" />
-                                        </SelectTrigger>
-                                    </FormControl>
-                                    <SelectContent>
-                                        {shifts.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-                                    </SelectContent>
-                                </Select>
-                                <FormDescription>Please select the Shift from the drop down list</FormDescription>
-                                <FormMessage />
-                            </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="observedType"
-                            render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Observed Type<span className="text-red-500">*</span></FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                    <FormControl>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select observed type" />
-                                        </SelectTrigger>
-                                    </FormControl>
-                                    <SelectContent>
-                                        {observedTypes.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-                                    </SelectContent>
-                                </Select>
-                                <FormMessage />
-                            </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="qualityKeyActivity"
-                            render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Quality Key Activity<span className="text-red-500">*</span></FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                    <FormControl>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select activity" />
-                                        </SelectTrigger>
-                                    </FormControl>
-                                    <SelectContent>
-                                        {qualityKeyActivities.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-                                    </SelectContent>
-                                </Select>
-                                <FormMessage />
-                            </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="qualityActName"
-                            render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Quality Act Name<span className="text-red-500">*</span></FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                    <FormControl>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select act name" />
-                                        </SelectTrigger>
-                                    </FormControl>
-                                    <SelectContent>
-                                        {qualityActNames.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-                                    </SelectContent>
-                                </Select>
-                                <FormMessage />
-                            </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="isActComplied"
-                            render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Is Act Complied<span className="text-red-500">*</span></FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                    <FormControl>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select an option" />
-                                        </SelectTrigger>
-                                    </FormControl>
-                                    <SelectContent>
-                                        {actCompliedOptions.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-                                    </SelectContent>
-                                </Select>
-                                <FormMessage />
-                            </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="descriptionOfAct"
-                            render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Description of Act<span className="text-red-500">*</span></FormLabel>
-                                <FormControl>
-                                <Textarea placeholder="Enter description" {...field} maxLength={4000} />
-                                </FormControl>
-                                <FormDescription>{4000 - (descriptionOfActValue?.length || 0)} Characters Left</FormDescription>
-                                <FormMessage />
-                            </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="keyQualityBehaviour"
-                            render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Key Quality Behaviour<span className="text-red-500">*</span></FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                    <FormControl>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select behaviour" />
-                                        </SelectTrigger>
-                                    </FormControl>
-                                    <SelectContent>
-                                        {keyQualityBehaviours.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-                                    </SelectContent>
-                                </Select>
-                                <FormMessage />
-                            </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="susaStatus"
-                            render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>SUSA Status<span className="text-red-500">*</span></FormLabel>
-                                <Select onValueChange={field.onChange} value={field.value} defaultValue={field.value} disabled>
-                                    <FormControl>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select status" />
-                                        </SelectTrigger>
-                                    </FormControl>
-                                    <SelectContent>
-                                        {susaStatuses.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-                                    </SelectContent>
-                                </Select>
-                                <FormMessage />
-                            </FormItem>
-                            )}
-                        />
-                    </AccordionContent>
                 </AccordionItem>
               </Accordion>
               <CardFooter className="flex flex-col sm:flex-row justify-end gap-4 pt-8 px-0">
@@ -712,7 +426,7 @@ export default function QualitySusaForm() {
                   Clear Form
                 </Button>
                 <Button type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? <Loader2 className="animate-spin" /> : <Printer />}
+                  {isSubmitting ? <Loader2 className="animate-spin" /> : null}
                   Submit
                 </Button>
               </CardFooter>
