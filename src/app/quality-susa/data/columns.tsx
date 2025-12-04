@@ -16,6 +16,7 @@ export type QualitySusaIncident = {
   observerType: string;
   isActComplied: string;
   descriptionOfAct: string;
+  userId: string;
   [key: string]: any; // Allow other fields
 };
 
@@ -51,16 +52,12 @@ export const columns: ColumnDef<QualitySusaIncident>[] = [
     header: 'Block',
   },
   {
-    accessorKey: 'areaFloor',
-    header: 'Area / Floor',
-  },
-  {
     accessorKey: 'observerName',
     header: 'Observer Name',
   },
   {
-    accessorKey: 'observerType',
-    header: 'Observer Type',
+    accessorKey: 'userId',
+    header: 'Created By (User ID)',
   },
   {
     accessorKey: 'isActComplied',
@@ -75,5 +72,7 @@ export const columns: ColumnDef<QualitySusaIncident>[] = [
     }
   },
 ];
+
+    
 
     

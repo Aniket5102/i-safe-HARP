@@ -50,7 +50,7 @@ import AsianPaintsLogo from "./asian-paints-logo";
 import { Textarea } from "./ui/textarea";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Calendar } from "./ui/calendar";
-import { useFirestore } from "@/firebase";
+import { useAuth, useFirestore } from "@/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError, type SecurityRuleContext } from '@/firebase/errors';
@@ -105,6 +105,7 @@ export default function QualitySusaForm() {
   const { toast } = useToast();
   const router = useRouter();
   const firestore = useFirestore();
+  const auth = useAuth();
   const formRef = React.useRef<HTMLDivElement>(null);
   const qrCodeRef = React.useRef<HTMLDivElement>(null);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
@@ -152,11 +153,12 @@ export default function QualitySusaForm() {
 
 
   async function onSubmit(values: FormValues) {
-    if (!firestore) {
+    const user = auth?.currentUser;
+    if (!firestore || !user) {
       toast({
         variant: "destructive",
         title: "Connection Error",
-        description: "Could not connect to the database. Please try again later.",
+        description: "Could not connect to the database or you are not logged in. Please try again later.",
       });
       return;
     }
@@ -167,6 +169,7 @@ export default function QualitySusaForm() {
       const incidentData = {
         ...values,
         bbqReferenceNumber,
+        userId: user.uid,
         createdAt: serverTimestamp(),
       };
 
@@ -760,6 +763,8 @@ export default function QualitySusaForm() {
     </>
   );
 }
+
+    
 
     
 
