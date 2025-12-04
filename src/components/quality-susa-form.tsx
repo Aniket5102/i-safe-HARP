@@ -50,8 +50,10 @@ import AsianPaintsLogo from "./asian-paints-logo";
 import { Textarea } from "./ui/textarea";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Calendar } from "./ui/calendar";
-import { useFirestore } from "@/firebase";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { useFirestore, useAuth } from "@/firebase";
+import { collection, addDoc, serverTimestamp, CollectionReference } from "firebase/firestore";
+import { errorEmitter } from "@/firebase/error-emitter";
+import { FirestorePermissionError } from "@/firebase/errors";
 
 const formSchema = z.object({
   locationName: z.string().min(1, "Location is required."),
@@ -103,6 +105,7 @@ export default function QualitySusaForm() {
   const { toast } = useToast();
   const router = useRouter();
   const firestore = useFirestore();
+  const auth = useAuth();
   const formRef = React.useRef<HTMLDivElement>(null);
   const qrCodeRef = React.useRef<HTMLDivElement>(null);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
@@ -166,7 +169,7 @@ export default function QualitySusaForm() {
       ...values,
       bbqReferenceNumber,
       createdAt: serverTimestamp(),
-      userId: 'anonymous'
+      userId: auth?.currentUser?.uid || 'anonymous',
     };
 
     const docRef = collection(firestore, 'quality-susa-incidents');
@@ -179,13 +182,13 @@ export default function QualitySusaForm() {
         });
         form.reset();
       })
-      .catch((error) => {
-        console.error("Error adding document: ", error);
-        toast({
-          variant: "destructive",
-          title: "Submission Error",
-          description: "An error occurred while saving the incident. Please try again.",
+      .catch(async (serverError) => {
+        const permissionError = new FirestorePermissionError({
+          path: (docRef as CollectionReference).path,
+          operation: 'create',
+          requestResourceData: incidentData,
         });
+        errorEmitter.emit('permission-error', permissionError);
       })
       .finally(() => {
         setIsSubmitting(false);

@@ -55,11 +55,13 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import Image from "next/image";
 import { Textarea } from "./ui/textarea";
-import { useFirestore } from "@/firebase";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { useFirestore, useAuth } from "@/firebase";
+import { collection, addDoc, serverTimestamp, CollectionReference } from "firebase/firestore";
 import { useRouter } from 'next/navigation';
 import AsianPaintsLogo from "./asian-paints-logo";
 import { Calendar } from "@/components/ui/calendar";
+import { errorEmitter } from "@/firebase/error-emitter";
+import { FirestorePermissionError } from "@/firebase/errors";
 
 const formSchema = z.object({
   date: z.date({ required_error: "A date is required." }),
@@ -113,6 +115,7 @@ const risks = ["Medium", "high", "low"];
 export default function HarpForm() {
   const { toast } = useToast();
   const firestore = useFirestore();
+  const auth = useAuth();
   const router = useRouter();
   const formRef = React.useRef<HTMLDivElement>(null);
   const qrCodeRef = React.useRef<HTMLDivElement>(null);
@@ -171,6 +174,7 @@ export default function HarpForm() {
         ...values,
         harpId,
         createdAt: serverTimestamp(),
+        userId: auth?.currentUser?.uid || 'anonymous'
     };
 
     const docRef = collection(firestore, 'harp-incidents');
@@ -183,13 +187,13 @@ export default function HarpForm() {
         });
         form.reset();
       })
-      .catch((error) => {
-        console.error("Error adding document: ", error);
-        toast({
-            variant: "destructive",
-            title: "Submission Error",
-            description: "An error occurred while saving the incident. Please try again.",
+      .catch(async (serverError) => {
+        const permissionError = new FirestorePermissionError({
+          path: (docRef as CollectionReference).path,
+          operation: 'create',
+          requestResourceData: incidentData,
         });
+        errorEmitter.emit('permission-error', permissionError);
       })
       .finally(() => {
         setIsSubmitting(false);
