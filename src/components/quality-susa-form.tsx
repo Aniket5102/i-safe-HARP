@@ -152,18 +152,51 @@ export default function QualitySusaForm() {
 
 
   async function onSubmit(values: FormValues) {
+    if (!firestore) {
+      toast({
+        variant: "destructive",
+        title: "Connection Error",
+        description: "Could not connect to the database. Please try again later.",
+      });
+      return;
+    }
+
     setIsSubmitting(true);
     
-    // Simulate a successful submission without calling Firestore
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    try {
+      const incidentData = {
+        ...values,
+        bbqReferenceNumber,
+        createdAt: serverTimestamp(),
+      };
 
-    toast({
-      title: "Success!",
-      description: `QUALITY SUSA has been raised with reference ID: ${bbqReferenceNumber}. (Submission simulated)`,
-    });
-    form.reset();
-    
-    setIsSubmitting(false);
+      const docRef = collection(firestore, 'quality-susa-incidents');
+      addDoc(docRef, incidentData)
+        .catch(async (serverError) => {
+          const permissionError = new FirestorePermissionError({
+            path: docRef.path,
+            operation: 'create',
+            requestResourceData: incidentData,
+          } satisfies SecurityRuleContext);
+          errorEmitter.emit('permission-error', permissionError);
+        });
+
+      toast({
+        title: "Success!",
+        description: `QUALITY SUSA has been raised with reference ID: ${bbqReferenceNumber}.`,
+      });
+      form.reset();
+
+    } catch (error) {
+      console.error("Error adding document: ", error);
+      toast({
+        variant: "destructive",
+        title: "Submission Error",
+        description: "An error occurred while saving the incident. Please try again.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   const handleGenerateQrCode = () => {
@@ -727,5 +760,7 @@ export default function QualitySusaForm() {
     </>
   );
 }
+
+    
 
     
