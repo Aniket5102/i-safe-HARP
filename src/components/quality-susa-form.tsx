@@ -152,48 +152,17 @@ export default function QualitySusaForm() {
 
 
   async function onSubmit(values: FormValues) {
-    if (!firestore) {
-      toast({
-        variant: "destructive",
-        title: "Firestore not available",
-        description: "Please check your Firebase connection.",
-      });
-      return;
-    }
     setIsSubmitting(true);
-    const docToSave = {
-      ...values,
-      bbqReferenceNumber,
-      createdAt: serverTimestamp(),
-    };
     
-    try {
-      const incidentsCollection = collection(firestore, 'quality-susa-incidents');
-      await addDoc(incidentsCollection, docToSave);
-      toast({
-        title: "Success!",
-        description: `QUALITY SUSA has been raised with reference ID: ${bbqReferenceNumber}`,
-      });
-      form.reset();
-    } catch (serverError: any) {
-       if (serverError.code === 'permission-denied') {
-          const incidentsCollection = collection(firestore, 'quality-susa-incidents');
-          const permissionError = new FirestorePermissionError({
-            path: incidentsCollection.path,
-            operation: 'create',
-            requestResourceData: docToSave,
-          } satisfies SecurityRuleContext);
-          errorEmitter.emit('permission-error', permissionError);
-        } else {
-          toast({
-            variant: "destructive",
-            title: "Uh oh! Something went wrong.",
-            description: "There was a problem with your request.",
-          });
-        }
-    } finally {
+    // Simulate submission
+    setTimeout(() => {
+        toast({
+            title: "Success! (Simulated)",
+            description: `QUALITY SUSA has been raised with reference ID: ${bbqReferenceNumber}. Data was not saved to the database.`,
+        });
+        form.reset();
         setIsSubmitting(false);
-    }
+    }, 1000);
   }
 
   const handleGenerateQrCode = () => {
@@ -757,5 +726,3 @@ export default function QualitySusaForm() {
     </>
   );
 }
-
-    
