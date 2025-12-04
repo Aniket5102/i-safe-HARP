@@ -141,15 +141,9 @@ export default function QualitySusaForm() {
   });
   
   React.useEffect(() => {
+    // Set an initial value on mount
     setBbqReferenceNumber(`QUALITYSUSA${format(new Date(), 'yyyyMMddHHmmss')}`);
   }, []);
-
-  React.useEffect(() => {
-    if (form.formState.isSubmitSuccessful) {
-      setBbqReferenceNumber(`QUALITYSUSA${format(new Date(), 'yyyyMMddHHmmss')}`);
-    }
-  }, [form.formState.isSubmitSuccessful]);
-
 
   async function onSubmit(values: FormValues) {
     if (!firestore) {
@@ -163,9 +157,13 @@ export default function QualitySusaForm() {
 
     setIsSubmitting(true);
     
+    // Generate new BBQ reference number on submit
+    const newBbqReferenceNumber = `QUALITYSUSA${format(new Date(), 'yyyyMMddHHmmss')}`;
+    setBbqReferenceNumber(newBbqReferenceNumber);
+    
     const incidentData = {
       ...values,
-      bbqReferenceNumber,
+      bbqReferenceNumber: newBbqReferenceNumber,
       createdAt: serverTimestamp(),
       userId: auth?.currentUser?.uid || 'anonymous',
     };
@@ -175,9 +173,11 @@ export default function QualitySusaForm() {
         await addDoc(docRef, incidentData);
         toast({
           title: "Success!",
-          description: `QUALITY SUSA has been raised with reference ID: ${bbqReferenceNumber}.`,
+          description: `QUALITY SUSA has been raised with reference ID: ${newBbqReferenceNumber}.`,
         });
         form.reset();
+        // Set a new initial BBQ number for the next form
+        setBbqReferenceNumber(`QUALITYSUSA${format(new Date(), 'yyyyMMddHHmmss')}`);
     } catch (error: any) {
         console.error("Error writing document: ", error);
         toast({
@@ -751,3 +751,5 @@ export default function QualitySusaForm() {
     </>
   );
 }
+
+    
