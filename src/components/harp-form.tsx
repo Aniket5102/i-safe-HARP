@@ -125,8 +125,23 @@ export default function HarpForm() {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+        date: new Date(),
+        location: "Khandala",
+        department: "Production Department",
+        block: "SPB",
+        floor: "SPB Floor",
         activity: "",
+        carriedOutBy: "Aniket",
+        employeeType: "APL Employee",
+        employeeName: "Aniket",
+        employeeId: "P00126717",
+        designation: "Manager - Production",
+        employeeDepartment: "PRODUCTION",
+        hazard: "Chemical Hazards",
         accident: "Exposure to chemical while charging",
+        risk: "Medium",
+        prevention: "",
+        otherObservation: "",
     },
   });
 
@@ -151,34 +166,34 @@ export default function HarpForm() {
       createdAt: serverTimestamp(),
     };
 
-    try {
-        await addDoc(incidentsCollection, docToSave);
-        
+    addDoc(incidentsCollection, docToSave)
+      .then(() => {
         toast({
             title: 'Success!',
             description: `HARP Incident has been raised with incident ID: ${harpId}`,
         });
-
         form.reset();
-    } catch (error: any) {
-        if (error.code === 'permission-denied') {
+      })
+      .catch(async (serverError) => {
+        if (serverError.code === 'permission-denied') {
             const permissionError = new FirestorePermissionError({
               path: incidentsCollection.path,
               operation: 'create',
               requestResourceData: docToSave,
-            } satisfies SecurityRuleContext);
+            });
             errorEmitter.emit('permission-error', permissionError);
         } else {
-            console.error('Error during submission process: ', error);
+            console.error('Error during submission process: ', serverError);
             toast({
                 variant: 'destructive',
                 title: 'Uh oh! An unexpected error occurred.',
                 description: 'Please try again.',
             });
         }
-    } finally {
-      setIsSubmitting(false);
-    }
+    })
+    .finally(() => {
+        setIsSubmitting(false);
+    });
   }
 
   const handleGenerateQrCode = () => {
@@ -696,5 +711,7 @@ export default function HarpForm() {
     </>
   );
 }
+
+    
 
     
