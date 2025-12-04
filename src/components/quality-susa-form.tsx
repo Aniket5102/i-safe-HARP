@@ -117,26 +117,27 @@ export default function QualitySusaForm() {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      locationName: "",
-      department: "",
-      block: "",
-      areaFloor: "",
-      observerName: "",
-      observerType: "",
-      employeeId: "",
-      designation: "",
-      employeeDepartment: "",
-      employeeBlock: "",
-      sbtDbtOther: "",
-      observationGoal: "",
-      timeOfObservation: "",
-      shift: "",
-      observedType: "",
-      qualityKeyActivity: "",
-      qualityActName: "",
-      isActComplied: "",
-      descriptionOfAct: "",
-      keyQualityBehaviour: "",
+      locationName: "Khandala",
+      department: "Quality Assurance Department",
+      block: "MAIN QA Block",
+      areaFloor: "MAIN QA AREA",
+      observerName: "Aniket",
+      observerType: "APL Employee",
+      employeeId: "P00126717",
+      designation: "Manager - Production",
+      employeeDepartment: "PRODUCTION",
+      employeeBlock: "SPB",
+      sbtDbtOther: "NA",
+      observationGoal: "3",
+      dateOfObservation: new Date(),
+      timeOfObservation: format(new Date(), 'HH:mm'),
+      shift: "General Shift",
+      observedType: "Technician",
+      qualityKeyActivity: "calibration",
+      qualityActName: "Weighing scales are calibrated and status is available",
+      isActComplied: "Yes",
+      descriptionOfAct: "The act was complied with correctly.",
+      keyQualityBehaviour: "I will always ensure timely calibration is done following right procedure",
       susaStatus: "Open",
     },
   });
@@ -763,11 +764,3 @@ export default function QualitySusaForm() {
     </>
   );
 }
-
-    
-
-    
-
-    
-
-    
