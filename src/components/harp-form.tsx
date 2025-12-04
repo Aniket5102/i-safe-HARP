@@ -146,54 +146,18 @@ export default function HarpForm() {
   });
 
   async function onSubmit(values: FormValues) {
-    if (!firestore) {
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: 'Firestore is not available. Please try again later.',
-      });
-      return;
-    }
-
     setIsSubmitting(true);
     const harpId = `HARP-${Date.now()}`;
     
-    const incidentsCollection = collection(firestore, 'harp-incidents');
-    const docToSave = {
-      ...values,
-      harpId,
-      otherObservation: values.otherObservation || null,
-      createdAt: serverTimestamp(),
-    };
-
-    addDoc(incidentsCollection, docToSave)
-      .then(() => {
-        toast({
-            title: 'Success!',
-            description: `HARP Incident has been raised with incident ID: ${harpId}`,
-        });
-        form.reset();
-      })
-      .catch(async (serverError) => {
-        if (serverError.code === 'permission-denied') {
-            const permissionError = new FirestorePermissionError({
-              path: incidentsCollection.path,
-              operation: 'create',
-              requestResourceData: docToSave,
-            });
-            errorEmitter.emit('permission-error', permissionError);
-        } else {
-            console.error('Error during submission process: ', serverError);
-            toast({
-                variant: 'destructive',
-                title: 'Uh oh! An unexpected error occurred.',
-                description: 'Please try again.',
-            });
-        }
-    })
-    .finally(() => {
-        setIsSubmitting(false);
-    });
+    // Temporarily disable Firestore submission
+    setTimeout(() => {
+      toast({
+          title: 'Success! (Simulated)',
+          description: `HARP Incident has been raised with incident ID: ${harpId}`,
+      });
+      form.reset();
+      setIsSubmitting(false);
+    }, 1000);
   }
 
   const handleGenerateQrCode = () => {
@@ -675,7 +639,7 @@ export default function HarpForm() {
                 <Button type="button" variant="outline" onClick={() => form.reset()}>
                   Clear Form
                 </Button>
-                <Button type="submit" disabled={isSubmitting || !firestore}>
+                <Button type="submit" disabled={isSubmitting}>
                   {isSubmitting ? <Loader2 className="animate-spin" /> : <Printer />}
                   Raise HARP Incident
                 </Button>
@@ -711,7 +675,5 @@ export default function HarpForm() {
     </>
   );
 }
-
-    
 
     

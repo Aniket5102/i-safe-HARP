@@ -152,53 +152,17 @@ export default function QualitySusaForm() {
 
 
   async function onSubmit(values: FormValues) {
-    if (!firestore) {
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: 'Firestore is not available. Please try again later.',
-      });
-      return;
-    }
-
     setIsSubmitting(true);
-
-    const docToSave = {
-        ...values,
-        bbqReferenceNumber,
-        createdAt: serverTimestamp(),
-    };
-
-    try {
-      const incidentsCollection = collection(firestore, 'quality-susa-incidents');
-
-      addDoc(incidentsCollection, docToSave)
-        .catch(async (serverError) => {
-            const permissionError = new FirestorePermissionError({
-              path: incidentsCollection.path,
-              operation: 'create',
-              requestResourceData: docToSave,
-            });
-            errorEmitter.emit('permission-error', permissionError);
-        });
-      
+    
+    // Temporarily disable Firestore submission
+    setTimeout(() => {
       toast({
-          title: 'Success!',
+          title: 'Success! (Simulated)',
           description: `QUALITY SUSA has been raised with reference ID: ${bbqReferenceNumber}`,
       });
-      
       form.reset();
-
-    } catch (error) {
-        console.error('Error during submission process: ', error);
-        toast({
-            variant: 'destructive',
-            title: 'Uh oh! An unexpected error occurred.',
-            description: 'Please try again.',
-        });
-    } finally {
-        setIsSubmitting(false);
-    }
+      setIsSubmitting(false);
+    }, 1000);
   }
 
   const handleGenerateQrCode = () => {
@@ -726,7 +690,7 @@ export default function QualitySusaForm() {
                 <Button type="button" variant="outline" onClick={() => form.reset()}>
                   Clear Form
                 </Button>
-                <Button type="submit" disabled={isSubmitting || !firestore}>
+                <Button type="submit" disabled={isSubmitting}>
                   {isSubmitting ? <Loader2 className="animate-spin" /> : <Printer />}
                   Submit
                 </Button>
@@ -762,3 +726,5 @@ export default function QualitySusaForm() {
     </>
   );
 }
+
+    
