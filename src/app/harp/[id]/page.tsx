@@ -103,7 +103,7 @@ export default function HarpIncidentDetailsPage() {
         // Create a sorted list of entries based on the desired order
         const sortedEntries = displayOrder
             .map(key => ([key, incident[key]]))
-            .filter(([, value]) => value !== undefined && key !== 'id');
+            .filter(([key, value]) => value !== undefined && key !== 'id');
 
         // Append any fields from the incident that are not in the displayOrder
         const remainingEntries = Object.entries(incident)
