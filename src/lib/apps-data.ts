@@ -5,6 +5,7 @@ export type App = {
   imageUrl: string;
   imageHint: string;
   href: string;
+  dataHref?: string;
 };
 
 export const apps: App[] = [
@@ -13,7 +14,8 @@ export const apps: App[] = [
     subtitle: 'SUSA Reporting for i-Safe Quality Team', 
     imageUrl: 'https://picsum.photos/seed/quality-susa/200/200',
     imageHint: 'quality safety logo', 
-    href: '/quality-susa' 
+    href: '/quality-susa',
+    dataHref: '/quality-susa/data',
   },
   { 
     name: 'Quality Incident Reporting', 
@@ -55,7 +57,8 @@ export const apps: App[] = [
     subtitle: 'Personal Risk Assessment',
     imageUrl: 'https://1.bp.blogspot.com/-CReOKJSBrQo/X8trFT6wFmI/AAAAAAAAEvs/1ryF9Le7aH8fUoRU0BAIVkeDStOFn1liACLcBGAsYHQ/w1200-h630-p-k-no-nu/risk-assessment.png', 
     imageHint: 'risk assessment', 
-    href: '/harp' 
+    href: '/harp',
+    dataHref: '/harp/data',
   },
   { 
     name: 'BBS', 
@@ -72,5 +75,7 @@ export const apps: App[] = [
     href: '/harp'
   }
 ];
+
+    
 
     

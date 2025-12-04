@@ -94,7 +94,7 @@ interface AppOptionsDialogProps {
 }
 
 function AppOptionsDialog({ app, isOpen, onOpenChange }: AppOptionsDialogProps) {
-  const dataHref = `${app.href}/data`;
+  const dataHref = app.dataHref || `${app.href}/data`;
   
   const options = [
     { name: 'Data', icon: Database, href: dataHref },
@@ -122,3 +122,5 @@ function AppOptionsDialog({ app, isOpen, onOpenChange }: AppOptionsDialogProps) 
     </Dialog>
   );
 }
+
+    

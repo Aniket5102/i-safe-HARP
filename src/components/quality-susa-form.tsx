@@ -111,6 +111,8 @@ export default function QualitySusaForm() {
   const [qrCodeValue, setQrCodeValue] = React.useState<string | null>(null);
   const [isDatePickerOpen, setIsDatePickerOpen] = React.useState(false);
   
+  const [bbqReferenceNumber, setBbqReferenceNumber] = React.useState('');
+
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -137,8 +139,6 @@ export default function QualitySusaForm() {
       susaStatus: "Open",
     },
   });
-
-  const [bbqReferenceNumber, setBbqReferenceNumber] = React.useState('');
   
   React.useEffect(() => {
     setBbqReferenceNumber(`QUALITYSUSA${format(new Date(), 'yyyyMMddHHmmss')}`);
@@ -760,6 +760,8 @@ export default function QualitySusaForm() {
     </>
   );
 }
+
+    
 
     
 

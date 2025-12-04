@@ -48,8 +48,6 @@ export default function QualitySusaDataPage() {
     if (loading) {
         return <div className="text-center p-8">Loading incidents...</div>;
     }
-    // Note: The DataTable component needs to be generic enough or adapted for QualitySusa data.
-    // Assuming the existing DataTable can handle it by just changing the filter column name.
     return <DataTable columns={columns} data={data} filterColumn="bbqReferenceNumber" filterPlaceholder="Filter by BBQ Reference Number..." />;
   }
 
@@ -90,3 +88,5 @@ export default function QualitySusaDataPage() {
     </div>
   );
 }
+
+    

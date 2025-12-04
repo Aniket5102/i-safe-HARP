@@ -75,3 +75,5 @@ export const columns: ColumnDef<QualitySusaIncident>[] = [
     }
   },
 ];
+
+    

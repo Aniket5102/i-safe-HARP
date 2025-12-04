@@ -45,7 +45,7 @@ import { App, apps } from '@/lib/apps-data';
 import { Separator } from '@/components/ui/separator';
 
 const modules = [
-  { name: 'Calendar', icon: CalendarDays },
+  { name: 'Calendar/Task Management', icon: CalendarDays },
   { name: 'Inspections & Audits', icon: FileText },
   { name: 'Incident Management', icon: HardHat },
   { name: 'Risk Assessment', icon: ClipboardCheck },
@@ -248,7 +248,7 @@ interface AppOptionsDialogProps {
 }
 
 function AppOptionsDialog({ app, isOpen, onOpenChange }: AppOptionsDialogProps) {
-  const dataHref = app.name.toLowerCase().includes('harp') ? '/harp/data' : `${app.href}/data`;
+  const dataHref = app.dataHref || `${app.href}/data`;
   
   const options = [
     { name: 'Data', icon: Database, href: dataHref },
@@ -276,3 +276,5 @@ function AppOptionsDialog({ app, isOpen, onOpenChange }: AppOptionsDialogProps) 
     </Dialog>
   );
 }
+
+    
