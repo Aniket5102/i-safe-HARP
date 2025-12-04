@@ -60,8 +60,8 @@ import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { useRouter } from 'next/navigation';
 import AsianPaintsLogo from "./asian-paints-logo";
 import { Calendar } from "@/components/ui/calendar";
-import { errorEmitter } from "@/firebase/error-emitter";
 import { FirestorePermissionError } from "@/firebase/errors";
+import { errorEmitter } from "@/firebase/error-emitter";
 
 const formSchema = z.object({
   date: z.date({ required_error: "A date is required." }),
@@ -164,10 +164,7 @@ export default function QualitySusaForm() {
 
     setIsSubmitting(true);
     const newBbqReferenceNumber = `BBQ-${Date.now()}`;
-    setBbqReferenceNumber(newBbqReferenceNumber);
-
     const currentSusaId = `SUSA-${Date.now()}`;
-    setSusaId(currentSusaId);
 
     const incidentData = {
       ...values,
@@ -177,9 +174,8 @@ export default function QualitySusaForm() {
       userId: auth?.currentUser?.uid || 'anonymous'
     };
 
-    const docRef = collection(firestore, 'quality-susa-incidents');
-    
-    addDoc(docRef, incidentData).then(() => {
+    try {
+        await addDoc(collection(firestore, 'quality-susa-incidents'), incidentData);
         toast({
             title: "Success!",
             description: `Quality SUSA Incident has been raised with incident ID: ${currentSusaId}.`,
@@ -187,16 +183,16 @@ export default function QualitySusaForm() {
         form.reset();
         setSusaId(`SUSA-${Date.now()}`);
         setBbqReferenceNumber('');
-        setIsSubmitting(false);
-    }).catch(async (serverError) => {
-        const permissionError = new FirestorePermissionError({
-            path: docRef.path,
-            operation: 'create',
-            requestResourceData: incidentData,
+    } catch (error) {
+        console.error("Error writing document: ", error);
+        toast({
+            variant: "destructive",
+            title: "Submission Error",
+            description: "Could not submit the form. Please try again.",
         });
-        errorEmitter.emit('permission-error', permissionError);
+    } finally {
         setIsSubmitting(false);
-    });
+    }
   }
 
   const handleGenerateQrCode = () => {
@@ -313,7 +309,7 @@ export default function QualitySusaForm() {
                     <FormItem>
                         <FormLabel>BBQ Reference Number</FormLabel>
                         <FormControl>
-                            <Input disabled value={bbqReferenceNumber} />
+                            <Input disabled value={bbqReferenceNumber} placeholder="Will be generated on submit" />
                         </FormControl>
                         <FormDescription>(Generated on Submit)</FormDescription>
                     </FormItem>
@@ -669,20 +665,19 @@ export default function QualitySusaForm() {
                       <FormItem>
                         <FormLabel>Upload Attachment(s) If Any</FormLabel>
                         <div className="flex items-center justify-center w-full">
-                            <label htmlFor="dropzone-file" className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+                            <label htmlFor="dropzone-file-susa" className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
                                 <div className="flex flex-col items-center justify-center pt-5 pb-6">
                                     <Upload className="w-8 h-8 mb-2 text-gray-500" />
                                     <p className="mb-2 text-sm text-gray-500"><span className="font-semibold">Click to upload</span> or drag and drop</p>
                                     <p className="text-xs text-gray-500">SVG, PNG, JPG or GIF (MAX. 800x400px)</p>
                                 </div>
                                 <FormControl>
-                                    <input id="dropzone-file" type="file" className="hidden" />
+                                    <input id="dropzone-file-susa" type="file" className="hidden" />
                                 </FormControl>
                             </label>
                         </div> 
                         <FormMessage className="mt-2" />
                       </FormItem>
-                    
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>
@@ -726,7 +721,5 @@ export default function QualitySusaForm() {
     </>
   );
 }
-
-    
 
     
