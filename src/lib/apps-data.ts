@@ -10,14 +10,6 @@ export type App = {
 
 export const apps: App[] = [
   { 
-    name: 'QUALITY SUSA', 
-    subtitle: 'SUSA Reporting for i-Safe Quality Team', 
-    imageUrl: 'https://picsum.photos/seed/quality-susa/200/200',
-    imageHint: 'quality safety logo', 
-    href: '/quality-susa',
-    dataHref: '/quality-susa/data',
-  },
-  { 
     name: 'Quality Incident Reporting', 
     subtitle: 'Quality Incident Reporting',
     imageUrl: 'https://picsum.photos/seed/incident-documentation/200/200', 
