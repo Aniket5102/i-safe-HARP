@@ -146,18 +146,52 @@ export default function HarpForm() {
   });
 
   async function onSubmit(values: FormValues) {
+    if (!firestore) {
+      toast({
+        variant: "destructive",
+        title: "Firestore not available",
+        description: "Please check your Firebase connection.",
+      });
+      return;
+    }
     setIsSubmitting(true);
     const harpId = `HARP-${Date.now()}`;
     
-    // Simulate a successful submission
-    setTimeout(() => {
+    const docToSave = {
+      ...values,
+      harpId,
+      createdAt: serverTimestamp(),
+      otherObservation: values.otherObservation || null,
+    };
+
+    try {
+      const incidentsCollection = collection(firestore, 'harp-incidents');
+      await addDoc(incidentsCollection, docToSave);
+      
+      toast({
+        title: "Success!",
+        description: `HARP Incident has been raised with incident ID: ${harpId}`,
+      });
+      form.reset();
+    } catch (serverError: any) {
+      if (serverError.code === 'permission-denied') {
+        const incidentsCollection = collection(firestore, 'harp-incidents');
+        const permissionError = new FirestorePermissionError({
+          path: incidentsCollection.path,
+          operation: 'create',
+          requestResourceData: docToSave,
+        } satisfies SecurityRuleContext);
+        errorEmitter.emit('permission-error', permissionError);
+      } else {
         toast({
-          title: "Success! (Simulated)",
-          description: `HARP Incident has been raised with incident ID: ${harpId}`,
+          variant: "destructive",
+          title: "Uh oh! Something went wrong.",
+          description: "There was a problem with your request.",
         });
-        form.reset();
-        setIsSubmitting(false);
-    }, 1000);
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   const handleGenerateQrCode = () => {
