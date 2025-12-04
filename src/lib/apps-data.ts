@@ -65,7 +65,14 @@ export const apps: App[] = [
     imageUrl: 'https://1.bp.blogspot.com/-CReOKJSBrQo/X8trFT6wFmI/AAAAAAAAEvs/1ryF9Le7aH8fUoRU0BAIVkeDStOFn1liACLcBGAsYHQ/w1200-h630-p-k-no-nu/risk-assessment.png',
     imageHint: 'report development',
     href: '/harp'
-  }
+  },
+  { 
+    name: 'Quality SUSA',
+    subtitle: 'Safety in construction and operations',
+    imageUrl: 'https://picsum.photos/seed/quality-assurance/200/200', 
+    imageHint: 'quality assurance',
+    href: '#'
+  },
 ];
 
     
