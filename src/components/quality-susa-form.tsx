@@ -53,7 +53,7 @@ import { Calendar } from "./ui/calendar";
 import { useFirestore } from "@/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { errorEmitter } from '@/firebase/error-emitter';
-import { FirestorePermissionError } from '@/firebase/errors';
+import { FirestorePermissionError, type SecurityRuleContext } from '@/firebase/errors';
 
 const formSchema = z.object({
   locationName: z.string().min(1, "Location is required."),
@@ -152,17 +152,52 @@ export default function QualitySusaForm() {
 
 
   async function onSubmit(values: FormValues) {
-    setIsSubmitting(true);
-    
-    // Temporarily disable Firestore submission
-    setTimeout(() => {
+    if (!firestore) {
       toast({
-          title: 'Success! (Simulated)',
-          description: `QUALITY SUSA has been raised with reference ID: ${bbqReferenceNumber}`,
+        variant: "destructive",
+        title: "Firestore not available",
+        description: "Please try again later.",
       });
-      form.reset();
-      setIsSubmitting(false);
-    }, 1000);
+      return;
+    }
+
+    setIsSubmitting(true);
+    const docToSave = {
+      ...values,
+      bbqReferenceNumber,
+      createdAt: serverTimestamp(),
+    };
+
+    const incidentsCollection = collection(firestore, 'quality-susa-incidents');
+
+    addDoc(incidentsCollection, docToSave)
+      .then(() => {
+        toast({
+          title: "Success!",
+          description: `QUALITY SUSA has been raised with reference ID: ${bbqReferenceNumber}`,
+        });
+        form.reset();
+        setIsSubmitting(false);
+      })
+      .catch((serverError) => {
+        if (serverError.code === 'permission-denied') {
+          const permissionError = new FirestorePermissionError({
+            path: incidentsCollection.path,
+            operation: 'create',
+            requestResourceData: docToSave,
+          } satisfies SecurityRuleContext);
+
+          errorEmitter.emit('permission-error', permissionError);
+        } else {
+          console.error("Error adding document: ", serverError);
+          toast({
+            variant: "destructive",
+            title: "Uh oh! Something went wrong.",
+            description: "There was a problem with your request.",
+          });
+        }
+        setIsSubmitting(false);
+      });
   }
 
   const handleGenerateQrCode = () => {
@@ -726,5 +761,3 @@ export default function QualitySusaForm() {
     </>
   );
 }
-
-    

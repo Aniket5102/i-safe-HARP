@@ -172,6 +172,7 @@ export default function HarpForm() {
           description: `HARP Incident has been raised with incident ID: ${harpId}`,
         });
         form.reset();
+        setIsSubmitting(false);
       })
       .catch((serverError) => {
         if (serverError.code === 'permission-denied') {
@@ -190,8 +191,6 @@ export default function HarpForm() {
                 description: "There was a problem with your request.",
             });
         }
-      })
-      .finally(() => {
         setIsSubmitting(false);
       });
   }
@@ -711,7 +710,3 @@ export default function HarpForm() {
     </>
   );
 }
-
-    
-
-    
