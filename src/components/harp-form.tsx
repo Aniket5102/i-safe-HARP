@@ -123,17 +123,6 @@ export default function HarpForm() {
   const [isDatePickerOpen, setIsDatePickerOpen] = React.useState(false);
   const [harpId, setHarpId] = React.useState('');
 
-  React.useEffect(() => {
-    setHarpId(`HARP-${Date.now()}`);
-  }, []);
-
-  React.useEffect(() => {
-    if (form.formState.isSubmitSuccessful) {
-      setHarpId(`HARP-${Date.now()}`);
-    }
-  }, [form.formState.isSubmitSuccessful]);
-
-
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -156,6 +145,17 @@ export default function HarpForm() {
         otherObservation: "",
     },
   });
+
+  React.useEffect(() => {
+    setHarpId(`HARP-${Date.now()}`);
+  }, []);
+
+  React.useEffect(() => {
+    if (form.formState.isSubmitSuccessful) {
+      setHarpId(`HARP-${Date.now()}`);
+    }
+  }, [form.formState.isSubmitSuccessful]);
+
 
   async function onSubmit(values: FormValues) {
     if (!firestore) {
@@ -725,5 +725,7 @@ export default function HarpForm() {
     </>
   );
 }
+
+    
 
     
