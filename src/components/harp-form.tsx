@@ -59,8 +59,6 @@ import { useFirestore } from "@/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { useRouter } from 'next/navigation';
 import AsianPaintsLogo from "./asian-paints-logo";
-import { errorEmitter } from '@/firebase/error-emitter';
-import { FirestorePermissionError, type SecurityRuleContext } from '@/firebase/errors';
 import { Calendar } from "@/components/ui/calendar";
 
 const formSchema = z.object({
@@ -177,15 +175,7 @@ export default function HarpForm() {
         };
 
         const docRef = collection(firestore, 'harp-incidents');
-        addDoc(docRef, incidentData)
-            .catch(async (serverError) => {
-                const permissionError = new FirestorePermissionError({
-                    path: docRef.path,
-                    operation: 'create',
-                    requestResourceData: incidentData,
-                } satisfies SecurityRuleContext);
-                errorEmitter.emit('permission-error', permissionError);
-            });
+        await addDoc(docRef, incidentData);
         
         toast({
             title: "Success!",
@@ -725,7 +715,5 @@ export default function HarpForm() {
     </>
   );
 }
-
-    
 
     
