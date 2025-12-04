@@ -167,32 +167,33 @@ export default function HarpForm() {
     
     setIsSubmitting(true);
     
-    try {
-        const incidentData = {
-            ...values,
-            harpId,
-            createdAt: serverTimestamp(),
-        };
+    const incidentData = {
+        ...values,
+        harpId,
+        createdAt: serverTimestamp(),
+    };
 
-        const docRef = collection(firestore, 'harp-incidents');
-        await addDoc(docRef, incidentData);
-        
+    const docRef = collection(firestore, 'harp-incidents');
+
+    addDoc(docRef, incidentData)
+      .then(() => {
         toast({
             title: "Success!",
             description: `HARP Incident has been raised with incident ID: ${harpId}.`,
         });
         form.reset();
-        
-    } catch (error) {
+      })
+      .catch((error) => {
         console.error("Error adding document: ", error);
         toast({
             variant: "destructive",
             title: "Submission Error",
             description: "An error occurred while saving the incident. Please try again.",
         });
-    } finally {
+      })
+      .finally(() => {
         setIsSubmitting(false);
-    }
+      });
   }
 
   const handleGenerateQrCode = () => {

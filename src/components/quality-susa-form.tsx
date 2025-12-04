@@ -162,33 +162,34 @@ export default function QualitySusaForm() {
 
     setIsSubmitting(true);
     
-    try {
-      const incidentData = {
-        ...values,
-        bbqReferenceNumber,
-        createdAt: serverTimestamp(),
-        userId: 'anonymous'
-      };
+    const incidentData = {
+      ...values,
+      bbqReferenceNumber,
+      createdAt: serverTimestamp(),
+      userId: 'anonymous'
+    };
 
-      const docRef = collection(firestore, 'quality-susa-incidents');
-      await addDoc(docRef, incidentData);
-
-      toast({
-        title: "Success!",
-        description: `QUALITY SUSA has been raised with reference ID: ${bbqReferenceNumber}.`,
+    const docRef = collection(firestore, 'quality-susa-incidents');
+    
+    addDoc(docRef, incidentData)
+      .then(() => {
+        toast({
+          title: "Success!",
+          description: `QUALITY SUSA has been raised with reference ID: ${bbqReferenceNumber}.`,
+        });
+        form.reset();
+      })
+      .catch((error) => {
+        console.error("Error adding document: ", error);
+        toast({
+          variant: "destructive",
+          title: "Submission Error",
+          description: "An error occurred while saving the incident. Please try again.",
+        });
+      })
+      .finally(() => {
+        setIsSubmitting(false);
       });
-      form.reset();
-
-    } catch (error) {
-      console.error("Error adding document: ", error);
-      toast({
-        variant: "destructive",
-        title: "Submission Error",
-        description: "An error occurred while saving the incident. Please try again.",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
   }
 
   const handleGenerateQrCode = () => {
@@ -752,5 +753,3 @@ export default function QualitySusaForm() {
     </>
   );
 }
-
-    
