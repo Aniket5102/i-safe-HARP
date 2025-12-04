@@ -175,8 +175,9 @@ export default function HarpForm() {
       form.reset();
     } catch (serverError: any) {
         if (serverError.code === 'permission-denied') {
+            const incidentsCollection = collection(firestore, 'harp-incidents');
             const permissionError = new FirestorePermissionError({
-              path: 'harp-incidents',
+              path: incidentsCollection.path,
               operation: 'create',
               requestResourceData: docToSave,
             } satisfies SecurityRuleContext);

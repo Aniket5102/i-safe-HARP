@@ -180,8 +180,9 @@ export default function QualitySusaForm() {
 
     } catch (serverError: any) {
         if (serverError.code === 'permission-denied') {
+          const incidentsCollection = collection(firestore, 'quality-susa-incidents');
           const permissionError = new FirestorePermissionError({
-            path: 'quality-susa-incidents',
+            path: incidentsCollection.path,
             operation: 'create',
             requestResourceData: docToSave,
           } satisfies SecurityRuleContext);
