@@ -18,10 +18,9 @@ service cloud.firestore {
       allow read, update, delete: if isOwner(resource);
     }
 
-    // Quality SUSA Incidents: Allow create for any authenticated user, but only owner can read/update/delete.
+    // Quality SUSA Incidents: Open access for testing purposes.
     match /quality-susa-incidents/{incidentId} {
-      allow create: if isCreatingOwnDoc();
-      allow read, update, delete: if isOwner(resource);
+      allow read, write: if true;
     }
     
     // Default-deny all other access
