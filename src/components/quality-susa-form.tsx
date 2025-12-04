@@ -51,9 +51,7 @@ import { Textarea } from "./ui/textarea";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Calendar } from "./ui/calendar";
 import { useFirestore, useAuth } from "@/firebase";
-import { collection, addDoc, serverTimestamp, CollectionReference } from "firebase/firestore";
-import { errorEmitter } from "@/firebase/error-emitter";
-import { FirestorePermissionError } from "@/firebase/errors";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
 const formSchema = z.object({
   locationName: z.string().min(1, "Location is required."),
@@ -172,27 +170,24 @@ export default function QualitySusaForm() {
       userId: auth?.currentUser?.uid || 'anonymous',
     };
 
-    const docRef = collection(firestore, 'quality-susa-incidents');
-    
-    addDoc(docRef, incidentData)
-      .then(() => {
-        toast({
-          title: "Success!",
-          description: `QUALITY SUSA has been raised with reference ID: ${bbqReferenceNumber}.`,
-        });
-        form.reset();
-      })
-      .catch(async (serverError) => {
-        const permissionError = new FirestorePermissionError({
-          path: (docRef as CollectionReference).path,
-          operation: 'create',
-          requestResourceData: incidentData,
-        });
-        errorEmitter.emit('permission-error', permissionError);
-      })
-      .finally(() => {
-        setIsSubmitting(false);
+    try {
+      const docRef = collection(firestore, 'quality-susa-incidents');
+      await addDoc(docRef, incidentData);
+      toast({
+        title: "Success!",
+        description: `QUALITY SUSA has been raised with reference ID: ${bbqReferenceNumber}.`,
       });
+      form.reset();
+    } catch (error: any) {
+      console.error("Error writing document: ", error);
+      toast({
+        variant: "destructive",
+        title: "Submission Error",
+        description: `There was an error submitting the form: ${error.message}`,
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   const handleGenerateQrCode = () => {
