@@ -146,52 +146,19 @@ export default function HarpForm() {
   });
 
   async function onSubmit(values: FormValues) {
-    if (!firestore) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Firestore is not connected. Please try again later.",
-      });
-      return;
-    }
     setIsSubmitting(true);
     const harpId = `HARP-${Date.now()}`;
 
-    const docToSave = {
-      ...values,
-      harpId,
-      otherObservation: values.otherObservation || null,
-      createdAt: serverTimestamp(),
-    };
-    
-    try {
-      const incidentsCollection = collection(firestore, 'harp-incidents');
-      await addDoc(incidentsCollection, docToSave);
+    // Simulate a successful submission without calling Firestore
+    await new Promise(resolve => setTimeout(resolve, 1000));
 
-      toast({
-        title: "Success!",
-        description: `HARP Incident has been raised with incident ID: ${harpId}.`,
-      });
-      form.reset();
-    } catch (serverError: any) {
-        if (serverError.code === 'permission-denied') {
-            const incidentsCollection = collection(firestore, 'harp-incidents');
-            const permissionError = new FirestorePermissionError({
-              path: incidentsCollection.path,
-              operation: 'create',
-              requestResourceData: docToSave,
-            } satisfies SecurityRuleContext);
-            errorEmitter.emit('permission-error', permissionError);
-        } else {
-            toast({
-                variant: "destructive",
-                title: "Uh oh! Something went wrong.",
-                description: "There was a problem with your request.",
-            });
-        }
-    } finally {
-        setIsSubmitting(false);
-    }
+    toast({
+      title: "Success!",
+      description: `HARP Incident has been raised with incident ID: ${harpId}. (Submission simulated)`,
+    });
+    form.reset();
+
+    setIsSubmitting(false);
   }
 
   const handleGenerateQrCode = () => {
@@ -709,3 +676,5 @@ export default function HarpForm() {
     </>
   );
 }
+
+    
