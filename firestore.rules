@@ -3,16 +3,9 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    // Allow public read and write access for development.
-    // This should be secured before production.
-    match /harp-incidents/{incidentId} {
-      allow read, write: if true;
-    }
-
-    // Allow public read and write access for development.
-    // This should be secured before production.
-    match /quality-susa-incidents/{incidentId} {
+    // Allow read and write access to all documents for development purposes.
+    // This should be locked down before going to production.
+    match /{document=**} {
       allow read, write: if true;
     }
   }
