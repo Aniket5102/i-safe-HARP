@@ -71,7 +71,8 @@ export const apps: App[] = [
     subtitle: 'Safety in construction and operations',
     imageUrl: 'https://picsum.photos/seed/quality-assurance/200/200', 
     imageHint: 'quality assurance',
-    href: '#'
+    href: '/quality-susa',
+    dataHref: '/quality-susa/data',
   },
 ];
 
