@@ -60,7 +60,7 @@ import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { useRouter } from 'next/navigation';
 import AsianPaintsLogo from "./asian-paints-logo";
 import { errorEmitter } from '@/firebase/error-emitter';
-import { FirestorePermissionError } from '@/firebase/errors';
+import { FirestorePermissionError, type SecurityRuleContext } from '@/firebase/errors';
 import { Calendar } from "@/components/ui/calendar";
 
 const formSchema = z.object({
@@ -143,24 +143,16 @@ export default function HarpForm() {
     setIsSubmitting(true);
     const harpId = `HARP-${Date.now()}`;
     
-    try {
-        const incidentsCollection = collection(firestore, 'harp-incidents');
-        const docToSave = {
-          ...values,
-          harpId,
-          otherObservation: values.otherObservation || null,
-          createdAt: serverTimestamp(),
-        };
+    const incidentsCollection = collection(firestore, 'harp-incidents');
+    const docToSave = {
+      ...values,
+      harpId,
+      otherObservation: values.otherObservation || null,
+      createdAt: serverTimestamp(),
+    };
 
-        addDoc(incidentsCollection, docToSave)
-          .catch(async (serverError) => {
-            const permissionError = new FirestorePermissionError({
-              path: incidentsCollection.path,
-              operation: 'create',
-              requestResourceData: docToSave,
-            });
-            errorEmitter.emit('permission-error', permissionError);
-          });
+    try {
+        await addDoc(incidentsCollection, docToSave);
         
         toast({
             title: 'Success!',
@@ -168,13 +160,22 @@ export default function HarpForm() {
         });
 
         form.reset();
-    } catch (error) {
-        console.error('Error during submission process: ', error);
-        toast({
-            variant: 'destructive',
-            title: 'Uh oh! An unexpected error occurred.',
-            description: 'Please try again.',
-        });
+    } catch (error: any) {
+        if (error.code === 'permission-denied') {
+            const permissionError = new FirestorePermissionError({
+              path: incidentsCollection.path,
+              operation: 'create',
+              requestResourceData: docToSave,
+            } satisfies SecurityRuleContext);
+            errorEmitter.emit('permission-error', permissionError);
+        } else {
+            console.error('Error during submission process: ', error);
+            toast({
+                variant: 'destructive',
+                title: 'Uh oh! An unexpected error occurred.',
+                description: 'Please try again.',
+            });
+        }
     } finally {
       setIsSubmitting(false);
     }
