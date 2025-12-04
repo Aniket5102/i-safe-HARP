@@ -154,12 +154,11 @@ export default function QualitySusaForm() {
 
 
   async function onSubmit(values: FormValues) {
-    const user = auth?.currentUser;
-    if (!firestore || !user) {
+    if (!firestore) {
       toast({
         variant: "destructive",
         title: "Connection Error",
-        description: "Could not connect to the database or you are not logged in. Please try again later.",
+        description: "Could not connect to the database. Please try again later.",
       });
       return;
     }
@@ -170,7 +169,7 @@ export default function QualitySusaForm() {
       const incidentData = {
         ...values,
         bbqReferenceNumber,
-        userId: user.uid,
+        userId: auth?.currentUser?.uid || 'anonymous',
         createdAt: serverTimestamp(),
       };
 
@@ -764,3 +763,5 @@ export default function QualitySusaForm() {
     </>
   );
 }
+
+    
