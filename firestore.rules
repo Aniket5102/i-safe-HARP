@@ -1,15 +1,8 @@
-
 rules_version = '2';
-
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /harp-incidents/{incidentId} {
-      allow read, write: if true;
-    }
-    match /quality-susa-incidents/{incidentId} {
+    match /{document=**} {
       allow read, write: if true;
     }
   }
 }
-
-    
