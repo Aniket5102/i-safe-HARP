@@ -56,10 +56,12 @@ import html2canvas from "html2canvas";
 import Image from "next/image";
 import { Textarea } from "./ui/textarea";
 import { useFirestore, useAuth } from "@/firebase";
-import { collection, addDoc, serverTimestamp, CollectionReference } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { useRouter } from 'next/navigation';
 import AsianPaintsLogo from "./asian-paints-logo";
 import { Calendar } from "@/components/ui/calendar";
+import { errorEmitter } from "@/firebase/error-emitter";
+import { FirestorePermissionError } from "@/firebase/errors";
 
 const formSchema = z.object({
   date: z.date({ required_error: "A date is required." }),
@@ -121,6 +123,7 @@ export default function QualitySusaForm() {
   const [qrCodeValue, setQrCodeValue] = React.useState<string | null>(null);
   const [isDatePickerOpen, setIsDatePickerOpen] = React.useState(false);
   const [susaId, setSusaId] = React.useState('');
+  const [bbqReferenceNumber, setBbqReferenceNumber] = React.useState('');
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -160,34 +163,45 @@ export default function QualitySusaForm() {
     }
 
     setIsSubmitting(true);
+    const newBbqReferenceNumber = `BBQ-${Date.now()}`;
+    setBbqReferenceNumber(newBbqReferenceNumber);
+
     const currentSusaId = `SUSA-${Date.now()}`;
     setSusaId(currentSusaId);
 
     const incidentData = {
       ...values,
       susaId: currentSusaId,
+      bbqReferenceNumber: newBbqReferenceNumber,
       createdAt: serverTimestamp(),
       userId: auth?.currentUser?.uid || 'anonymous'
     };
 
-    // Simplified submission logic
     const docRef = collection(firestore, 'quality-susa-incidents');
-    await addDoc(docRef, incidentData);
     
-    toast({
-      title: "Success!",
-      description: `Quality SUSA Incident has been raised with incident ID: ${currentSusaId}.`,
+    addDoc(docRef, incidentData).then(() => {
+        toast({
+            title: "Success!",
+            description: `Quality SUSA Incident has been raised with incident ID: ${currentSusaId}.`,
+        });
+        form.reset();
+        setSusaId(`SUSA-${Date.now()}`);
+        setBbqReferenceNumber('');
+        setIsSubmitting(false);
+    }).catch(async (serverError) => {
+        const permissionError = new FirestorePermissionError({
+            path: docRef.path,
+            operation: 'create',
+            requestResourceData: incidentData,
+        });
+        errorEmitter.emit('permission-error', permissionError);
+        setIsSubmitting(false);
     });
-    
-    form.reset();
-    // Generate a new ID for the next form entry
-    setSusaId(`SUSA-${Date.now()}`); 
-    setIsSubmitting(false);
   }
 
   const handleGenerateQrCode = () => {
     const values = form.getValues();
-    const allValues = { ...values, susaId };
+    const allValues = { ...values, susaId, bbqReferenceNumber };
     setQrCodeValue(JSON.stringify(allValues));
   };
 
@@ -295,6 +309,13 @@ export default function QualitySusaForm() {
                             <Input disabled value={susaId} />
                         </FormControl>
                         <FormDescription>(Auto Generated)</FormDescription>
+                    </FormItem>
+                    <FormItem>
+                        <FormLabel>BBQ Reference Number</FormLabel>
+                        <FormControl>
+                            <Input disabled value={bbqReferenceNumber} />
+                        </FormControl>
+                        <FormDescription>(Generated on Submit)</FormDescription>
                     </FormItem>
                     <FormField
                       control={form.control}
@@ -705,5 +726,7 @@ export default function QualitySusaForm() {
     </>
   );
 }
+
+    
 
     

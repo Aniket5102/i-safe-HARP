@@ -56,10 +56,12 @@ import html2canvas from "html2canvas";
 import Image from "next/image";
 import { Textarea } from "./ui/textarea";
 import { useFirestore, useAuth } from "@/firebase";
-import { collection, addDoc, serverTimestamp, CollectionReference } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { useRouter } from 'next/navigation';
 import AsianPaintsLogo from "./asian-paints-logo";
 import { Calendar } from "@/components/ui/calendar";
+import { errorEmitter } from "@/firebase/error-emitter";
+import { FirestorePermissionError } from "@/firebase/errors";
 
 const formSchema = z.object({
   date: z.date({ required_error: "A date is required." }),
@@ -175,24 +177,23 @@ export default function HarpForm() {
         userId: auth?.currentUser?.uid || 'anonymous'
     };
 
-    try {
-        const docRef = collection(firestore, 'harp-incidents');
-        await addDoc(docRef, incidentData);
+    const docRef = collection(firestore, 'harp-incidents');
+    addDoc(docRef, incidentData).then(() => {
         toast({
             title: "Success!",
             description: `HARP Incident has been raised with incident ID: ${harpId}.`,
         });
         form.reset();
-    } catch (error: any) {
-        console.error("Error writing document: ", error);
-        toast({
-          variant: "destructive",
-          title: "Submission Error",
-          description: `There was an error submitting the form: ${error.message}`,
-        });
-    } finally {
         setIsSubmitting(false);
-    }
+    }).catch(async (serverError) => {
+        const permissionError = new FirestorePermissionError({
+            path: docRef.path,
+            operation: 'create',
+            requestResourceData: incidentData,
+        });
+        errorEmitter.emit('permission-error', permissionError);
+        setIsSubmitting(false);
+    });
   }
 
   const handleGenerateQrCode = () => {
@@ -715,3 +716,7 @@ export default function HarpForm() {
     </>
   );
 }
+
+    
+
+    
