@@ -149,50 +149,40 @@ export default function QualitySusaForm() {
     setSusaId(`SUSA-${Date.now()}`);
   }, []);
 
-  React.useEffect(() => {
-    if (form.formState.isSubmitSuccessful) {
-      setSusaId(`SUSA-${Date.now()}`);
-    }
-  }, [form.formState.isSubmitSuccessful]);
-
-
   async function onSubmit(values: FormValues) {
     if (!firestore) {
-        toast({
-            variant: "destructive",
-            title: "Connection Error",
-            description: "Could not connect to the database. Please try again later.",
-        });
-        return;
+      toast({
+        variant: "destructive",
+        title: "Connection Error",
+        description: "Could not connect to the database. Please try again.",
+      });
+      return;
     }
-    
+
     setIsSubmitting(true);
-    
+    const currentSusaId = `SUSA-${Date.now()}`;
+    setSusaId(currentSusaId);
+
     const incidentData = {
-        ...values,
-        susaId,
-        createdAt: serverTimestamp(),
-        userId: auth?.currentUser?.uid || 'anonymous'
+      ...values,
+      susaId: currentSusaId,
+      createdAt: serverTimestamp(),
+      userId: auth?.currentUser?.uid || 'anonymous'
     };
 
-    try {
-        const docRef = collection(firestore, 'quality-susa-incidents');
-        await addDoc(docRef, incidentData);
-        toast({
-            title: "Success!",
-            description: `Quality SUSA Incident has been raised with incident ID: ${susaId}.`,
-        });
-        form.reset();
-    } catch (error: any) {
-        console.error("Error writing document: ", error);
-        toast({
-          variant: "destructive",
-          title: "Submission Error",
-          description: `There was an error submitting the form: ${error.message}`,
-        });
-    } finally {
-        setIsSubmitting(false);
-    }
+    // Simplified submission logic
+    const docRef = collection(firestore, 'quality-susa-incidents');
+    await addDoc(docRef, incidentData);
+    
+    toast({
+      title: "Success!",
+      description: `Quality SUSA Incident has been raised with incident ID: ${currentSusaId}.`,
+    });
+    
+    form.reset();
+    // Generate a new ID for the next form entry
+    setSusaId(`SUSA-${Date.now()}`); 
+    setIsSubmitting(false);
   }
 
   const handleGenerateQrCode = () => {
@@ -715,3 +705,5 @@ export default function QualitySusaForm() {
     </>
   );
 }
+
+    
