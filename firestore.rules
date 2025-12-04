@@ -3,31 +3,9 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // Helper functions
-    function isOwner(resource) {
-      return request.auth != null && request.auth.uid == resource.data.userId;
-    }
-
-    function isCreatingOwnDoc() {
-      return request.auth != null && request.resource.data.userId == request.auth.uid;
-    }
-
-    // HARP Incidents: Allow create for any authenticated user, but only owner can read/update/delete.
-    match /harp-incidents/{incidentId} {
-      allow create: if isCreatingOwnDoc();
-      allow read, update, delete: if isOwner(resource);
-    }
-
-    // Quality SUSA Incidents: Open access for testing purposes.
-    match /quality-susa-incidents/{incidentId} {
-      allow read, write: if true;
-    }
-    
-    // Default-deny all other access
+    // Open access for all paths for testing purposes.
     match /{document=**} {
-      allow read, write: if false;
+      allow read, write: if true;
     }
   }
 }
-
-    
