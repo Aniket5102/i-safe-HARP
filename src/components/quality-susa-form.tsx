@@ -167,6 +167,7 @@ export default function QualitySusaForm() {
         ...values,
         bbqReferenceNumber,
         createdAt: serverTimestamp(),
+        userId: 'anonymous'
       };
 
       const docRef = collection(firestore, 'quality-susa-incidents');
@@ -751,3 +752,5 @@ export default function QualitySusaForm() {
     </>
   );
 }
+
+    
