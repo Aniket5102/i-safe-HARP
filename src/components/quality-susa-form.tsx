@@ -141,7 +141,6 @@ export default function QualitySusaForm() {
   });
   
   React.useEffect(() => {
-    // Set an initial value on mount
     setBbqReferenceNumber(`QUALITYSUSA${format(new Date(), 'yyyyMMddHHmmss')}`);
   }, []);
 
@@ -157,9 +156,7 @@ export default function QualitySusaForm() {
 
     setIsSubmitting(true);
     
-    // Generate new BBQ reference number on submit
     const newBbqReferenceNumber = `QUALITYSUSA${format(new Date(), 'yyyyMMddHHmmss')}`;
-    setBbqReferenceNumber(newBbqReferenceNumber);
     
     const incidentData = {
       ...values,
@@ -176,7 +173,6 @@ export default function QualitySusaForm() {
           description: `QUALITY SUSA has been raised with reference ID: ${newBbqReferenceNumber}.`,
         });
         form.reset();
-        // Set a new initial BBQ number for the next form
         setBbqReferenceNumber(`QUALITYSUSA${format(new Date(), 'yyyyMMddHHmmss')}`);
     } catch (error: any) {
         console.error("Error writing document: ", error);
