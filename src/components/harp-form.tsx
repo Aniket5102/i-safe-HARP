@@ -121,6 +121,18 @@ export default function HarpForm() {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [qrCodeValue, setQrCodeValue] = React.useState<string | null>(null);
   const [isDatePickerOpen, setIsDatePickerOpen] = React.useState(false);
+  const [harpId, setHarpId] = React.useState('');
+
+  React.useEffect(() => {
+    setHarpId(`HARP-${Date.now()}`);
+  }, []);
+
+  React.useEffect(() => {
+    if (form.formState.isSubmitSuccessful) {
+      setHarpId(`HARP-${Date.now()}`);
+    }
+  }, [form.formState.isSubmitSuccessful]);
+
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -146,24 +158,56 @@ export default function HarpForm() {
   });
 
   async function onSubmit(values: FormValues) {
+    if (!firestore) {
+        toast({
+            variant: "destructive",
+            title: "Connection Error",
+            description: "Could not connect to the database. Please try again later.",
+        });
+        return;
+    }
+    
     setIsSubmitting(true);
-    const harpId = `HARP-${Date.now()}`;
+    
+    try {
+        const incidentData = {
+            ...values,
+            harpId,
+            createdAt: serverTimestamp(),
+        };
 
-    // Simulate a successful submission without calling Firestore
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    toast({
-      title: "Success!",
-      description: `HARP Incident has been raised with incident ID: ${harpId}. (Submission simulated)`,
-    });
-    form.reset();
-
-    setIsSubmitting(false);
+        const docRef = collection(firestore, 'harp-incidents');
+        addDoc(docRef, incidentData)
+            .catch(async (serverError) => {
+                const permissionError = new FirestorePermissionError({
+                    path: docRef.path,
+                    operation: 'create',
+                    requestResourceData: incidentData,
+                } satisfies SecurityRuleContext);
+                errorEmitter.emit('permission-error', permissionError);
+            });
+        
+        toast({
+            title: "Success!",
+            description: `HARP Incident has been raised with incident ID: ${harpId}.`,
+        });
+        form.reset();
+        
+    } catch (error) {
+        console.error("Error adding document: ", error);
+        toast({
+            variant: "destructive",
+            title: "Submission Error",
+            description: "An error occurred while saving the incident. Please try again.",
+        });
+    } finally {
+        setIsSubmitting(false);
+    }
   }
 
   const handleGenerateQrCode = () => {
     const values = form.getValues();
-    const allValues = Object.fromEntries(Object.entries(values).filter(([key, value]) => value !== ''));
+    const allValues = { ...values, harpId };
     setQrCodeValue(JSON.stringify(allValues));
   };
 
@@ -265,265 +309,270 @@ export default function HarpForm() {
                 <AccordionItem value="general-details">
                   <AccordionTrigger className="text-lg font-semibold">General Details</AccordionTrigger>
                   <AccordionContent className="pt-4 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-                    
-                      <FormField
-                        control={form.control}
-                        name="date"
-                        render={({ field }) => (
-                          <FormItem className="flex flex-col">
-                            <FormLabel>Date<span className="text-red-500">*</span></FormLabel>
-                            <Popover open={isDatePickerOpen} onOpenChange={setIsDatePickerOpen}>
-                              <PopoverTrigger asChild>
-                                <FormControl>
-                                  <Button
-                                    variant={"outline"}
-                                    className={cn(
-                                      "w-full pl-3 text-left font-normal",
-                                      !field.value && "text-muted-foreground"
-                                    )}
-                                  >
-                                    {field.value ? (
-                                      format(field.value, "PPP")
-                                    ) : (
-                                      <span>Pick a date</span>
-                                    )}
-                                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                  </Button>
-                                </FormControl>
-                              </PopoverTrigger>
-                              <PopoverContent className="w-auto p-0" align="start">
-                                <Calendar
-                                  mode="single"
-                                  selected={field.value}
-                                  onSelect={(date) => {
-                                      if (date) field.onChange(date);
-                                      setIsDatePickerOpen(false);
-                                  }}
-                                  disabled={(date) =>
-                                    date > new Date() || date < new Date("1900-01-01")
-                                  }
-                                  initialFocus
-                                />
-                              </PopoverContent>
-                            </Popover>
-                            <FormMessage className="mt-2" />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="location"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Location<span className="text-red-500">*</span></FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                <FormControl>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select a location" />
-                                </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                {locations.map(loc => <SelectItem key={loc} value={loc}>{loc}</SelectItem>)}
-                                </SelectContent>
-                            </Select>
-                            <FormMessage className="mt-2" />
-                          </FormItem>
-                        )}
-                      />
-                       <FormField
-                        control={form.control}
-                        name="department"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Department<span className="text-red-500">*</span></FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                <FormControl>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select a department" />
-                                </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                {departments.map(dep => <SelectItem key={dep} value={dep}>{dep}</SelectItem>)}
-                                </SelectContent>
-                            </Select>
-                            <FormMessage className="mt-2" />
-                          </FormItem>
-                        )}
-                      />
-                       <FormField
-                        control={form.control}
-                        name="block"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Block<span className="text-red-500">*</span></FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                <FormControl>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select a block" />
-                                </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                {blocks.map(b => <SelectItem key={b} value={b}>{b}</SelectItem>)}
-                                </SelectContent>
-                            </Select>
-                            <FormMessage className="mt-2" />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="floor"
-                        render={({ field }) => (
-                           <FormItem>
-                            <FormLabel>Floor<span className="text-red-500">*</span></FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                <FormControl>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select a floor" />
-                                </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                {floors.map(f => <SelectItem key={f} value={f}>{f}</SelectItem>)}
-                                </SelectContent>
-                            </Select>
-                            <FormMessage className="mt-2" />
-                          </FormItem>
-                        )}
-                      />
-                       <FormField
-                        control={form.control}
-                        name="activity"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Activity<span className="text-red-500">*</span></FormLabel>
-                            <FormControl>
-                              <Input placeholder="Enter activity" {...field} />
-                            </FormControl>
-                            <FormMessage className="mt-2" />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="carriedOutBy"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Carried Out By<span className="text-red-500">*</span></FormLabel>
-                             <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                <FormControl>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select a person" />
-                                </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                {people.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
-                                </SelectContent>
-                            </Select>
-                            <FormMessage className="mt-2" />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="employeeType"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Employee Type<span className="text-red-500">*</span></FormLabel>
-                             <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                <FormControl>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select employee type" />
-                                </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                {employeeTypes.map(et => <SelectItem key={et} value={et}>{et}</SelectItem>)}
-                                </SelectContent>
-                            </Select>
-                            <FormMessage className="mt-2" />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="employeeName"
-                        render={({ field }) => (
-                           <FormItem>
-                            <FormLabel>Employee Name<span className="text-red-500">*</span></FormLabel>
-                             <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                <FormControl>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select an employee" />
-                                </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                {people.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
-                                </SelectContent>
-                            </Select>
-                            <FormMessage className="mt-2" />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="employeeId"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Employee ID<span className="text-red-500">*</span></FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                <FormControl>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select an Employee ID" />
-                                </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                {employeeIds.map(id => <SelectItem key={id} value={id}>{id}</SelectItem>)}
-                                </SelectContent>
-                            </Select>
-                            <FormMessage className="mt-2" />
-                          </FormItem>
-                        )}
-                      />
-                       <FormField
-                        control={form.control}
-                        name="designation"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Designation<span className="text-red-500">*</span></FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                <FormControl>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select a designation" />
-                                </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                {designations.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}
-                                </SelectContent>
-                            </Select>
-                            <FormMessage className="mt-2" />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="employeeDepartment"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Employee Department<span className="text-red-500">*</span></FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                <FormControl>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select a department" />
-                                </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                {employeeDepartments.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}
-                                </SelectContent>
-                            </Select>
-                            <FormMessage className="mt-2" />
-                          </FormItem>
-                        )}
-                      />
-                    
+                    <FormItem>
+                        <FormLabel>HARP ID #</FormLabel>
+                        <FormControl>
+                            <Input disabled value={harpId} />
+                        </FormControl>
+                        <FormDescription>(Auto Generated)</FormDescription>
+                    </FormItem>
+                    <FormField
+                      control={form.control}
+                      name="date"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-col">
+                          <FormLabel>Date<span className="text-red-500">*</span></FormLabel>
+                          <Popover open={isDatePickerOpen} onOpenChange={setIsDatePickerOpen}>
+                            <PopoverTrigger asChild>
+                              <FormControl>
+                                <Button
+                                  variant={"outline"}
+                                  className={cn(
+                                    "w-full pl-3 text-left font-normal",
+                                    !field.value && "text-muted-foreground"
+                                  )}
+                                >
+                                  {field.value ? (
+                                    format(field.value, "PPP")
+                                  ) : (
+                                    <span>Pick a date</span>
+                                  )}
+                                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                </Button>
+                              </FormControl>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="start">
+                              <Calendar
+                                mode="single"
+                                selected={field.value}
+                                onSelect={(date) => {
+                                    if (date) field.onChange(date);
+                                    setIsDatePickerOpen(false);
+                                }}
+                                disabled={(date) =>
+                                  date > new Date() || date < new Date("1900-01-01")
+                                }
+                                initialFocus
+                              />
+                            </PopoverContent>
+                          </Popover>
+                          <FormMessage className="mt-2" />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="location"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Location<span className="text-red-500">*</span></FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                              <SelectTrigger>
+                                  <SelectValue placeholder="Select a location" />
+                              </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                              {locations.map(loc => <SelectItem key={loc} value={loc}>{loc}</SelectItem>)}
+                              </SelectContent>
+                          </Select>
+                          <FormMessage className="mt-2" />
+                        </FormItem>
+                      )}
+                    />
+                     <FormField
+                      control={form.control}
+                      name="department"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Department<span className="text-red-500">*</span></FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                              <SelectTrigger>
+                                  <SelectValue placeholder="Select a department" />
+                              </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                              {departments.map(dep => <SelectItem key={dep} value={dep}>{dep}</SelectItem>)}
+                              </SelectContent>
+                          </Select>
+                          <FormMessage className="mt-2" />
+                        </FormItem>
+                      )}
+                    />
+                     <FormField
+                      control={form.control}
+                      name="block"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Block<span className="text-red-500">*</span></FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                              <SelectTrigger>
+                                  <SelectValue placeholder="Select a block" />
+                              </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                              {blocks.map(b => <SelectItem key={b} value={b}>{b}</SelectItem>)}
+                              </SelectContent>
+                          </Select>
+                          <FormMessage className="mt-2" />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="floor"
+                      render={({ field }) => (
+                         <FormItem>
+                          <FormLabel>Floor<span className="text-red-500">*</span></FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                              <SelectTrigger>
+                                  <SelectValue placeholder="Select a floor" />
+                              </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                              {floors.map(f => <SelectItem key={f} value={f}>{f}</SelectItem>)}
+                              </SelectContent>
+                          </Select>
+                          <FormMessage className="mt-2" />
+                        </FormItem>
+                      )}
+                    />
+                     <FormField
+                      control={form.control}
+                      name="activity"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Activity<span className="text-red-500">*</span></FormLabel>
+                          <FormControl>
+                            <Input placeholder="Enter activity" {...field} />
+                          </FormControl>
+                          <FormMessage className="mt-2" />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="carriedOutBy"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Carried Out By<span className="text-red-500">*</span></FormLabel>
+                           <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                              <SelectTrigger>
+                                  <SelectValue placeholder="Select a person" />
+                              </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                              {people.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+                              </SelectContent>
+                          </Select>
+                          <FormMessage className="mt-2" />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="employeeType"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Employee Type<span className="text-red-500">*</span></FormLabel>
+                           <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                              <SelectTrigger>
+                                  <SelectValue placeholder="Select employee type" />
+                              </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                              {employeeTypes.map(et => <SelectItem key={et} value={et}>{et}</SelectItem>)}
+                              </SelectContent>
+                          </Select>
+                          <FormMessage className="mt-2" />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="employeeName"
+                      render={({ field }) => (
+                         <FormItem>
+                          <FormLabel>Employee Name<span className="text-red-500">*</span></FormLabel>
+                           <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                              <SelectTrigger>
+                                  <SelectValue placeholder="Select an employee" />
+                              </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                              {people.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+                              </SelectContent>
+                          </Select>
+                          <FormMessage className="mt-2" />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="employeeId"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Employee ID<span className="text-red-500">*</span></FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                              <SelectTrigger>
+                                  <SelectValue placeholder="Select an Employee ID" />
+                              </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                              {employeeIds.map(id => <SelectItem key={id} value={id}>{id}</SelectItem>)}
+                              </SelectContent>
+                          </Select>
+                          <FormMessage className="mt-2" />
+                        </FormItem>
+                      )}
+                    />
+                     <FormField
+                      control={form.control}
+                      name="designation"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Designation<span className="text-red-500">*</span></FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                              <SelectTrigger>
+                                  <SelectValue placeholder="Select a designation" />
+                              </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                              {designations.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}
+                              </SelectContent>
+                          </Select>
+                          <FormMessage className="mt-2" />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="employeeDepartment"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Employee Department<span className="text-red-500">*</span></FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                              <SelectTrigger>
+                                  <SelectValue placeholder="Select a department" />
+                              </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                              {employeeDepartments.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}
+                              </SelectContent>
+                          </Select>
+                          <FormMessage className="mt-2" />
+                        </FormItem>
+                      )}
+                    />
                   </AccordionContent>
                 </AccordionItem>
                 <AccordionItem value="harp-details">
