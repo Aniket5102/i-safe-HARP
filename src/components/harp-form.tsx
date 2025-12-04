@@ -146,15 +146,6 @@ export default function HarpForm() {
   });
 
   async function onSubmit(values: FormValues) {
-    if (!firestore) {
-      toast({
-        variant: "destructive",
-        title: "Firestore not available",
-        description: "Please try again later.",
-      });
-      return;
-    }
-
     setIsSubmitting(true);
     const harpId = `HARP-${Date.now()}`;
     const docToSave = {
@@ -163,8 +154,18 @@ export default function HarpForm() {
       createdAt: serverTimestamp(),
     };
 
-    const incidentsCollection = collection(firestore, 'harp-incidents');
+    if (!firestore) {
+      toast({
+        variant: "destructive",
+        title: "Firestore not available",
+        description: "Please try again later.",
+      });
+      setIsSubmitting(false);
+      return;
+    }
 
+    const incidentsCollection = collection(firestore, 'harp-incidents');
+    
     addDoc(incidentsCollection, docToSave)
       .then(() => {
         toast({
@@ -172,7 +173,6 @@ export default function HarpForm() {
           description: `HARP Incident has been raised with incident ID: ${harpId}`,
         });
         form.reset();
-        setIsSubmitting(false);
       })
       .catch((serverError) => {
         if (serverError.code === 'permission-denied') {
@@ -181,16 +181,16 @@ export default function HarpForm() {
               operation: 'create',
               requestResourceData: docToSave,
             } satisfies SecurityRuleContext);
-
             errorEmitter.emit('permission-error', permissionError);
         } else {
-            console.error("Error adding document: ", serverError);
-            toast({
-                variant: "destructive",
-                title: "Uh oh! Something went wrong.",
-                description: "There was a problem with your request.",
-            });
+          toast({
+            variant: "destructive",
+            title: "Uh oh! Something went wrong.",
+            description: "There was a problem with your request.",
+          });
         }
+      })
+      .finally(() => {
         setIsSubmitting(false);
       });
   }
