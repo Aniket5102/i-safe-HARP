@@ -167,7 +167,7 @@ export default function QualitySusaForm() {
       toast({
         variant: "destructive",
         title: "Connection Error",
-        description: "Could not connect to the database. Please try again.",
+        description: "Could not connect to the database. Please try again later.",
       });
       return;
     }
