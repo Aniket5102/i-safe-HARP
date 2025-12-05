@@ -58,8 +58,6 @@ import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { useRouter } from 'next/navigation';
 import AsianPaintsLogo from "./asian-paints-logo";
 import { Calendar } from "@/components/ui/calendar";
-import { FirestorePermissionError } from "@/firebase/errors";
-import { errorEmitter } from "@/firebase/error-emitter";
 
 const formSchema = z.object({
   date: z.date({ required_error: "A date is required." }),
@@ -179,9 +177,8 @@ export default function QualitySusaForm() {
       userId: user?.uid || 'anonymous'
     };
     
-    const docRef = collection(firestore, 'quality-susa-incidents');
-
-    addDoc(docRef, incidentData).then(() => {
+    try {
+        await addDoc(collection(firestore, 'quality-susa-incidents'), incidentData);
         toast({
             title: "Success!",
             description: `Quality SUSA Incident has been raised with incident ID: ${currentSusaId}.`,
@@ -189,16 +186,16 @@ export default function QualitySusaForm() {
         form.reset();
         setSusaId(`SUSA-${Date.now()}`);
         setBbqReferenceNumber('');
-    }).catch(async (serverError) => {
-        const permissionError = new FirestorePermissionError({
-            path: 'quality-susa-incidents',
-            operation: 'create',
-            requestResourceData: incidentData,
+    } catch (error) {
+        console.error("Error submitting incident:", error);
+        toast({
+            variant: "destructive",
+            title: "Submission Error",
+            description: "Could not save the incident. Please try again.",
         });
-        errorEmitter.emit('permission-error', permissionError);
-    }).finally(() => {
+    } finally {
         setIsSubmitting(false);
-    });
+    }
   }
 
   const handleGenerateQrCode = () => {

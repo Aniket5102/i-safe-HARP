@@ -59,8 +59,6 @@ import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { useRouter } from 'next/navigation';
 import AsianPaintsLogo from "./asian-paints-logo";
 import { Calendar } from "@/components/ui/calendar";
-import { FirestorePermissionError } from "@/firebase/errors";
-import { errorEmitter } from "@/firebase/error-emitter";
 
 const formSchema = z.object({
   date: z.date({ required_error: "A date is required." }),
@@ -176,24 +174,23 @@ export default function HarpForm() {
         userId: user?.uid || 'anonymous'
     };
     
-    const docRef = collection(firestore, 'harp-incidents');
-
-    addDoc(docRef, incidentData).then(() => {
+    try {
+        await addDoc(collection(firestore, 'harp-incidents'), incidentData);
         toast({
             title: "Success!",
             description: `HARP Incident has been raised with incident ID: ${harpId}.`,
         });
         form.reset();
-    }).catch(async (serverError) => {
-        const permissionError = new FirestorePermissionError({
-            path: 'harp-incidents',
-            operation: 'create',
-            requestResourceData: incidentData,
+    } catch (error) {
+        console.error("Error submitting incident:", error);
+        toast({
+            variant: "destructive",
+            title: "Submission Error",
+            description: "Could not save the incident. Please try again.",
         });
-        errorEmitter.emit('permission-error', permissionError);
-    }).finally(() => {
+    } finally {
         setIsSubmitting(false);
-    });
+    }
   }
 
   const handleGenerateQrCode = () => {
