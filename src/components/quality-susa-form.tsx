@@ -112,7 +112,7 @@ const risks = ["Medium", "high", "low"];
 export default function QualitySusaForm() {
   const { toast } = useToast();
   const firestore = useFirestore();
-  const { user } = useUser();
+  const { user, loading: userLoading } = useUser();
   const router = useRouter();
   const formRef = React.useRef<HTMLDivElement>(null);
   const qrCodeRef = React.useRef<HTMLDivElement>(null);
@@ -145,15 +145,22 @@ export default function QualitySusaForm() {
     },
   });
 
-  React.useEffect(() => {
-    setSusaId(`SUSA-${Date.now()}`);
+  const generateNewIds = React.useCallback(() => {
+    const timestamp = Date.now();
+    setSusaId(`SUSA-${timestamp}`);
+    setBbqReferenceNumber(`BBQ-${timestamp}`);
   }, []);
 
   React.useEffect(() => {
+    generateNewIds();
+  }, [generateNewIds]);
+
+  React.useEffect(() => {
     if (form.formState.isSubmitSuccessful) {
-      setSusaId(`SUSA-${Date.now()}`);
+      form.reset();
+      generateNewIds();
     }
-  }, [form.formState.isSubmitSuccessful]);
+  }, [form.formState.isSubmitSuccessful, form, generateNewIds]);
 
 
   async function onSubmit(values: FormValues) {
@@ -167,26 +174,21 @@ export default function QualitySusaForm() {
     }
 
     setIsSubmitting(true);
-    const newBbqReferenceNumber = `BBQ-${Date.now()}`;
-    const currentSusaId = `SUSA-${Date.now()}`;
-
+    
     const incidentData = {
       ...values,
-      susaId: currentSusaId,
-      bbqReferenceNumber: newBbqReferenceNumber,
+      susaId: susaId,
+      bbqReferenceNumber: bbqReferenceNumber,
       createdAt: serverTimestamp(),
-      userId: user?.uid || 'anonymous'
+      userId: user?.uid
     };
     
     try {
-        await addDoc(collection(firestore, 'quality-susa-incidents'), incidentData);
+        const docRef = await addDoc(collection(firestore, 'quality-susa-incidents'), incidentData);
         toast({
             title: "Success!",
-            description: `Quality SUSA Incident has been raised with incident ID: ${currentSusaId}.`,
+            description: `Quality SUSA Incident has been raised with incident ID: ${susaId}.`,
         });
-        form.reset();
-        setSusaId(`SUSA-${Date.now()}`);
-        setBbqReferenceNumber('');
     } catch (error) {
         console.error("Error submitting incident:", error);
         toast({
@@ -270,6 +272,8 @@ export default function QualitySusaForm() {
       });
     }
   };
+
+  const canSubmit = !isSubmitting && !userLoading && !!user;
   
   return (
     <>
@@ -315,7 +319,7 @@ export default function QualitySusaForm() {
                         <FormControl>
                             <Input disabled value={bbqReferenceNumber} placeholder="Will be generated on submit" />
                         </FormControl>
-                        <FormDescription>(Generated on Submit)</FormDescription>
+                        <FormDescription>(Auto Generated)</FormDescription>
                     </FormItem>
                     <FormField
                       control={form.control}
@@ -686,10 +690,15 @@ export default function QualitySusaForm() {
                 </AccordionItem>
               </Accordion>
               <CardFooter className="flex flex-col sm:flex-row justify-end gap-4 pt-8 px-0">
+                {!user && !userLoading && (
+                    <p className="text-sm text-destructive font-semibold text-center sm:text-left flex-1">
+                        Please sign in to raise a Quality SUSA Incident.
+                    </p>
+                )}
                 <Button type="button" variant="outline" onClick={() => form.reset()}>
                   Clear Form
                 </Button>
-                <Button type="submit" disabled={isSubmitting}>
+                <Button type="submit" disabled={!canSubmit}>
                   {isSubmitting ? <Loader2 className="animate-spin" /> : <Printer />}
                   Raise Quality SUSA Incident
                 </Button>
@@ -725,3 +734,5 @@ export default function QualitySusaForm() {
     </>
   );
 }
+
+    

@@ -112,7 +112,7 @@ const risks = ["Medium", "high", "low"];
 export default function HarpForm() {
   const { toast } = useToast();
   const firestore = useFirestore();
-  const { user } = useUser();
+  const { user, loading: userLoading } = useUser();
   const router = useRouter();
   const formRef = React.useRef<HTMLDivElement>(null);
   const qrCodeRef = React.useRef<HTMLDivElement>(null);
@@ -150,9 +150,10 @@ export default function HarpForm() {
 
   React.useEffect(() => {
     if (form.formState.isSubmitSuccessful) {
+      form.reset();
       setHarpId(`HARP-${Date.now()}`);
     }
-  }, [form.formState.isSubmitSuccessful]);
+  }, [form.formState.isSubmitSuccessful, form]);
 
 
   async function onSubmit(values: FormValues) {
@@ -171,16 +172,15 @@ export default function HarpForm() {
         ...values,
         harpId,
         createdAt: serverTimestamp(),
-        userId: user?.uid || 'anonymous'
+        userId: user?.uid
     };
     
     try {
-        await addDoc(collection(firestore, 'harp-incidents'), incidentData);
+        const docRef = await addDoc(collection(firestore, 'harp-incidents'), incidentData);
         toast({
             title: "Success!",
             description: `HARP Incident has been raised with incident ID: ${harpId}.`,
         });
-        form.reset();
     } catch (error) {
         console.error("Error submitting incident:", error);
         toast({
@@ -265,6 +265,8 @@ export default function HarpForm() {
     }
   };
   
+  const canSubmit = !isSubmitting && !userLoading && !!user;
+
   return (
     <>
       <Card ref={formRef} className="w-full shadow-2xl" id="harp-form-card">
@@ -674,10 +676,15 @@ export default function HarpForm() {
                 </AccordionItem>
               </Accordion>
               <CardFooter className="flex flex-col sm:flex-row justify-end gap-4 pt-8 px-0">
+                 {!user && !userLoading && (
+                    <p className="text-sm text-destructive font-semibold text-center sm:text-left flex-1">
+                        Please sign in to raise a HARP Incident.
+                    </p>
+                )}
                 <Button type="button" variant="outline" onClick={() => form.reset()}>
                   Clear Form
                 </Button>
-                <Button type="submit" disabled={isSubmitting}>
+                <Button type="submit" disabled={!canSubmit}>
                   {isSubmitting ? <Loader2 className="animate-spin" /> : <Printer />}
                   Raise HARP Incident
                 </Button>
@@ -713,3 +720,5 @@ export default function HarpForm() {
     </>
   );
 }
+
+    
