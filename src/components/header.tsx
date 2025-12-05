@@ -20,7 +20,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import AsianPaintsLogo from "./asian-paints-logo";
 import Link from "next/link";
 import { useUser } from "@/firebase";
-import AuthButton from "./auth-button";
+
 
 export default function Header() {
   const { user, loading } = useUser();
@@ -68,7 +68,10 @@ export default function Header() {
             <div className="text-sm text-gray-600">
               Asian Paints Limited (APL)
             </div>
-            <AuthButton />
+            <Avatar className="h-9 w-9">
+                <AvatarImage src="https://github.com/shadcn.png" alt="User" />
+                <AvatarFallback>U</AvatarFallback>
+            </Avatar>
           </div>
         </div>
       </div>

@@ -48,13 +48,13 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { useToast } from "@/hooks/use-toast";
-import { CalendarIcon, ChevronLeft, FileDown, Loader2, Printer, Download, X, Upload, LogIn } from "lucide-react";
+import { CalendarIcon, ChevronLeft, FileDown, Loader2, Printer, Download, X, Upload } from "lucide-react";
 import { format } from "date-fns";
 import QRCode from "qrcode.react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { Textarea } from "./ui/textarea";
-import { useFirestore, useUser } from "@/firebase";
+import { useFirestore } from "@/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { useRouter } from 'next/navigation';
 import AsianPaintsLogo from "./asian-paints-logo";
@@ -112,7 +112,6 @@ const risks = ["Medium", "high", "low"];
 export default function QualitySusaForm() {
   const { toast } = useToast();
   const firestore = useFirestore();
-  const { user, loading: userLoading } = useUser();
   const router = useRouter();
   const formRef = React.useRef<HTMLDivElement>(null);
   const qrCodeRef = React.useRef<HTMLDivElement>(null);
@@ -172,15 +171,6 @@ export default function QualitySusaForm() {
       });
       return;
     }
-     if (!user) {
-      toast({
-        variant: 'destructive',
-        title: 'Authentication Error',
-        description: 'You must be logged in to submit an incident.',
-      });
-      return;
-    }
-
     setIsSubmitting(true);
     
     const incidentData = {
@@ -188,7 +178,6 @@ export default function QualitySusaForm() {
       susaId: susaId,
       bbqReferenceNumber: bbqReferenceNumber,
       createdAt: serverTimestamp(),
-      userId: user.uid,
     };
     
     try {
@@ -697,17 +686,11 @@ export default function QualitySusaForm() {
                 </AccordionItem>
               </Accordion>
               <CardFooter className="flex flex-col sm:flex-row justify-end gap-4 pt-8 px-0">
-                {!user && !userLoading && (
-                  <Button type="button" variant="outline" onClick={() => router.push('/login')}>
-                    <LogIn className="mr-2 h-4 w-4" />
-                    Sign In to Raise Incident
-                  </Button>
-                )}
                 <Button type="button" variant="outline" onClick={() => form.reset()}>
                   Clear Form
                 </Button>
-                <Button type="submit" disabled={isSubmitting || userLoading || !user}>
-                  {isSubmitting || userLoading ? <Loader2 className="animate-spin" /> : <Printer />}
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? <Loader2 className="animate-spin" /> : <Printer />}
                   Raise Quality SUSA Incident
                 </Button>
               </CardFooter>
