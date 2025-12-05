@@ -112,7 +112,7 @@ const risks = ["Medium", "high", "low"];
 export default function QualitySusaForm() {
   const { toast } = useToast();
   const firestore = useFirestore();
-  const { user } = useUser();
+  const { user, loading: userLoading } = useUser();
   const router = useRouter();
   const formRef = React.useRef<HTMLDivElement>(null);
   const qrCodeRef = React.useRef<HTMLDivElement>(null);
@@ -697,7 +697,7 @@ export default function QualitySusaForm() {
                 </AccordionItem>
               </Accordion>
               <CardFooter className="flex flex-col sm:flex-row justify-end gap-4 pt-8 px-0">
-                {!user && (
+                {!user && !userLoading && (
                     <p className="text-sm text-destructive">
                     Please sign in to raise an incident.
                     </p>
@@ -705,8 +705,8 @@ export default function QualitySusaForm() {
                 <Button type="button" variant="outline" onClick={() => form.reset()}>
                   Clear Form
                 </Button>
-                <Button type="submit" disabled={isSubmitting || !user}>
-                  {isSubmitting ? <Loader2 className="animate-spin" /> : <Printer />}
+                <Button type="submit" disabled={isSubmitting || userLoading || !user}>
+                  {isSubmitting || userLoading ? <Loader2 className="animate-spin" /> : <Printer />}
                   Raise Quality SUSA Incident
                 </Button>
               </CardFooter>
@@ -741,6 +741,3 @@ export default function QualitySusaForm() {
     </>
   );
 }
-
-    
-    
