@@ -53,10 +53,9 @@ import { format } from "date-fns";
 import QRCode from "qrcode.react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
-import Image from "next/image";
 import { Textarea } from "./ui/textarea";
 import { useFirestore, useUser } from "@/firebase";
-import { collection, addDoc, serverTimestamp, doc } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { useRouter } from 'next/navigation';
 import AsianPaintsLogo from "./asian-paints-logo";
 import { Calendar } from "@/components/ui/calendar";
@@ -348,7 +347,7 @@ export default function HarpForm() {
                               />
                             </PopoverContent>
                           </Popover>
-                          <FormMessage className="mt-2" />
+                          <FormMessage />
                         </FormItem>
                       )}
                     />
@@ -368,7 +367,7 @@ export default function HarpForm() {
                               {locations.map(loc => <SelectItem key={loc} value={loc}>{loc}</SelectItem>)}
                               </SelectContent>
                           </Select>
-                          <FormMessage className="mt-2" />
+                          <FormMessage />
                         </FormItem>
                       )}
                     />
@@ -388,7 +387,7 @@ export default function HarpForm() {
                               {departments.map(dep => <SelectItem key={dep} value={dep}>{dep}</SelectItem>)}
                               </SelectContent>
                           </Select>
-                          <FormMessage className="mt-2" />
+                          <FormMessage />
                         </FormItem>
                       )}
                     />
@@ -408,7 +407,7 @@ export default function HarpForm() {
                               {blocks.map(b => <SelectItem key={b} value={b}>{b}</SelectItem>)}
                               </SelectContent>
                           </Select>
-                          <FormMessage className="mt-2" />
+                          <FormMessage />
                         </FormItem>
                       )}
                     />
@@ -428,7 +427,7 @@ export default function HarpForm() {
                               {floors.map(f => <SelectItem key={f} value={f}>{f}</SelectItem>)}
                               </SelectContent>
                           </Select>
-                          <FormMessage className="mt-2" />
+                          <FormMessage />
                         </FormItem>
                       )}
                     />
@@ -441,7 +440,7 @@ export default function HarpForm() {
                           <FormControl>
                             <Input placeholder="Enter activity" {...field} />
                           </FormControl>
-                          <FormMessage className="mt-2" />
+                          <FormMessage />
                         </FormItem>
                       )}
                     />
@@ -461,7 +460,7 @@ export default function HarpForm() {
                               {people.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
                               </SelectContent>
                           </Select>
-                          <FormMessage className="mt-2" />
+                          <FormMessage />
                         </FormItem>
                       )}
                     />
@@ -481,7 +480,7 @@ export default function HarpForm() {
                               {employeeTypes.map(et => <SelectItem key={et} value={et}>{et}</SelectItem>)}
                               </SelectContent>
                           </Select>
-                          <FormMessage className="mt-2" />
+                          <FormMessage />
                         </FormItem>
                       )}
                     />
@@ -501,7 +500,7 @@ export default function HarpForm() {
                               {people.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
                               </SelectContent>
                           </Select>
-                          <FormMessage className="mt-2" />
+                          <FormMessage />
                         </FormItem>
                       )}
                     />
@@ -521,7 +520,7 @@ export default function HarpForm() {
                               {employeeIds.map(id => <SelectItem key={id} value={id}>{id}</SelectItem>)}
                               </SelectContent>
                           </Select>
-                          <FormMessage className="mt-2" />
+                          <FormMessage />
                         </FormItem>
                       )}
                     />
@@ -541,7 +540,7 @@ export default function HarpForm() {
                               {designations.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}
                               </SelectContent>
                           </Select>
-                          <FormMessage className="mt-2" />
+                          <FormMessage />
                         </FormItem>
                       )}
                     />
@@ -561,7 +560,7 @@ export default function HarpForm() {
                               {employeeDepartments.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}
                               </SelectContent>
                           </Select>
-                          <FormMessage className="mt-2" />
+                          <FormMessage />
                         </FormItem>
                       )}
                     />
@@ -587,7 +586,7 @@ export default function HarpForm() {
                                 {hazards.map(h => <SelectItem key={h} value={h}>{h}</SelectItem>)}
                               </SelectContent>
                             </Select>
-                            <FormMessage className="mt-2" />
+                            <FormMessage />
                           </FormItem>
                         )}
                       />
@@ -600,7 +599,7 @@ export default function HarpForm() {
                             <FormControl>
                               <Input placeholder="Enter accident details" {...field} />
                             </FormControl>
-                            <FormMessage className="mt-2" />
+                            <FormMessage />
                           </FormItem>
                         )}
                       />
@@ -620,7 +619,7 @@ export default function HarpForm() {
                                 {risks.map(r => <SelectItem key={r} value={r}>{r}</SelectItem>)}
                               </SelectContent>
                             </Select>
-                            <FormMessage className="mt-2" />
+                            <FormMessage />
                           </FormItem>
                         )}
                       />
@@ -633,7 +632,7 @@ export default function HarpForm() {
                             <FormControl>
                               <Textarea placeholder="Describe prevention measures" {...field} />
                             </FormControl>
-                            <FormMessage className="mt-2" />
+                            <FormMessage />
                           </FormItem>
                         )}
                       />
@@ -653,7 +652,7 @@ export default function HarpForm() {
                             <FormControl>
                               <Textarea placeholder="Enter your observations" {...field} />
                             </FormControl>
-                            <FormMessage className="mt-2" />
+                            <FormMessage />
                           </FormItem>
                         )}
                       />
@@ -671,7 +670,7 @@ export default function HarpForm() {
                                 </FormControl>
                             </label>
                         </div> 
-                        <FormMessage className="mt-2" />
+                        <FormMessage />
                       </FormItem>
                     
                   </AccordionContent>
