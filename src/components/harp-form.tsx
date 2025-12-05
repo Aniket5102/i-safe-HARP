@@ -165,6 +165,14 @@ export default function HarpForm() {
         });
         return;
     }
+     if (!user) {
+      toast({
+        variant: 'destructive',
+        title: 'Authentication Error',
+        description: 'You must be logged in to submit an incident.',
+      });
+      return;
+    }
     
     setIsSubmitting(true);
     
@@ -172,26 +180,25 @@ export default function HarpForm() {
         ...values,
         harpId,
         createdAt: serverTimestamp(),
-        userId: user ? user.uid : 'anonymous',
+        userId: user.uid,
     };
     
     try {
-        const incidentsCollection = collection(firestore, 'harp-incidents');
-        await addDoc(incidentsCollection, incidentData);
-        toast({
-            title: "Success!",
-            description: `HARP Incident has been raised with incident ID: ${harpId}.`,
-        });
-        form.reset();
-    } catch (error) {
-        console.error("Error submitting incident:", error);
-        toast({
-            variant: "destructive",
-            title: "Submission Error",
-            description: "Could not save the incident. Please try again.",
-        });
+      await addDoc(collection(firestore, 'harp-incidents'), incidentData);
+      toast({
+        title: "Success!",
+        description: `HARP Incident has been raised with incident ID: ${harpId}.`,
+      });
+      form.reset();
+    } catch (error: any) {
+      console.error("Error submitting incident:", error);
+      toast({
+        variant: "destructive",
+        title: "Submission Error",
+        description: error.message || "Could not save the incident. Please try again.",
+      });
     } finally {
-        setIsSubmitting(false);
+      setIsSubmitting(false);
     }
   }
 
@@ -676,10 +683,15 @@ export default function HarpForm() {
                 </AccordionItem>
               </Accordion>
               <CardFooter className="flex flex-col sm:flex-row justify-end gap-4 pt-8 px-0">
+                {!user && (
+                    <p className="text-sm text-destructive">
+                    Please sign in to raise an incident.
+                    </p>
+                )}
                 <Button type="button" variant="outline" onClick={() => form.reset()}>
                   Clear Form
                 </Button>
-                <Button type="submit" disabled={isSubmitting}>
+                <Button type="submit" disabled={isSubmitting || !user}>
                   {isSubmitting ? <Loader2 className="animate-spin" /> : <Printer />}
                   Raise HARP Incident
                 </Button>
@@ -716,4 +728,5 @@ export default function HarpForm() {
   );
 }
 
+    
     
