@@ -54,7 +54,7 @@ import QRCode from "qrcode.react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { Textarea } from "./ui/textarea";
-import { useFirestore } from "@/firebase";
+import { useFirestore, useUser } from "@/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { useRouter } from 'next/navigation';
 import AsianPaintsLogo from "./asian-paints-logo";
@@ -112,6 +112,7 @@ const risks = ["Medium", "high", "low"];
 export default function QualitySusaForm() {
   const { toast } = useToast();
   const firestore = useFirestore();
+  const { user } = useUser();
   const router = useRouter();
   const formRef = React.useRef<HTMLDivElement>(null);
   const qrCodeRef = React.useRef<HTMLDivElement>(null);
@@ -179,14 +180,17 @@ export default function QualitySusaForm() {
       susaId: susaId,
       bbqReferenceNumber: bbqReferenceNumber,
       createdAt: serverTimestamp(),
+      userId: user ? user.uid : 'anonymous',
     };
     
     try {
-        const docRef = await addDoc(collection(firestore, 'quality-susa-incidents'), incidentData);
+        const incidentsCollection = collection(firestore, 'quality-susa-incidents');
+        await addDoc(incidentsCollection, incidentData);
         toast({
             title: "Success!",
             description: `Quality SUSA Incident has been raised with incident ID: ${susaId}.`,
         });
+        form.reset();
     } catch (error) {
         console.error("Error submitting incident:", error);
         toast({
@@ -725,3 +729,5 @@ export default function QualitySusaForm() {
     </>
   );
 }
+
+    

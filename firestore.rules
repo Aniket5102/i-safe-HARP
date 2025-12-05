@@ -12,12 +12,12 @@ service cloud.firestore {
     // Public access for quality-susa-incidents
     match /quality-susa-incidents/{incidentId} {
       // Anyone can create/read/update/delete
-      allow read, write: if true;
+      allow read, write,create: if true;
     }
 
     // Deny everything else explicitly (optional but recommended)
-    match /{document=**} {
-      allow read, write: if false;
-    }
+    //match /{document=**} {
+    //  allow read, write: if false;
+    //}
   }
 }

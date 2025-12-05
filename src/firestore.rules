@@ -3,21 +3,20 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Public access for harp-incidents
     match /harp-incidents/{incidentId} {
-      // Anyone can create/read/update/delete
-      allow read, write: if true;
+      allow create: if true;
+      allow read, update, delete: if request.auth != null;
     }
 
-    // Public access for quality-susa-incidents
     match /quality-susa-incidents/{incidentId} {
-      // Anyone can create/read/update/delete
-      allow read, write: if true;
+      allow create: if true;
+      allow read, update, delete: if request.auth != null;
     }
 
-    // Deny everything else explicitly (optional but recommended)
     match /{document=**} {
       allow read, write: if false;
     }
   }
 }
+
+    
