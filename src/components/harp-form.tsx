@@ -56,7 +56,7 @@ import html2canvas from "html2canvas";
 import Image from "next/image";
 import { Textarea } from "./ui/textarea";
 import { useFirestore, useAuth } from "@/firebase";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp, doc } from "firebase/firestore";
 import { useRouter } from 'next/navigation';
 import AsianPaintsLogo from "./asian-paints-logo";
 import { Calendar } from "@/components/ui/calendar";
@@ -115,7 +115,7 @@ const risks = ["Medium", "high", "low"];
 export default function HarpForm() {
   const { toast } = useToast();
   const firestore = useFirestore();
-  const auth = useAuth();
+  const { user } = useAuth();
   const router = useRouter();
   const formRef = React.useRef<HTMLDivElement>(null);
   const qrCodeRef = React.useRef<HTMLDivElement>(null);
@@ -174,26 +174,27 @@ export default function HarpForm() {
         ...values,
         harpId,
         createdAt: serverTimestamp(),
-        userId: auth?.currentUser?.uid || 'anonymous'
+        userId: user?.uid || 'anonymous'
     };
+    
+    const docRef = collection(firestore, 'harp-incidents');
 
-    try {
-        await addDoc(collection(firestore, 'harp-incidents'), incidentData);
+    addDoc(docRef, incidentData).then(() => {
         toast({
             title: "Success!",
             description: `HARP Incident has been raised with incident ID: ${harpId}.`,
         });
         form.reset();
-    } catch (error) {
-        console.error("Error writing document: ", error);
-        toast({
-            variant: "destructive",
-            title: "Submission Error",
-            description: "Could not submit the form. Please try again.",
+    }).catch(async (serverError) => {
+        const permissionError = new FirestorePermissionError({
+            path: 'harp-incidents',
+            operation: 'create',
+            requestResourceData: incidentData,
         });
-    } finally {
+        errorEmitter.emit('permission-error', permissionError);
+    }).finally(() => {
         setIsSubmitting(false);
-    }
+    });
   }
 
   const handleGenerateQrCode = () => {
@@ -716,5 +717,3 @@ export default function HarpForm() {
     </>
   );
 }
-
-    

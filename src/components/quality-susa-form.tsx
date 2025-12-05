@@ -115,7 +115,7 @@ const risks = ["Medium", "high", "low"];
 export default function QualitySusaForm() {
   const { toast } = useToast();
   const firestore = useFirestore();
-  const auth = useAuth();
+  const { user } = useAuth();
   const router = useRouter();
   const formRef = React.useRef<HTMLDivElement>(null);
   const qrCodeRef = React.useRef<HTMLDivElement>(null);
@@ -171,11 +171,12 @@ export default function QualitySusaForm() {
       susaId: currentSusaId,
       bbqReferenceNumber: newBbqReferenceNumber,
       createdAt: serverTimestamp(),
-      userId: auth?.currentUser?.uid || 'anonymous'
+      userId: user?.uid || 'anonymous'
     };
+    
+    const docRef = collection(firestore, 'quality-susa-incidents');
 
-    try {
-        await addDoc(collection(firestore, 'quality-susa-incidents'), incidentData);
+    addDoc(docRef, incidentData).then(() => {
         toast({
             title: "Success!",
             description: `Quality SUSA Incident has been raised with incident ID: ${currentSusaId}.`,
@@ -183,16 +184,16 @@ export default function QualitySusaForm() {
         form.reset();
         setSusaId(`SUSA-${Date.now()}`);
         setBbqReferenceNumber('');
-    } catch (error) {
-        console.error("Error writing document: ", error);
-        toast({
-            variant: "destructive",
-            title: "Submission Error",
-            description: "Could not submit the form. Please try again.",
+    }).catch(async (serverError) => {
+        const permissionError = new FirestorePermissionError({
+            path: 'quality-susa-incidents',
+            operation: 'create',
+            requestResourceData: incidentData,
         });
-    } finally {
+        errorEmitter.emit('permission-error', permissionError);
+    }).finally(() => {
         setIsSubmitting(false);
-    }
+    });
   }
 
   const handleGenerateQrCode = () => {
@@ -721,5 +722,3 @@ export default function QualitySusaForm() {
     </>
   );
 }
-
-    

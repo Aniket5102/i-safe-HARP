@@ -34,7 +34,7 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased">
         <FirebaseClientProvider>
-          <SidebarProvider defaultOpen={false}>
+          <SidebarProvider>
             <div className="relative min-h-screen">
               <Sidebar>
                 <SidebarHeader>
