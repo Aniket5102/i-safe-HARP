@@ -54,7 +54,7 @@ import QRCode from "qrcode.react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { Textarea } from "./ui/textarea";
-import { useFirestore, useUser } from "@/firebase";
+import { useFirestore } from "@/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { useRouter } from 'next/navigation';
 import AsianPaintsLogo from "./asian-paints-logo";
@@ -112,7 +112,6 @@ const risks = ["Medium", "high", "low"];
 export default function HarpForm() {
   const { toast } = useToast();
   const firestore = useFirestore();
-  const { user, loading: userLoading } = useUser();
   const router = useRouter();
   const formRef = React.useRef<HTMLDivElement>(null);
   const qrCodeRef = React.useRef<HTMLDivElement>(null);
@@ -172,7 +171,6 @@ export default function HarpForm() {
         ...values,
         harpId,
         createdAt: serverTimestamp(),
-        userId: user?.uid
     };
     
     try {
@@ -265,8 +263,6 @@ export default function HarpForm() {
     }
   };
   
-  const canSubmit = !isSubmitting && !userLoading && !!user;
-
   return (
     <>
       <Card ref={formRef} className="w-full shadow-2xl" id="harp-form-card">
@@ -676,15 +672,10 @@ export default function HarpForm() {
                 </AccordionItem>
               </Accordion>
               <CardFooter className="flex flex-col sm:flex-row justify-end gap-4 pt-8 px-0">
-                 {!user && !userLoading && (
-                    <p className="text-sm text-destructive font-semibold text-center sm:text-left flex-1">
-                        Please sign in to raise a HARP Incident.
-                    </p>
-                )}
                 <Button type="button" variant="outline" onClick={() => form.reset()}>
                   Clear Form
                 </Button>
-                <Button type="submit" disabled={!canSubmit}>
+                <Button type="submit" disabled={isSubmitting}>
                   {isSubmitting ? <Loader2 className="animate-spin" /> : <Printer />}
                   Raise HARP Incident
                 </Button>
@@ -720,5 +711,3 @@ export default function HarpForm() {
     </>
   );
 }
-
-    
