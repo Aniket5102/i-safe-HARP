@@ -723,5 +723,3 @@ export default function QualitySusaForm() {
     </>
   );
 }
-
-    
