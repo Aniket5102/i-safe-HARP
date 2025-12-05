@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -55,7 +54,7 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import Image from "next/image";
 import { Textarea } from "./ui/textarea";
-import { useFirestore, useAuth } from "@/firebase";
+import { useFirestore, useUser } from "@/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { useRouter } from 'next/navigation';
 import AsianPaintsLogo from "./asian-paints-logo";
@@ -113,7 +112,7 @@ const risks = ["Medium", "high", "low"];
 export default function QualitySusaForm() {
   const { toast } = useToast();
   const firestore = useFirestore();
-  const { user } = useAuth();
+  const { user } = useUser();
   const router = useRouter();
   const formRef = React.useRef<HTMLDivElement>(null);
   const qrCodeRef = React.useRef<HTMLDivElement>(null);
