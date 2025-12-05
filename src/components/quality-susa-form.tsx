@@ -48,7 +48,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { useToast } from "@/hooks/use-toast";
-import { CalendarIcon, ChevronLeft, FileDown, Loader2, Printer, Download, X, Upload } from "lucide-react";
+import { CalendarIcon, ChevronLeft, FileDown, Loader2, Printer, Download, X, Upload, LogIn } from "lucide-react";
 import { format } from "date-fns";
 import QRCode from "qrcode.react";
 import jsPDF from "jspdf";
@@ -698,9 +698,10 @@ export default function QualitySusaForm() {
               </Accordion>
               <CardFooter className="flex flex-col sm:flex-row justify-end gap-4 pt-8 px-0">
                 {!user && !userLoading && (
-                    <p className="text-sm text-destructive">
-                    Please sign in to raise an incident.
-                    </p>
+                  <Button type="button" variant="outline" onClick={() => router.push('/login')}>
+                    <LogIn className="mr-2 h-4 w-4" />
+                    Sign In to Raise Incident
+                  </Button>
                 )}
                 <Button type="button" variant="outline" onClick={() => form.reset()}>
                   Clear Form

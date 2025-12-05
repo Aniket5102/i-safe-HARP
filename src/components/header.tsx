@@ -19,9 +19,12 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import AsianPaintsLogo from "./asian-paints-logo";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
+import { useUser } from "@/firebase";
+import AuthButton from "./auth-button";
 
 export default function Header() {
+  const { user, loading } = useUser();
+
   return (
     <header className="bg-white shadow-md sticky top-0 z-40">
       <div className="container mx-auto px-4">
@@ -65,10 +68,7 @@ export default function Header() {
             <div className="text-sm text-gray-600">
               Asian Paints Limited (APL)
             </div>
-            <Avatar className="h-9 w-9">
-              <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-              <AvatarFallback className="bg-primary/20 text-primary font-bold">AK</AvatarFallback>
-            </Avatar>
+            <AuthButton />
           </div>
         </div>
       </div>
