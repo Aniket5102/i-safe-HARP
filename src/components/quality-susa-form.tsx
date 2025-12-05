@@ -59,6 +59,8 @@ import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { useRouter } from 'next/navigation';
 import AsianPaintsLogo from "./asian-paints-logo";
 import { Calendar } from "@/components/ui/calendar";
+import { errorEmitter } from "@/firebase/error-emitter";
+import { FirestorePermissionError } from "@/firebase/errors";
 
 const formSchema = z.object({
   date: z.date({ required_error: "A date is required." }),
@@ -156,7 +158,7 @@ export default function QualitySusaForm() {
 
   React.useEffect(() => {
     if (form.formState.isSubmitSuccessful) {
-      form.reset();
+      form.reset(form.formState.defaultValues);
       generateNewIds();
     }
   }, [form.formState.isSubmitSuccessful, form, generateNewIds]);
@@ -180,23 +182,35 @@ export default function QualitySusaForm() {
       createdAt: serverTimestamp(),
     };
     
-    try {
-      await addDoc(collection(firestore, 'quality-susa-incidents'), incidentData);
-      toast({
+    const incidentsCollection = collection(firestore, 'quality-susa-incidents');
+
+    addDoc(incidentsCollection, incidentData)
+      .then((docRef) => {
+        toast({
           title: "Success!",
           description: `Quality SUSA Incident has been raised with incident ID: ${susaId}.`,
-      });
-      form.reset();
-    } catch (error: any) {
-      console.error("Error submitting incident:", error);
-      toast({
-          variant: "destructive",
-          title: "Submission Error",
-          description: error.message || "Could not save the incident. Please try again.",
-      });
-    } finally {
+        });
+        form.reset();
+      })
+      .catch((error) => {
+        if (error.code === 'permission-denied') {
+          const permissionError = new FirestorePermissionError({
+            path: incidentsCollection.path,
+            operation: 'create',
+            requestResourceData: incidentData,
+          });
+          errorEmitter.emit('permission-error', permissionError);
+        } else {
+          toast({
+            variant: "destructive",
+            title: "Submission Error",
+            description: error.message || "Could not save the incident. Please try again.",
+          });
+        }
+      })
+      .finally(() => {
         setIsSubmitting(false);
-    }
+      });
   }
 
   const handleGenerateQrCode = () => {
@@ -725,3 +739,5 @@ export default function QualitySusaForm() {
     </>
   );
 }
+
+    
