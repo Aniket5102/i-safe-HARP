@@ -60,6 +60,8 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { errorEmitter } from "@/firebase/error-emitter";
+import { FirestorePermissionError } from "@/firebase/errors";
 
 const formSchema = z.object({
   observerName: z.string().min(1, "Observer name is required."),
@@ -152,71 +154,78 @@ function BbsFormContent() {
         }
     };
 
-    const handleUpdate = async (values: FormValues) => {
+    const handleUpdate = (values: FormValues) => {
         if (!firestore || !foundIncident) return;
         setIsLoading(true);
 
-        try {
         const docRef = doc(firestore, "bbs-observations", foundIncident.id);
-        await updateDoc(docRef, {
+        updateDoc(docRef, {
             ...values,
             updatedAt: serverTimestamp(),
+        }).then(() => {
+            toast({ title: "Success", description: "Incident updated successfully." });
+        }).catch((serverError) => {
+            const permissionError = new FirestorePermissionError({
+              path: docRef.path,
+              operation: 'update',
+              requestResourceData: values,
+            });
+            errorEmitter.emit('permission-error', permissionError);
+        }).finally(() => {
+            setIsLoading(false);
         });
-        toast({ title: "Success", description: "Incident updated successfully." });
-        } catch (error: any) {
-        toast({
-            variant: "destructive",
-            title: "Update Error",
-            description: error.message || "Could not update the observation.",
-        });
-        } finally {
-        setIsLoading(false);
-        }
     };
 
     const handleDelete = async () => {
         if (!firestore || !foundIncident) return;
         setIsLoading(true);
-        try {
-            await deleteDoc(doc(firestore, "bbs-observations", foundIncident.id));
+
+        const docRef = doc(firestore, "bbs-observations", foundIncident.id);
+        deleteDoc(docRef).then(() => {
             toast({ title: "Success", description: "Incident deleted successfully."});
             setFoundIncident(null);
             setIncidentId('');
             form.reset();
-        } catch (error: any) {
-            toast({
-                variant: "destructive",
-                title: "Delete Error",
-                description: error.message || "Could not delete the observation.",
+        }).catch((serverError) => {
+            const permissionError = new FirestorePermissionError({
+              path: docRef.path,
+              operation: 'delete',
             });
-        } finally {
+            errorEmitter.emit('permission-error', permissionError);
+        }).finally(() => {
             setIsLoading(false);
-        }
+        });
     };
 
-    const onNewSubmit = async (values: FormValues) => {
+    const onNewSubmit = (values: FormValues) => {
         if (!firestore) return;
         setIsLoading(true);
-        try {
+
         const observationData = {
             ...values,
             createdAt: serverTimestamp(),
         };
-        const docRef = await addDoc(collection(firestore, 'bbs-observations'), observationData);
-        toast({
-            title: "Success!",
-            description: `Safety observation has been recorded with ID: ${docRef.id}.`,
+        const collectionRef = collection(firestore, 'bbs-observations');
+
+        addDoc(collectionRef, observationData)
+        .then((docRef) => {
+            toast({
+                title: "Success!",
+                description: `Safety observation has been recorded with ID: ${docRef.id}.`,
+            });
+            form.reset();
+        })
+        .catch((serverError) => {
+            const permissionError = new FirestorePermissionError({
+              path: collectionRef.path,
+              operation: 'create',
+              requestResourceData: observationData,
+            });
+            errorEmitter.emit('permission-error', permissionError);
+        })
+        .finally(() => {
+            setIsLoading(false);
         });
-        form.reset();
-        } catch (error: any) {
-        toast({
-            variant: "destructive",
-            title: "Submission Error",
-            description: error.message || "Could not save the observation.",
-        });
-        } finally {
-        setIsLoading(false);
-        }
     };
 
     const resetSearch = () => {
