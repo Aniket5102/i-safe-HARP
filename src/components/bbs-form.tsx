@@ -256,7 +256,7 @@ export default function BbsForm() {
         </Tabs>
       </CardHeader>
       <CardContent>
-        {activeTab === 'modify' && (
+        {activeTab !== 'new' && (
             <div className="flex items-center gap-2 mb-8">
               <Input
                 placeholder="Enter Incident ID to find..."
@@ -439,58 +439,34 @@ export default function BbsForm() {
                   Update Observation
                 </Button>
               )}
+               {activeTab === 'delete' && foundIncident && (
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="destructive" disabled={isLoading}>
+                        <Trash2 className="mr-2 h-4 w-4" /> Delete Incident
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This action cannot be undone. This will permanently delete the
+                          observation with ID: <span className="font-semibold">{foundIncident.id}</span>
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleDelete} disabled={isLoading}>
+                          {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Yes, delete it"}
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+              )}
             </CardFooter>
           </form>
         </Form>
-        {activeTab === 'delete' && (
-          <div>
-            <div className="flex w-full max-w-sm items-center space-x-2">
-              <div className="w-full">
-                <FormLabel>Incident Number</FormLabel>
-                <Input
-                  placeholder="e.g., #09876"
-                  value={incidentId}
-                  onChange={(e) => setIncidentId(e.target.value)}
-                  disabled={isLoading}
-                />
-              </div>
-              <Button onClick={handleSearch} disabled={!incidentId || isLoading} className="self-end">
-                {isLoading ? <Loader2 className="animate-spin" /> : null}
-                Search
-              </Button>
-            </div>
-
-            {foundIncident && (
-              <div className="flex justify-end pt-8">
-                  <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                          <Button variant="destructive" disabled={isLoading}>
-                              <Trash2 className="mr-2 h-4 w-4" /> Delete Incident
-                          </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                          <AlertDialogHeader>
-                              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                  This action cannot be undone. This will permanently delete the
-                                  observation with ID: <span className="font-semibold">{foundIncident.id}</span>
-                              </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
-                              <AlertDialogAction onClick={handleDelete} disabled={isLoading}>
-                                  {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Yes, delete it"}
-                              </AlertDialogAction>
-                          </AlertDialogFooter>
-                      </AlertDialogContent>
-                  </AlertDialog>
-              </div>
-            )}
-          </div>
-        )}
       </CardContent>
     </Card>
   );
 }
-
-    
