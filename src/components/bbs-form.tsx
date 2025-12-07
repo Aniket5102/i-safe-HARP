@@ -53,9 +53,6 @@ import {
   getDoc,
   updateDoc,
   deleteDoc,
-  query,
-  where,
-  getDocs,
   DocumentData,
   Timestamp
 } from "firebase/firestore";
@@ -121,7 +118,6 @@ export default function BbsForm() {
 
       if (docSnap.exists()) {
         const data = docSnap.data() as DocumentData;
-        // Convert Firestore Timestamp to JS Date
         if (data.observationDate instanceof Timestamp) {
             data.observationDate = data.observationDate.toDate();
         }
@@ -196,10 +192,10 @@ export default function BbsForm() {
         ...values,
         createdAt: serverTimestamp(),
       };
-      const docRef = await addDoc(collection(firestore, 'bbs-observations'), observationData);
+      await addDoc(collection(firestore, 'bbs-observations'), observationData);
       toast({
         title: "Success!",
-        description: `Safety observation has been recorded with ID: ${docRef.id}.`,
+        description: `Safety observation has been recorded.`,
       });
       form.reset();
     } catch (error: any) {
@@ -216,7 +212,16 @@ export default function BbsForm() {
   const resetSearch = () => {
     setIncidentId("");
     setFoundIncident(null);
-    form.reset();
+    form.reset({
+      observerName: "John Doe",
+      location: "Workshop A",
+      observationDate: new Date(),
+      taskObserved: "Welding, Forklift Operation",
+      properUseOfPPE: "n/a",
+      bodyPositioning: "n/a",
+      toolAndEquipmentHandling: "n/a",
+      comments: "",
+    });
   };
 
   return (
@@ -245,13 +250,13 @@ export default function BbsForm() {
           <TabsContent value="delete">
             <CardTitle className="font-headline text-2xl">Delete Safety Observation</CardTitle>
             <CardDescription>
-              Enter an incident ID to find and delete an observation.
+              Enter an incident number to find and delete an observation.
             </CardDescription>
           </TabsContent>
         </Tabs>
       </CardHeader>
       <CardContent>
-        {(activeTab === 'modify' || activeTab === 'delete') && (
+        {activeTab === 'modify' && (
             <div className="flex items-center gap-2 mb-8">
               <Input
                 placeholder="Enter Incident ID to find..."
@@ -268,6 +273,7 @@ export default function BbsForm() {
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(activeTab === 'new' ? onNewSubmit : handleUpdate)} className="space-y-8">
+            {activeTab !== 'delete' ? (
             <fieldset
               disabled={isLoading || (activeTab === 'modify' && !foundIncident)}
               className="space-y-8"
@@ -418,6 +424,7 @@ export default function BbsForm() {
                   )}
               />
             </fieldset>
+            ) : null }
             
             <CardFooter className="flex justify-end p-0 pt-4">
               {activeTab === 'new' && (
@@ -435,31 +442,51 @@ export default function BbsForm() {
             </CardFooter>
           </form>
         </Form>
-        {activeTab === 'delete' && foundIncident && (
-            <div className="flex justify-end pt-4">
-                <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                        <Button variant="destructive" disabled={isLoading}>
-                            <Trash2 className="mr-2 h-4 w-4" /> Delete Incident
-                        </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                        <AlertDialogHeader>
-                            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                                This action cannot be undone. This will permanently delete the
-                                observation with ID: <span className="font-semibold">{foundIncident.id}</span>
-                            </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={handleDelete}>
-                                {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Yes, delete it"}
-                            </AlertDialogAction>
-                        </AlertDialogFooter>
-                    </AlertDialogContent>
-                </AlertDialog>
+        {activeTab === 'delete' && (
+          <div>
+            <div className="flex w-full max-w-sm items-center space-x-2">
+              <div className="w-full">
+                <FormLabel>Incident Number</FormLabel>
+                <Input
+                  placeholder="e.g., #09876"
+                  value={incidentId}
+                  onChange={(e) => setIncidentId(e.target.value)}
+                  disabled={isLoading}
+                />
+              </div>
+              <Button onClick={handleSearch} disabled={!incidentId || isLoading} className="self-end">
+                {isLoading ? <Loader2 className="animate-spin" /> : null}
+                Search
+              </Button>
             </div>
+
+            {foundIncident && (
+              <div className="flex justify-end pt-8">
+                  <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                          <Button variant="destructive" disabled={isLoading}>
+                              <Trash2 className="mr-2 h-4 w-4" /> Delete Incident
+                          </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                          <AlertDialogHeader>
+                              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                  This action cannot be undone. This will permanently delete the
+                                  observation with ID: <span className="font-semibold">{foundIncident.id}</span>
+                              </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction onClick={handleDelete} disabled={isLoading}>
+                                  {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Yes, delete it"}
+                              </AlertDialogAction>
+                          </AlertDialogFooter>
+                      </AlertDialogContent>
+                  </AlertDialog>
+              </div>
+            )}
+          </div>
         )}
       </CardContent>
     </Card>
