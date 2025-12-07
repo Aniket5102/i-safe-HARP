@@ -1,8 +1,14 @@
+'use client';
+
+import BbsForm from '@/components/bbs-form';
+import { ShieldCheck } from 'lucide-react';
 
 export default function BbsPage() {
   return (
-    <div className="flex justify-center items-center h-full p-8">
-      <h1 className="text-4xl font-bold text-foreground">BBS here</h1>
-    </div>
+    <main className="flex min-h-screen flex-col items-center justify-center p-4 sm:p-8 md:p-12 bg-gray-50">
+      <div className="w-full max-w-4xl">
+        <BbsForm />
+      </div>
+    </main>
   );
 }
