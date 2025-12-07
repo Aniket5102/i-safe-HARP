@@ -96,9 +96,11 @@ interface AppOptionsDialogProps {
 function AppOptionsDialog({ app, isOpen, onOpenChange }: AppOptionsDialogProps) {
   const dataHref = app.dataHref || `${app.href}/data`;
   
+  const modifyHref = app.name === 'BBS' ? `${app.href}?tab=modify` : `${app.href}/modify`;
+
   const options = [
     { name: 'Data', icon: Database, href: dataHref },
-    { name: 'Modify', icon: PenSquare, href: `${app.href}/modify` },
+    { name: 'Modify', icon: PenSquare, href: modifyHref },
     { name: 'New', icon: PlusCircle, href: app.href },
   ];
 
