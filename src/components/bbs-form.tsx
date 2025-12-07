@@ -247,184 +247,191 @@ export default function BbsForm() {
               Enter an incident ID to find and modify an observation.
             </CardDescription>
           </TabsContent>
-          <TabsContent value="delete">
-            <CardTitle className="font-headline text-2xl">Delete Safety Observation</CardTitle>
-            <CardDescription>
+           <TabsContent value="delete">
+             <CardTitle className="font-headline text-2xl">Delete Safety Observation</CardTitle>
+             <CardDescription>
               Enter an incident number to find and delete an observation.
             </CardDescription>
-          </TabsContent>
+           </TabsContent>
         </Tabs>
       </CardHeader>
       <CardContent>
-        {activeTab !== 'new' && (
-            <div className="flex items-center gap-2 mb-8">
-              <Input
-                placeholder="Enter Incident ID to find..."
-                value={incidentId}
-                onChange={(e) => setIncidentId(e.target.value)}
-                disabled={isLoading}
-              />
-              <Button onClick={handleSearch} disabled={!incidentId || isLoading}>
-                {isLoading ? <Loader2 className="animate-spin" /> : <Search />}
-                Search
-              </Button>
-            </div>
-        )}
-
         <Form {...form}>
           <form onSubmit={form.handleSubmit(activeTab === 'new' ? onNewSubmit : handleUpdate)} className="space-y-8">
+            
+            {activeTab !== 'new' && (
+              <div className="flex items-center gap-2 mb-8">
+                <Input
+                  placeholder="Enter Incident ID to find..."
+                  value={incidentId}
+                  onChange={(e) => setIncidentId(e.target.value)}
+                  disabled={isLoading}
+                />
+                <Button type="button" onClick={handleSearch} disabled={!incidentId || isLoading}>
+                  {isLoading ? <Loader2 className="animate-spin" /> : <Search />}
+                  Search
+                </Button>
+              </div>
+            )}
+            
             {activeTab !== 'delete' ? (
-            <fieldset
-              disabled={isLoading || (activeTab === 'modify' && !foundIncident)}
-              className="space-y-8"
-            >
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <FormField
-                  control={form.control}
-                  name="observerName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Observer Name</FormLabel>
-                      <FormControl>
-                        <Input placeholder="John Doe" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="location"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Location</FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g., Workshop A" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="observationDate"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col">
-                      <FormLabel>Observation Date</FormLabel>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant={"outline"}
-                              className={cn(
-                                "w-full pl-3 text-left font-normal",
-                                !field.value && "text-muted-foreground"
-                              )}
-                            >
-                              {field.value ? (
-                                format(field.value, "PPP")
-                              ) : (
-                                <span>Pick a date</span>
-                              )}
-                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={field.value}
-                            onSelect={field.onChange}
-                            disabled={(date) =>
-                              date > new Date() || date < new Date("1900-01-01")
-                            }
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="taskObserved"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Task Observed</FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g., Welding, Forklift Operation" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-              
-              <div>
-                <h3 className="text-lg font-medium mb-4">Behavior Categories</h3>
-                <div className="space-y-6">
-                  {behaviorCategories.map((category) => (
-                    <FormField
-                      key={category.name}
-                      control={form.control}
-                      name={category.name}
-                      render={({ field }) => (
-                        <FormItem className="space-y-3">
-                          <FormLabel>{category.label}</FormLabel>
-                          <FormControl>
-                            <RadioGroup
-                              onValueChange={field.onChange}
-                              value={field.value}
-                              className="flex items-center space-x-6"
-                            >
-                              <FormItem className="flex items-center space-x-2 space-y-0">
-                                <FormControl>
-                                  <RadioGroupItem value="safe" />
-                                </FormControl>
-                                <FormLabel className="font-normal">Safe</FormLabel>
-                              </FormItem>
-                              <FormItem className="flex items-center space-x-2 space-y-0">
-                                <FormControl>
-                                  <RadioGroupItem value="at-risk" />
-                                </FormControl>
-                                <FormLabel className="font-normal">At-risk</FormLabel>
-                              </FormItem>
-                               <FormItem className="flex items-center space-x-2 space-y-0">
-                                <FormControl>
-                                  <RadioGroupItem value="n/a" />
-                                </FormControl>
-                                <FormLabel className="font-normal">N/A</FormLabel>
-                              </FormItem>
-                            </RadioGroup>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  ))}
-                </div>
-              </div>
-
-              <FormField
-                  control={form.control}
-                  name="comments"
-                  render={({ field }) => (
+              <fieldset
+                disabled={isLoading || (activeTab === 'modify' && !foundIncident)}
+                className="space-y-8"
+              >
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <FormField
+                    control={form.control}
+                    name="observerName"
+                    render={({ field }) => (
                       <FormItem>
-                      <FormLabel>Comments</FormLabel>
-                      <FormControl>
-                          <Textarea
-                          placeholder="Add any additional comments or observations..."
-                          className="resize-none"
-                          {...field}
-                          />
-                      </FormControl>
-                      <FormMessage />
+                        <FormLabel>Observer Name</FormLabel>
+                        <FormControl>
+                          <Input placeholder="John Doe" {...field} />
+                        </FormControl>
+                        <FormMessage />
                       </FormItem>
-                  )}
-              />
-            </fieldset>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="location"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Location</FormLabel>
+                        <FormControl>
+                          <Input placeholder="e.g., Workshop A" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="observationDate"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-col">
+                        <FormLabel>Observation Date</FormLabel>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <FormControl>
+                              <Button
+                                variant={"outline"}
+                                className={cn(
+                                  "w-full pl-3 text-left font-normal",
+                                  !field.value && "text-muted-foreground"
+                                )}
+                              >
+                                {field.value ? (
+                                  format(field.value, "PPP")
+                                ) : (
+                                  <span>Pick a date</span>
+                                )}
+                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                              </Button>
+                            </FormControl>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={field.value}
+                              onSelect={field.onChange}
+                              disabled={(date) =>
+                                date > new Date() || date < new Date("1900-01-01")
+                              }
+                              initialFocus
+                            />
+                          </PopoverContent>
+                        </Popover>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="taskObserved"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Task Observed</FormLabel>
+                        <FormControl>
+                          <Input placeholder="e.g., Welding, Forklift Operation" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                
+                <div>
+                  <h3 className="text-lg font-medium mb-4">Behavior Categories</h3>
+                  <div className="space-y-6">
+                    {behaviorCategories.map((category) => (
+                      <FormField
+                        key={category.name}
+                        control={form.control}
+                        name={category.name}
+                        render={({ field }) => (
+                          <FormItem className="space-y-3">
+                            <FormLabel>{category.label}</FormLabel>
+                            <FormControl>
+                              <RadioGroup
+                                onValueChange={field.onChange}
+                                value={field.value}
+                                className="flex items-center space-x-6"
+                              >
+                                <FormItem className="flex items-center space-x-2 space-y-0">
+                                  <FormControl>
+                                    <RadioGroupItem value="safe" />
+                                  </FormControl>
+                                  <FormLabel className="font-normal">Safe</FormLabel>
+                                </FormItem>
+                                <FormItem className="flex items-center space-x-2 space-y-0">
+                                  <FormControl>
+                                    <RadioGroupItem value="at-risk" />
+                                  </FormControl>
+                                  <FormLabel className="font-normal">At-risk</FormLabel>
+                                </FormItem>
+                                 <FormItem className="flex items-center space-x-2 space-y-0">
+                                  <FormControl>
+                                    <RadioGroupItem value="n/a" />
+                                  </FormControl>
+                                  <FormLabel className="font-normal">N/A</FormLabel>
+                                </FormItem>
+                              </RadioGroup>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                <FormField
+                    control={form.control}
+                    name="comments"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>Comments</FormLabel>
+                        <FormControl>
+                            <Textarea
+                            placeholder="Add any additional comments or observations..."
+                            className="resize-none"
+                            {...field}
+                            />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+              </fieldset>
             ) : null }
+
+            {activeTab === 'delete' && !foundIncident && (
+              <div className="text-center text-muted-foreground py-10">
+                <p>Please search for an incident to delete.</p>
+              </div>
+            )}
             
             <CardFooter className="flex justify-end p-0 pt-4">
               {activeTab === 'new' && (
@@ -470,3 +477,6 @@ export default function BbsForm() {
     </Card>
   );
 }
+
+
+    
