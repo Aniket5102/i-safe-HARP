@@ -19,11 +19,8 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import AsianPaintsLogo from "./asian-paints-logo";
 import Link from "next/link";
-import { useUser } from "@/firebase";
-
 
 export default function Header() {
-  const { user, loading } = useUser();
 
   return (
     <header className="bg-white shadow-md sticky top-0 z-40">

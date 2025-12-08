@@ -4,7 +4,7 @@
 import { createContext, useContext, ReactNode, useEffect, useState } from 'react';
 import { getFirebase } from '.';
 import { FirebaseApp } from 'firebase/app';
-import { Auth, onAuthStateChanged, User } from 'firebase/auth';
+import { Auth } from 'firebase/auth';
 import { Firestore } from 'firebase/firestore';
 import { FirebaseErrorListener } from '@/components/FirebaseErrorListener';
 
@@ -12,7 +12,6 @@ interface FirebaseContextType {
   firebaseApp: FirebaseApp | null;
   auth: Auth | null;
   firestore: Firestore | null;
-  user: User | null;
   loading: boolean;
 }
 
@@ -20,36 +19,25 @@ const FirebaseContext = createContext<FirebaseContextType>({
   firebaseApp: null,
   auth: null,
   firestore: null,
-  user: null,
   loading: true,
 });
 
 export const FirebaseProvider = ({ children }: { children: ReactNode }) => {
-  const [firebaseInstances, setFirebaseInstances] = useState<Omit<FirebaseContextType, 'user' | 'loading'>>({
+  const [firebaseInstances, setFirebaseInstances] = useState<Omit<FirebaseContextType, 'loading'>>({
     firebaseApp: null,
     auth: null,
     firestore: null,
   });
-  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const { firebaseApp, auth, firestore } = getFirebase();
     setFirebaseInstances({ firebaseApp, auth, firestore });
-
-    if (auth) {
-      const unsubscribe = onAuthStateChanged(auth, (user) => {
-        setUser(user);
-        setLoading(false);
-      });
-      return () => unsubscribe();
-    } else {
-      setLoading(false);
-    }
+    setLoading(false);
   }, []);
 
   return (
-    <FirebaseContext.Provider value={{ ...firebaseInstances, user, loading }}>
+    <FirebaseContext.Provider value={{ ...firebaseInstances, loading }}>
       {children}
       <FirebaseErrorListener />
     </FirebaseContext.Provider>
@@ -80,6 +68,7 @@ export const useFirestore = () => {
 };
 
 export const useUser = () => {
-  const { user, loading } = useFirebase();
-  return { user, loading };
+  const { loading } = useFirebase();
+  // Return null for user as authentication is removed.
+  return { user: null, loading };
 }
