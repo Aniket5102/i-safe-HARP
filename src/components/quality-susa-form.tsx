@@ -59,6 +59,8 @@ import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { useRouter } from 'next/navigation';
 import AsianPaintsLogo from "./asian-paints-logo";
 import { Calendar } from "@/components/ui/calendar";
+import { errorEmitter } from "@/firebase/error-emitter";
+import { FirestorePermissionError } from "@/firebase/errors";
 
 const formSchema = z.object({
   date: z.date({ required_error: "A date is required." }),
@@ -172,29 +174,34 @@ export default function QualitySusaForm() {
       return;
     }
     setIsSubmitting(true);
-    try {
-      const incidentData = {
-        ...values,
-        susaId: susaId,
-        bbqReferenceNumber: bbqReferenceNumber,
-        createdAt: serverTimestamp(),
-      };
-      await addDoc(collection(firestore, 'quality-susa-incidents'), incidentData);
-      toast({
-        title: "Success!",
-        description: `Quality SUSA Incident has been raised with incident ID: ${susaId}.`,
+    
+    const incidentData = {
+      ...values,
+      susaId: susaId,
+      bbqReferenceNumber: bbqReferenceNumber,
+      createdAt: serverTimestamp(),
+    };
+    const collectionRef = collection(firestore, 'quality-susa-incidents');
+
+    addDoc(collectionRef, incidentData)
+      .then((docRef) => {
+        toast({
+          title: "Success!",
+          description: `Quality SUSA Incident has been raised with incident ID: ${docRef.id}.`,
+        });
+        form.reset();
+      })
+      .catch((serverError) => {
+        const permissionError = new FirestorePermissionError({
+          path: collectionRef.path,
+          operation: 'create',
+          requestResourceData: incidentData,
+        });
+        errorEmitter.emit('permission-error', permissionError);
+      })
+      .finally(() => {
+        setIsSubmitting(false);
       });
-      form.reset();
-    } catch (error: any) {
-      console.error("Error adding document: ", error);
-      toast({
-        variant: "destructive",
-        title: "Submission Error",
-        description: error.message || "Could not save the incident. Please try again.",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
   }
 
   const handleGenerateQrCode = () => {
@@ -723,3 +730,5 @@ export default function QualitySusaForm() {
     </>
   );
 }
+
+    
