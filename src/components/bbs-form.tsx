@@ -45,23 +45,9 @@ import { useToast } from "@/hooks/use-toast";
 import { CalendarIcon, Loader2, Search, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { Textarea } from "./ui/textarea";
-import { useFirestore } from "@/firebase";
-import {
-  collection,
-  addDoc,
-  serverTimestamp,
-  doc,
-  getDoc,
-  updateDoc,
-  deleteDoc,
-  DocumentData,
-  Timestamp
-} from "firebase/firestore";
 import { Calendar } from "@/components/ui/calendar";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { errorEmitter } from "@/firebase/error-emitter";
-import { FirestorePermissionError, type SecurityRuleContext } from "@/firebase/errors";
 
 const formSchema = z.object({
   observerName: z.string().min(1, "Observer name is required."),
@@ -89,7 +75,6 @@ const behaviorCategories = [
 
 function BbsFormContent() {
     const { toast } = useToast();
-    const firestore = useFirestore();
     const searchParams = useSearchParams();
     const tab = searchParams.get('tab');
 
@@ -119,119 +104,58 @@ function BbsFormContent() {
     }, [tab]);
 
     const handleSearch = async () => {
-        if (!firestore || !incidentId) return;
+        if (!incidentId) return;
         setIsLoading(true);
         setFoundIncident(null);
         form.reset();
 
-        try {
-        const docRef = doc(firestore, "bbs-observations", incidentId);
-        const docSnap = await getDoc(docRef);
-
-        if (docSnap.exists()) {
-            const data = docSnap.data() as DocumentData;
-            if (data.observationDate instanceof Timestamp) {
-                data.observationDate = data.observationDate.toDate();
-            }
-            form.reset(data as FormValues);
-            setFoundIncident({ id: docSnap.id, data: data as FormValues });
-            toast({ title: "Success", description: "Incident found and loaded." });
-        } else {
-            toast({
+        // DB removed
+        setTimeout(() => {
+          toast({
             variant: "destructive",
-            title: "Not Found",
+            title: "Database Disconnected",
             description: "No incident found with that ID.",
-            });
-        }
-        } catch (error: any) {
-        toast({
-            variant: "destructive",
-            title: "Error",
-            description: error.message || "An error occurred while searching.",
-        });
-        } finally {
-        setIsLoading(false);
-        }
+          });
+          setIsLoading(false);
+        }, 1000);
     };
 
     const handleUpdate = async (values: FormValues) => {
-        if (!firestore || !foundIncident) return;
+        if (!foundIncident) return;
         setIsLoading(true);
 
-        const docRef = doc(firestore, "bbs-observations", foundIncident.id);
-        const updatedData = {
-          ...values,
-          updatedAt: serverTimestamp(),
-        };
-
-        updateDoc(docRef, updatedData)
-            .then(() => {
-                toast({ title: "Success", description: "Incident updated successfully." });
-            })
-            .catch(async (serverError) => {
-                const permissionError = new FirestorePermissionError({
-                    path: docRef.path,
-                    operation: 'update',
-                    requestResourceData: updatedData,
-                } satisfies SecurityRuleContext);
-                errorEmitter.emit('permission-error', permissionError);
-            }).finally(() => {
-                setIsLoading(false);
-            });
+        // DB removed
+        setTimeout(() => {
+          toast({ title: "Database Disconnected", description: "Incident cannot be updated." });
+          setIsLoading(false);
+        }, 1000);
     };
 
     const handleDelete = async () => {
-        if (!firestore || !foundIncident) return;
+        if (!foundIncident) return;
         setIsLoading(true);
 
-        const docRef = doc(firestore, "bbs-observations", foundIncident.id);
-        
-        deleteDoc(docRef).then(() => {
-            toast({ title: "Success", description: "Incident deleted successfully."});
-            setFoundIncident(null);
-            setIncidentId('');
-            form.reset();
-        }).catch(async (serverError) => {
-            const permissionError = new FirestorePermissionError({
-                path: docRef.path,
-                operation: 'delete',
-            } satisfies SecurityRuleContext);
-            errorEmitter.emit('permission-error', permissionError);
-        }).finally(() => {
-            setIsLoading(false);
-        });
+        // DB removed
+        setTimeout(() => {
+          toast({ title: "Database Disconnected", description: "Incident cannot be deleted." });
+          setFoundIncident(null);
+          setIncidentId('');
+          form.reset();
+          setIsLoading(false);
+        }, 1000);
     };
 
     const onNewSubmit = async (values: FormValues) => {
-        if (!firestore) return;
         setIsLoading(true);
-
-        const observationData = {
-            ...values,
-            createdAt: serverTimestamp(),
-        };
-        
-        const obsCollection = collection(firestore, 'bbs-observations');
-
-        addDoc(obsCollection, observationData)
-            .then(docRef => {
-                toast({
-                    title: "Success!",
-                    description: `Safety observation has been recorded with ID: ${docRef.id}.`,
-                });
-                form.reset();
-            })
-            .catch(async (serverError) => {
-                 const permissionError = new FirestorePermissionError({
-                    path: obsCollection.path,
-                    operation: 'create',
-                    requestResourceData: observationData,
-                } satisfies SecurityRuleContext);
-                errorEmitter.emit('permission-error', permissionError);
-            })
-            .finally(() => {
-                setIsLoading(false);
-            });
+        // DB removed
+        setTimeout(() => {
+          toast({
+              title: "Database Disconnected",
+              description: `Safety observation cannot be recorded.`,
+          });
+          form.reset();
+          setIsLoading(false);
+        }, 1000);
     };
 
     const resetSearch = () => {
@@ -513,5 +437,3 @@ export default function BbsForm() {
         </React.Suspense>
     )
 }
-
-    

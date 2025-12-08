@@ -54,13 +54,9 @@ import QRCode from "qrcode.react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { Textarea } from "./ui/textarea";
-import { useFirestore } from "@/firebase";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { useRouter } from 'next/navigation';
 import AsianPaintsLogo from "./asian-paints-logo";
 import { Calendar } from "@/components/ui/calendar";
-import { errorEmitter } from "@/firebase/error-emitter";
-import { FirestorePermissionError, type SecurityRuleContext } from "@/firebase/errors";
 
 const formSchema = z.object({
   date: z.date({ required_error: "A date is required." }),
@@ -113,7 +109,6 @@ const risks = ["Medium", "high", "low"];
 
 export default function QualitySusaForm() {
   const { toast } = useToast();
-  const firestore = useFirestore();
   const router = useRouter();
   const formRef = React.useRef<HTMLDivElement>(null);
   const qrCodeRef = React.useRef<HTMLDivElement>(null);
@@ -165,44 +160,17 @@ export default function QualitySusaForm() {
 
 
   async function onSubmit(values: FormValues) {
-    if (!firestore) {
-      toast({
-        variant: "destructive",
-        title: "Connection Error",
-        description: "Could not connect to the database. Please try again later.",
-      });
-      return;
-    }
     setIsSubmitting(true);
     
-    const incidentData = {
-      ...values,
-      susaId: susaId,
-      bbqReferenceNumber: bbqReferenceNumber,
-      createdAt: serverTimestamp(),
-    };
-
-    const incidentsCollection = collection(firestore, 'quality-susa-incidents');
-    
-    addDoc(incidentsCollection, incidentData)
-      .then(docRef => {
+    // DB removed
+    setTimeout(() => {
         toast({
-          title: "Success!",
-          description: `Quality SUSA Incident has been raised with incident ID: ${docRef.id}.`,
+          title: "Database Disconnected",
+          description: `Quality SUSA Incident cannot be raised.`,
         });
         form.reset();
-      })
-      .catch(async (serverError) => {
-        const permissionError = new FirestorePermissionError({
-          path: incidentsCollection.path,
-          operation: 'create',
-          requestResourceData: incidentData,
-        } satisfies SecurityRuleContext);
-        errorEmitter.emit('permission-error', permissionError);
-      })
-      .finally(() => {
         setIsSubmitting(false);
-      });
+    }, 1000);
   }
 
   const handleGenerateQrCode = () => {
@@ -731,5 +699,3 @@ export default function QualitySusaForm() {
     </>
   );
 }
-
-    

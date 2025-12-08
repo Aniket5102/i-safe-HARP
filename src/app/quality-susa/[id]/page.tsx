@@ -2,8 +2,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { doc, getDoc, DocumentData } from 'firebase/firestore';
-import { useFirestore } from '@/firebase';
 import { useParams, useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -18,51 +16,15 @@ type QualitySusaIncident = {
 export default function QualitySusaIncidentDetailsPage() {
   const [incident, setIncident] = useState<QualitySusaIncident | null>(null);
   const [loading, setLoading] = useState(true);
-  const firestore = useFirestore();
   const params = useParams();
   const router = useRouter();
   const { id } = params;
 
   useEffect(() => {
-    const fetchIncident = async () => {
-      if (!firestore || !id) return;
-
-      setLoading(true);
-      try {
-        const docRef = doc(firestore, 'quality-susa-incidents', id as string);
-        const docSnap = await getDoc(docRef);
-
-        if (docSnap.exists()) {
-          const data = docSnap.data() as DocumentData;
-          
-          const formattedData: DocumentData = {};
-          for (const key in data) {
-            if (data[key] && typeof data[key].toDate === 'function') {
-              formattedData[key] = data[key].toDate();
-            } else {
-              formattedData[key] = data[key];
-            }
-          }
-
-          setIncident({
-              id: docSnap.id,
-              ...formattedData,
-          });
-
-        } else {
-          console.log('No such document!');
-        }
-      } catch (error) {
-          console.error("Error fetching incident:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if(firestore) {
-      fetchIncident();
-    }
-  }, [firestore, id]);
+    // DB removed
+    setLoading(false);
+    setIncident(null);
+  }, [id]);
 
   const renderValue = (value: any) => {
     if (value instanceof Date && isValid(value)) {
@@ -85,13 +47,6 @@ export default function QualitySusaIncidentDetailsPage() {
   ];
 
   const renderContent = () => {
-    if (!firestore) {
-        return (
-            <div className="flex justify-center items-center p-8">
-                <p>Connecting to Firebase...</p>
-            </div>
-        )
-    }
     if (loading) {
         return (
             <div className="flex justify-center items-center p-8">
@@ -125,7 +80,7 @@ export default function QualitySusaIncidentDetailsPage() {
           </div>
         )
     }
-    return <p className="text-center text-muted-foreground">Incident not found.</p>;
+    return <p className="text-center text-muted-foreground">Incident not found. Database is disconnected.</p>;
   }
 
   return (
