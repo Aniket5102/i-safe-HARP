@@ -60,8 +60,6 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { errorEmitter } from "@/firebase/error-emitter";
-import { FirestorePermissionError } from "@/firebase/errors";
 
 const formSchema = z.object({
   observerName: z.string().min(1, "Observer name is required."),
@@ -154,26 +152,28 @@ function BbsFormContent() {
         }
     };
 
-    const handleUpdate = (values: FormValues) => {
+    const handleUpdate = async (values: FormValues) => {
         if (!firestore || !foundIncident) return;
         setIsLoading(true);
 
         const docRef = doc(firestore, "bbs-observations", foundIncident.id);
-        updateDoc(docRef, {
-            ...values,
-            updatedAt: serverTimestamp(),
-        }).then(() => {
-            toast({ title: "Success", description: "Incident updated successfully." });
-        }).catch((serverError) => {
-            const permissionError = new FirestorePermissionError({
-              path: docRef.path,
-              operation: 'update',
-              requestResourceData: values,
+        
+        try {
+            await updateDoc(docRef, {
+                ...values,
+                updatedAt: serverTimestamp(),
             });
-            errorEmitter.emit('permission-error', permissionError);
-        }).finally(() => {
+            toast({ title: "Success", description: "Incident updated successfully." });
+        } catch (error: any) {
+            console.error("Error updating document: ", error);
+            toast({
+                variant: "destructive",
+                title: "Update Error",
+                description: error.message || "Could not update the incident.",
+            });
+        } finally {
             setIsLoading(false);
-        });
+        }
     };
 
     const handleDelete = async () => {
@@ -181,23 +181,26 @@ function BbsFormContent() {
         setIsLoading(true);
 
         const docRef = doc(firestore, "bbs-observations", foundIncident.id);
-        deleteDoc(docRef).then(() => {
+        
+        try {
+            await deleteDoc(docRef);
             toast({ title: "Success", description: "Incident deleted successfully."});
             setFoundIncident(null);
             setIncidentId('');
             form.reset();
-        }).catch((serverError) => {
-            const permissionError = new FirestorePermissionError({
-              path: docRef.path,
-              operation: 'delete',
+        } catch (error: any) {
+            console.error("Error deleting document: ", error);
+            toast({
+                variant: "destructive",
+                title: "Delete Error",
+                description: error.message || "Could not delete the incident.",
             });
-            errorEmitter.emit('permission-error', permissionError);
-        }).finally(() => {
+        } finally {
             setIsLoading(false);
-        });
+        }
     };
 
-    const onNewSubmit = (values: FormValues) => {
+    const onNewSubmit = async (values: FormValues) => {
         if (!firestore) return;
         setIsLoading(true);
 
@@ -205,27 +208,24 @@ function BbsFormContent() {
             ...values,
             createdAt: serverTimestamp(),
         };
-        const collectionRef = collection(firestore, 'bbs-observations');
-
-        addDoc(collectionRef, observationData)
-        .then((docRef) => {
+        
+        try {
+            const docRef = await addDoc(collection(firestore, 'bbs-observations'), observationData);
             toast({
                 title: "Success!",
                 description: `Safety observation has been recorded with ID: ${docRef.id}.`,
             });
             form.reset();
-        })
-        .catch((serverError) => {
-            const permissionError = new FirestorePermissionError({
-              path: collectionRef.path,
-              operation: 'create',
-              requestResourceData: observationData,
+        } catch (error: any) {
+            console.error("Error adding document: ", error);
+            toast({
+                variant: "destructive",
+                title: "Submission Error",
+                description: error.message || "Could not submit the form.",
             });
-            errorEmitter.emit('permission-error', permissionError);
-        })
-        .finally(() => {
+        } finally {
             setIsLoading(false);
-        });
+        }
     };
 
     const resetSearch = () => {
@@ -507,6 +507,3 @@ export default function BbsForm() {
         </React.Suspense>
     )
 }
-    
-
-    
