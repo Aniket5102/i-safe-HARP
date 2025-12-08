@@ -30,7 +30,7 @@ export default function Header() {
             <div className="flex items-center space-x-2">
               <AsianPaintsLogo />
               <img
-                src="https://img.freepik.com/premium-vector/safety-first-logo-design-shield-helmet-construction-safely-workplace-factory-logo-banner_521317-1381.jpg"
+                src="/icons/i-safe-logo.png"
                 alt="i-safe Logo"
                 className="h-10 w-10"
               />
