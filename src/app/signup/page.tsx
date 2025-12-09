@@ -56,10 +56,13 @@ export default function SignupPage() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
+    
+    const role = values.email.endsWith('@asianpaints.com') ? 'Admin' : 'Client';
+
     const newUser = {
       id: `user-${Date.now()}`,
       ...values,
-      role: 'User',
+      role: role,
     };
     const result = await saveUser(newUser);
 
@@ -68,7 +71,7 @@ export default function SignupPage() {
         title: 'Account Created',
         description: "You've been successfully signed up.",
       });
-      login({ name: values.name, email: values.email, role: 'User' });
+      login({ name: values.name, email: values.email, role: role });
     } else {
       toast({
         variant: 'destructive',

@@ -3,7 +3,7 @@
   {
     "id": "user-1",
     "name": "Admin User",
-    "email": "admin@example.com",
+    "email": "admin@asianpaints.com",
     "password": "password",
     "role": "Admin"
   },
@@ -12,6 +12,13 @@
     "name": "Aniket",
     "email": "aniket.khaladkar@asianpaints.com",
     "password": "Aniket@123",
-    "role": "User"
+    "role": "Admin"
+  },
+  {
+    "id": "user-2",
+    "name": "Client User",
+    "email": "client@example.com",
+    "password": "password",
+    "role": "Client"
   }
 ]

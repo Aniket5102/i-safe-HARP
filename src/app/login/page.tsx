@@ -55,7 +55,8 @@ export default function LoginPage() {
     const user = await findUser(values);
     
     if (user) {
-      login({ name: user.name, email: user.email, role: user.role });
+      const role = user.email.endsWith('@asianpaints.com') ? 'Admin' : 'Client';
+      login({ name: user.name, email: user.email, role: role });
     } else {
       toast({
         variant: 'destructive',
