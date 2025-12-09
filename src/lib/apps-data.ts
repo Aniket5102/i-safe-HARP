@@ -19,7 +19,7 @@ export const apps: App[] = [
   { 
     name: 'Permit To Work V2.0',
     subtitle: 'Permit To Work v2.0',
-    imageUrl: '/icons/permit-to-work-v2.png',
+    imageUrl: '/icons/permit-to-work-v2.png', 
     imageHint: 'safety permit', 
     href: '#' 
   },
