@@ -29,7 +29,10 @@ export default function Header() {
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center gap-4">
             <Link href="/" passHref>
-               <AsianPaintsLogo className="h-6 w-auto" />
+               <div className="flex items-center gap-4 text-primary">
+                 <AsianPaintsLogo className="h-6 w-auto" />
+                 <Image src="/i-safe-logo.png" alt="i-safe logo" width={80} height={20} />
+               </div>
             </Link>
           </div>
           <div className="flex items-center gap-4">
