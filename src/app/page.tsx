@@ -133,7 +133,7 @@ function HeroSection({ heroImage }: { heroImage: any }) {
             <DialogContent className="sm:max-w-md bg-zinc-900 border-zinc-800">
               <DialogHeader className="items-center text-center">
                 <Image src="/asian-paints-logo.png" alt="Asian Paints Logo" width={100} height={60} />
-                <DialogTitle className="text-2xl">i-Safe: Integrated Safety Management</DialogTitle>
+                <DialogTitle className="text-2xl text-center">i-Safe: Integrated Safety Management</DialogTitle>
               </DialogHeader>
               <div className="py-4 text-center text-muted-foreground">
                 <p>
