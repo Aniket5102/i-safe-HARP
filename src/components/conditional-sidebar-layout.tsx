@@ -12,13 +12,22 @@ import {
   SidebarInset,
 } from '@/components/ui/sidebar';
 import SidebarNav from '@/components/sidebar-nav';
+import { Loader2 } from 'lucide-react';
 
 export default function ConditionalSidebarLayout({
     children,
 }: {
     children: React.ReactNode;
 }) {
-    const { user } = useAuth();
+    const { user, isLoading } = useAuth();
+
+    if (isLoading) {
+        return (
+            <div className="flex min-h-screen items-center justify-center">
+                <Loader2 className="h-16 w-16 animate-spin text-primary" />
+            </div>
+        )
+    }
 
     if (!user) {
         return (

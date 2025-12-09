@@ -24,6 +24,7 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/navigation';
+import { Loader2 } from 'lucide-react';
 
 const modules = [
   { name: 'Calendar/Task Management', icon: CalendarDays, href: '#' },
@@ -36,17 +37,21 @@ const modules = [
 export default function HomePage() {
   const [selectedApp, setSelectedApp] = useState<App | null>(null);
   const heroImage = PlaceHolderImages.find(img => img.id === 'hero-background');
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (user === null) {
+    if (!isLoading && user === null) {
       router.push('/login');
     }
-  }, [user, router]);
+  }, [user, isLoading, router]);
 
-  if (!user) {
-    return null; // Or a loading spinner
+  if (isLoading || !user) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <Loader2 className="h-16 w-16 animate-spin text-primary" />
+      </div>
+    );
   }
 
   return (

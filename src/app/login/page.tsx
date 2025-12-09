@@ -23,18 +23,24 @@ import {
 } from '@/components/ui/card';
 import { useAuth } from '@/context/auth-context';
 import Link from 'next/link';
+import { findUser } from '../actions';
+import { useToast } from '@/hooks/use-toast';
+import { Loader2 } from 'lucide-react';
+import React from 'react';
 
 const formSchema = z.object({
   email: z.string().email({
     message: 'Invalid email address.',
   }),
-  password: z.string().min(6, {
-    message: 'Password must be at least 6 characters.',
+  password: z.string().min(1, {
+    message: 'Password is required.',
   }),
 });
 
 export default function LoginPage() {
   const { login } = useAuth();
+  const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -44,9 +50,20 @@ export default function LoginPage() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // For now, we'll just log in with a mock user
-    login({ name: 'Test User', email: values.email });
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsSubmitting(true);
+    const user = await findUser(values);
+    
+    if (user) {
+      login({ name: user.name, email: user.email });
+    } else {
+      toast({
+        variant: 'destructive',
+        title: 'Login Failed',
+        description: 'Invalid email or password.',
+      });
+    }
+    setIsSubmitting(false);
   }
 
   return (
@@ -87,7 +104,8 @@ export default function LoginPage() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full">
+              <Button type="submit" className="w-full" disabled={isSubmitting}>
+                {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Login
               </Button>
             </form>

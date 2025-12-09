@@ -23,6 +23,10 @@ import {
 } from '@/components/ui/card';
 import { useAuth } from '@/context/auth-context';
 import Link from 'next/link';
+import { saveUser } from '../actions';
+import { useToast } from '@/hooks/use-toast';
+import React from 'react';
+import { Loader2 } from 'lucide-react';
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -38,6 +42,8 @@ const formSchema = z.object({
 
 export default function SignupPage() {
   const { login } = useAuth();
+  const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -48,9 +54,28 @@ export default function SignupPage() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // For now, we'll just log in with the new user's data
-    login({ name: values.name, email: values.email });
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsSubmitting(true);
+    const newUser = {
+      id: `user-${Date.now()}`,
+      ...values,
+    };
+    const result = await saveUser(newUser);
+
+    if (result.success) {
+      toast({
+        title: 'Account Created',
+        description: "You've been successfully signed up.",
+      });
+      login({ name: values.name, email: values.email });
+    } else {
+      toast({
+        variant: 'destructive',
+        title: 'Sign Up Failed',
+        description: result.message,
+      });
+    }
+    setIsSubmitting(false);
   }
 
   return (
@@ -104,7 +129,8 @@ export default function SignupPage() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full">
+              <Button type="submit" className="w-full" disabled={isSubmitting}>
+                 {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Create Account
               </Button>
             </form>
