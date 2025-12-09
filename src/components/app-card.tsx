@@ -1,11 +1,10 @@
 
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Database, PenSquare, PlusCircle, MoreHorizontal } from 'lucide-react';
+import { MoreHorizontal } from 'lucide-react';
 import { App } from '@/lib/apps-data';
 
 interface AppCardProps {

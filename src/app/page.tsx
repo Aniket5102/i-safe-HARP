@@ -8,10 +8,6 @@ import {
   FileText,
   HardHat,
   ClipboardCheck,
-  Database,
-  PenSquare,
-  PlusCircle,
-  LayoutGrid,
   PlayCircle,
   Info,
 } from 'lucide-react';
@@ -204,9 +200,9 @@ function AppOptionsDialog({ app, isOpen, onOpenChange }: AppOptionsDialogProps) 
   const modifyHref = app.name === 'BBS' ? `${app.href}?tab=modify` : `${app.href}/modify`;
 
   const options = [
-    { name: 'Data', icon: Database, href: dataHref },
-    { name: 'Modify', icon: PenSquare, href: modifyHref },
-    { name: 'New', icon: PlusCircle, href: app.href },
+    { name: 'Data', href: dataHref },
+    { name: 'Modify', href: modifyHref },
+    { name: 'New', href: app.href },
   ];
 
   return (
@@ -218,8 +214,7 @@ function AppOptionsDialog({ app, isOpen, onOpenChange }: AppOptionsDialogProps) 
         <div className="flex flex-col space-y-2">
           {options.map((option) => (
             <Link key={option.name} href={option.href} passHref>
-              <Button variant="outline" className="w-full justify-start text-base p-6 bg-zinc-800 border-zinc-700 hover:bg-zinc-700">
-                <option.icon className="mr-3 h-5 w-5 text-primary" />
+              <Button variant="outline" className="w-full justify-center text-base p-6 bg-zinc-800 border-zinc-700 hover:bg-zinc-700">
                 {option.name}
               </Button>
             </Link>
