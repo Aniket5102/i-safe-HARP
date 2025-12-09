@@ -1,9 +1,14 @@
-
 [
   {
     "id": "user-1",
     "name": "Admin User",
     "email": "admin@example.com",
     "password": "password"
+  },
+  {
+    "id": "user-1765270701393",
+    "name": "Aniket",
+    "email": "aniket.khaladkar@asianpaints.com",
+    "password": "Aniket@123"
   }
 ]

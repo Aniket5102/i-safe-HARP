@@ -11,7 +11,7 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from '@/components/ui/sidebar';
-import { Home, Link as LinkIcon, LayoutGrid, Settings, ChevronRight, FileText, Calendar, HardHat, BarChart, Shield, ListTodo, Building, Wrench, Lock, Cog } from 'lucide-react';
+import { Home, Link as LinkIcon, LayoutGrid, Settings, ChevronRight, FileText, Calendar, HardHat, BarChart, Shield, ListTodo, Building, Wrench, Lock, Cog, LayoutDashboard } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
@@ -45,6 +45,15 @@ export default function SidebarNav() {
             <SidebarMenuButton as="a" tooltip={'Home'} isActive={pathname === '/'} className="justify-start">
               <Home />
               <span className="group-data-[state=expanded]:inline-flex group-data-[state=collapsed]:hidden">Home</span>
+            </SidebarMenuButton>
+          </NextLink>
+      </SidebarMenuItem>
+
+      <SidebarMenuItem>
+          <NextLink href={'/dashboard'} passHref>
+            <SidebarMenuButton as="a" tooltip={'Dashboard'} isActive={pathname.startsWith('/dashboard')} className="justify-start">
+              <LayoutDashboard />
+              <span className="group-data-[state=expanded]:inline-flex group-data-[state=collapsed]:hidden">Dashboard</span>
             </SidebarMenuButton>
           </NextLink>
       </SidebarMenuItem>
