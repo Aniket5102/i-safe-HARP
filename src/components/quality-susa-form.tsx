@@ -55,9 +55,9 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { Textarea } from "./ui/textarea";
 import { useRouter } from 'next/navigation';
-import AsianPaintsLogo from "./asian-paints-logo";
 import { Calendar } from "@/components/ui/calendar";
 import { saveIncident } from "@/app/actions";
+import Image from "next/image";
 
 const formSchema = z.object({
   date: z.date({ required_error: "A date is required." }),
@@ -702,7 +702,7 @@ export default function QualitySusaForm() {
           </div>
           <div className="p-6" ref={qrCodeRef}>
             <div className="flex items-center justify-center space-x-4 mb-4">
-                <AsianPaintsLogo />
+                <Image src="/asian-paints-logo.png" alt="Asian Paints Logo" width={120} height={18} />
             </div>
             <div className="flex items-center justify-center p-4 bg-white rounded-lg">
               {qrCodeValue && <QRCode value={qrCodeValue} size={256} style={{ height: "auto", maxWidth: "100%", width: "100%" }} />}
@@ -716,3 +716,5 @@ export default function QualitySusaForm() {
     </>
   );
 }
+
+    
