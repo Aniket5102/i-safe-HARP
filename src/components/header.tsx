@@ -29,14 +29,6 @@ export default function Header() {
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center gap-4">
             <AsianPaintsLogo />
-            <div className="flex items-center gap-2">
-                <Image
-                    src="/i-safe-logo.png"
-                    alt="i-safe Logo"
-                    width={80}
-                    height={20}
-                />
-            </div>
           </div>
           <div className="flex items-center gap-4">
             <Select>
