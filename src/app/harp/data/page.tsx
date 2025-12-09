@@ -29,7 +29,7 @@ export default function HarpDataPage() {
     if (loading) {
         return <div className="text-center p-8">Loading incidents...</div>;
     }
-    return <DataTable columns={columns} data={data} />;
+    return <DataTable columns={columns} data={data} filterColumn="harpId" filterPlaceholder="Filter by HARP ID..." />;
   }
 
   return (
