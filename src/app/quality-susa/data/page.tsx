@@ -7,7 +7,7 @@ import { DataTable } from '@/components/data-table';
 import { Button } from '@/components/ui/button';
 import { FileDown, ListFilter, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
-import incidentData from '@/lib/data/quality-susa-incidents.json';
+import { getQualitySusaIncidents } from '@/lib/data-loader';
 import IncidentsByLocationChart from '@/components/incidents-by-location-chart';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -16,13 +16,17 @@ export default function QualitySusaDataPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Load data from the imported JSON file
-    const formattedData = incidentData.map(item => ({
-      ...item,
-      date: new Date(item.date),
-    }));
-    setData(formattedData);
-    setLoading(false);
+    async function loadData() {
+        const incidentData = await getQualitySusaIncidents();
+        // Load data from the imported JSON file
+        const formattedData = incidentData.map((item: any) => ({
+        ...item,
+        date: new Date(item.date),
+        }));
+        setData(formattedData);
+        setLoading(false);
+    }
+    loadData();
   }, []);
 
   const renderContent = () => {

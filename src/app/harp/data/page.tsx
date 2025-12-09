@@ -7,22 +7,26 @@ import { DataTable } from '@/components/data-table';
 import { Button } from '@/components/ui/button';
 import { FileDown, ListFilter, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
-import incidentData from '@/lib/data/harp-incidents.json';
 import IncidentsByLocationChart from '@/components/incidents-by-location-chart';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { getHarpIncidents } from '@/lib/data-loader';
 
 export default function HarpDataPage() {
   const [data, setData] = useState<HarpIncident[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Load data from the imported JSON file
-    const formattedData = incidentData.map(item => ({
-      ...item,
-      date: new Date(item.date),
-    }));
-    setData(formattedData);
-    setLoading(false);
+    async function loadData() {
+        const incidentData = await getHarpIncidents();
+        // Load data from the imported JSON file
+        const formattedData = incidentData.map((item: any) => ({
+        ...item,
+        date: new Date(item.date),
+        }));
+        setData(formattedData);
+        setLoading(false);
+    }
+    loadData();
   }, []);
 
   const renderContent = () => {

@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import { format, isValid, parseISO } from 'date-fns';
-import observationData from '@/lib/data/bbs-observations.json';
+import { getBbsObservations } from '@/lib/data-loader';
 
 type BbsObservation = {
     id: string;
@@ -22,20 +22,24 @@ export default function BbsObservationDetailsPage() {
   const { id } = params;
 
   useEffect(() => {
-    if (id) {
-        const foundObservation = observationData.find(obs => obs.id === id);
-        if (foundObservation) {
-            const formattedObservation = {
-                ...foundObservation,
-                data: {
-                    ...foundObservation.data,
-                    observationDate: parseISO(foundObservation.data.observationDate),
-                }
-            };
-            setObservation(formattedObservation as any);
+    async function loadData() {
+        if (id) {
+            const observationData = await getBbsObservations();
+            const foundObservation = observationData.find((obs: any) => obs.id === id);
+            if (foundObservation) {
+                const formattedObservation = {
+                    ...foundObservation,
+                    data: {
+                        ...foundObservation.data,
+                        observationDate: parseISO(foundObservation.data.observationDate),
+                    }
+                };
+                setObservation(formattedObservation as any);
+            }
         }
+        setLoading(false);
     }
-    setLoading(false);
+    loadData();
   }, [id]);
 
   const renderValue = (value: any) => {

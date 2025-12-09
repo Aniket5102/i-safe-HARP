@@ -57,7 +57,7 @@ import { Textarea } from "./ui/textarea";
 import { Calendar } from "@/components/ui/calendar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { saveIncident } from "@/app/actions";
-import incidentData from "@/lib/data/harp-incidents.json";
+import { getHarpIncidents } from "@/lib/data-loader";
 
 const formSchema = z.object({
   date: z.date({ required_error: "A date is required." }),
@@ -177,8 +177,9 @@ function HarpFormContent() {
     setIsLoading(true);
     setFoundIncident(null);
 
+    const incidentData = await getHarpIncidents();
     const found = incidentData.find(
-      (inc) => inc.id === searchId || inc.harpId === searchId
+      (inc: any) => inc.id === searchId || inc.harpId === searchId
     );
 
     if (found) {

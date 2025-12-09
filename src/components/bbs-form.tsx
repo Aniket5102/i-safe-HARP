@@ -49,7 +49,7 @@ import { Textarea } from "./ui/textarea";
 import { Calendar } from "@/components/ui/calendar";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import observationData from "@/lib/data/bbs-observations.json";
+import { getBbsObservations } from "@/lib/data-loader";
 
 const formSchema = z.object({
   observerName: z.string().min(1, "Observer name is required."),
@@ -115,8 +115,8 @@ function BbsFormContent() {
         setIsLoading(true);
         setFoundIncident(null);
         
-        // Search in the local JSON file
-        const found = observationData.find(obs => obs.id === incidentId);
+        const observationData = await getBbsObservations();
+        const found = observationData.find((obs: any) => obs.id === incidentId);
 
         if (found) {
           const formattedData = {

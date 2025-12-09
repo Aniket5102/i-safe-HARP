@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import { format, isValid, parseISO } from 'date-fns';
-import incidentData from '@/lib/data/harp-incidents.json';
+import { getHarpIncidents } from '@/lib/data-loader';
 
 type HarpIncident = {
     id: string;
@@ -22,20 +22,24 @@ export default function HarpIncidentDetailsPage() {
   const { id } = params;
 
   useEffect(() => {
-    if (id) {
-        const foundIncident = incidentData.find(inc => inc.id === id);
-        if (foundIncident) {
-            // Create a new object to avoid modifying the imported JSON data directly
-            const formattedIncident = {
-                ...foundIncident,
-                // The date from JSON is a string, so we parse it into a Date object
-                date: parseISO(foundIncident.date), 
-                createdAt: foundIncident.createdAt ? parseISO(foundIncident.createdAt) : undefined,
-            };
-            setIncident(formattedIncident);
+    async function loadData() {
+        if (id) {
+            const incidentData = await getHarpIncidents();
+            const foundIncident = incidentData.find((inc: any) => inc.id === id);
+            if (foundIncident) {
+                // Create a new object to avoid modifying the imported JSON data directly
+                const formattedIncident = {
+                    ...foundIncident,
+                    // The date from JSON is a string, so we parse it into a Date object
+                    date: parseISO(foundIncident.date), 
+                    createdAt: foundIncident.createdAt ? parseISO(foundIncident.createdAt) : undefined,
+                };
+                setIncident(formattedIncident);
+            }
         }
+        setLoading(false);
     }
-    setLoading(false);
+    loadData();
   }, [id]);
 
   const renderValue = (value: any) => {

@@ -57,7 +57,7 @@ import { Textarea } from "./ui/textarea";
 import { Calendar } from "@/components/ui/calendar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { saveIncident } from "@/app/actions";
-import incidentData from "@/lib/data/quality-susa-incidents.json";
+import { getQualitySusaIncidents } from "@/lib/data-loader";
 
 
 const formSchema = z.object({
@@ -182,8 +182,9 @@ function QualitySusaFormContent() {
     setIsLoading(true);
     setFoundIncident(null);
 
+    const incidentData = await getQualitySusaIncidents();
     const found = incidentData.find(
-      (inc) => inc.id === searchId || inc.susaId === searchId
+      (inc: any) => inc.id === searchId || inc.susaId === searchId
     );
 
     if (found) {

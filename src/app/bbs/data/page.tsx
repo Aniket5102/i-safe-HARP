@@ -7,7 +7,7 @@ import { DataTable } from '@/components/data-table';
 import { Button } from '@/components/ui/button';
 import { FileDown, ListFilter, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
-import observationData from '@/lib/data/bbs-observations.json';
+import { getBbsObservations } from '@/lib/data-loader';
 import BbsObservationsByLocationChart from '@/components/bbs-observations-by-location-chart';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -16,16 +16,20 @@ export default function BbsDataPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Load data from the imported JSON file
-    const formattedData = observationData.map(item => ({
-      ...item,
-      data: {
-        ...item.data,
-        observationDate: new Date(item.data.observationDate),
-      },
-    }));
-    setData(formattedData as BbsObservation[]);
-    setLoading(false);
+    async function loadData() {
+        const observationData = await getBbsObservations();
+        // Load data from the imported JSON file
+        const formattedData = observationData.map((item: any) => ({
+        ...item,
+        data: {
+            ...item.data,
+            observationDate: new Date(item.data.observationDate),
+        },
+        }));
+        setData(formattedData as BbsObservation[]);
+        setLoading(false);
+    }
+    loadData();
   }, []);
 
   const renderContent = () => {
