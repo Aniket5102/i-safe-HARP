@@ -3,6 +3,7 @@
 
 import * as React from "react";
 import { useSearchParams } from "next/navigation";
+import Link from 'next/link';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -50,7 +51,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
-import { CalendarIcon, Loader2, Search, Trash2 } from "lucide-react";
+import { CalendarIcon, Loader2, Search, Trash2, CheckCircle, Home } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { Textarea } from "./ui/textarea";
 import { Calendar } from "@/components/ui/calendar";
@@ -130,6 +131,7 @@ function QualitySusaFormContent() {
   const [isLoading, setIsLoading] = React.useState(false);
   const [susaId, setSusaId] = React.useState("");
   const [bbqReferenceNumber, setBbqReferenceNumber] = React.useState("");
+  const [showSuccess, setShowSuccess] = React.useState(false);
 
   const defaultFormValues: FormValues = {
     date: new Date(),
@@ -253,12 +255,7 @@ function QualitySusaFormContent() {
     );
 
     if (result.success) {
-      toast({
-        title: "Incident Raised",
-        description: `Quality SUSA Incident ${susaId} has been saved.`,
-      });
-      form.reset(defaultFormValues);
-      generateNewIds();
+      setShowSuccess(true);
     } else {
       toast({
         variant: "destructive",
@@ -275,7 +272,26 @@ function QualitySusaFormContent() {
     setFoundIncident(null);
     form.reset(defaultFormValues);
     generateNewIds();
+    setShowSuccess(false);
   };
+  
+  if (showSuccess) {
+    return (
+        <Card className="w-full shadow-2xl">
+            <CardContent className="flex flex-col items-center justify-center p-10 min-h-[500px] text-center">
+                <CheckCircle className="w-24 h-24 text-green-500 mb-4" />
+                <h2 className="text-2xl font-bold mb-2">Incident Raised Successfully!</h2>
+                <p className="text-muted-foreground mb-6">Quality SUSA Incident {susaId} has been saved.</p>
+                <div className="flex gap-4">
+                    <Button onClick={resetSearch}>Raise Another Incident</Button>
+                    <Link href="/" passHref>
+                        <Button variant="outline"><Home className="mr-2 h-4 w-4" /> Go to Home</Button>
+                    </Link>
+                </div>
+            </CardContent>
+        </Card>
+    )
+  }
 
   const currentForm = (
     <fieldset

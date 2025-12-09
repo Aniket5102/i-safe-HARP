@@ -3,6 +3,7 @@
 
 import * as React from "react";
 import { useSearchParams } from "next/navigation";
+import Link from 'next/link';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -42,7 +43,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
-import { CalendarIcon, Loader2, Search, Trash2 } from "lucide-react";
+import { CalendarIcon, Loader2, Search, Trash2, CheckCircle, Home } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { Textarea } from "./ui/textarea";
 import { Calendar } from "@/components/ui/calendar";
@@ -83,6 +84,9 @@ function BbsFormContent() {
     const [incidentId, setIncidentId] = React.useState("");
     const [foundIncident, setFoundIncident] = React.useState<ObservationDoc | null>(null);
     const [isLoading, setIsLoading] = React.useState(false);
+    const [showSuccess, setShowSuccess] = React.useState(false);
+    const [newObservationId, setNewObservationId] = React.useState("");
+
 
     const defaultFormValues = {
       observerName: "John Doe",
@@ -166,11 +170,8 @@ function BbsFormContent() {
         // This is a mock implementation.
         setTimeout(() => {
           const newId = `BBS-${Date.now()}`;
-          toast({
-              title: "Observation Mock-Submitted",
-              description: `A new observation with ID ${newId} was created (simulation).`,
-          });
-          form.reset(defaultFormValues);
+          setNewObservationId(newId);
+          setShowSuccess(true);
           setIsLoading(false);
         }, 1000);
     };
@@ -179,7 +180,26 @@ function BbsFormContent() {
         setIncidentId("");
         setFoundIncident(null);
         form.reset(defaultFormValues);
+        setShowSuccess(false);
     };
+
+    if (showSuccess) {
+      return (
+          <Card className="w-full shadow-2xl">
+              <CardContent className="flex flex-col items-center justify-center p-10 min-h-[500px] text-center">
+                  <CheckCircle className="w-24 h-24 text-green-500 mb-4" />
+                  <h2 className="text-2xl font-bold mb-2">Observation Submitted Successfully!</h2>
+                  <p className="text-muted-foreground mb-6">A new observation with ID {newObservationId} was created.</p>
+                  <div className="flex gap-4">
+                      <Button onClick={resetSearch}>Submit Another Observation</Button>
+                      <Link href="/" passHref>
+                          <Button variant="outline"><Home className="mr-2 h-4 w-4" /> Go to Home</Button>
+                      </Link>
+                  </div>
+              </CardContent>
+          </Card>
+      )
+    }
     
     const currentForm = (
         <fieldset
