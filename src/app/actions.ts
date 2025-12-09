@@ -53,9 +53,11 @@ export async function saveUser(
   const filePath = 'src/lib/data/users.json';
   try {
     const fullPath = path.join(process.cwd(), filePath);
+    const dir = path.dirname(fullPath);
     let users: User[] = [];
 
     try {
+      await fs.mkdir(dir, { recursive: true });
       const fileContent = await fs.readFile(fullPath, 'utf-8');
       users = JSON.parse(fileContent);
     } catch (error: any) {
