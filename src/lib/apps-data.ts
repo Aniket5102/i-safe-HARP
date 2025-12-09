@@ -75,10 +75,3 @@ export const apps: App[] = [
     dataHref: '/quality-susa/data',
   },
 ];
-
-    
-
-    
-
-
-
