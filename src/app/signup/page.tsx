@@ -59,6 +59,7 @@ export default function SignupPage() {
     const newUser = {
       id: `user-${Date.now()}`,
       ...values,
+      role: 'User',
     };
     const result = await saveUser(newUser);
 
@@ -67,7 +68,7 @@ export default function SignupPage() {
         title: 'Account Created',
         description: "You've been successfully signed up.",
       });
-      login({ name: values.name, email: values.email });
+      login({ name: values.name, email: values.email, role: 'User' });
     } else {
       toast({
         variant: 'destructive',

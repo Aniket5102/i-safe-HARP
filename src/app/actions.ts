@@ -11,6 +11,7 @@ type Incident = {
 
 type User = {
   id: string;
+  role: string;
   [key: string]: any;
 };
 

@@ -1,5 +1,26 @@
-
 [
+  {
+    "id": "susa1765274253506",
+    "susaId": "SUSA-1765274253506",
+    "bbqReferenceNumber": "BBQ-1765274253506",
+    "date": "2025-12-09T09:57:33.462Z",
+    "location": "Khandala",
+    "department": "Production Department",
+    "block": "SPB",
+    "floor": "SPB Floor",
+    "activity": "ok",
+    "carriedOutBy": "Aniket",
+    "employeeType": "APL Employee",
+    "employeeName": "Aniket",
+    "employeeId": "P00126717",
+    "designation": "Manager - Production",
+    "employeeDepartment": "PRODUCTION",
+    "hazard": "Chemical Hazards",
+    "accident": "Exposure to chemical while charging",
+    "risk": "Medium",
+    "prevention": "ok",
+    "otherObservation": ""
+  },
   {
     "id": "susa-001",
     "susaId": "SUSA-1627888800000",

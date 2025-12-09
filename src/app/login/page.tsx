@@ -55,7 +55,7 @@ export default function LoginPage() {
     const user = await findUser(values);
     
     if (user) {
-      login({ name: user.name, email: user.email });
+      login({ name: user.name, email: user.email, role: user.role });
     } else {
       toast({
         variant: 'destructive',
