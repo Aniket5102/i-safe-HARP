@@ -19,6 +19,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import AsianPaintsLogo from "./asian-paints-logo";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Header() {
 
@@ -29,10 +30,11 @@ export default function Header() {
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
               <AsianPaintsLogo />
-              <img
+              <Image
                 src="/icons/i-safe-logo.png"
                 alt="i-safe Logo"
-                className="h-10 w-10"
+                width={40}
+                height={40}
               />
               <span className="text-lg font-light text-gray-600 tracking-wider">
                 i-safe
