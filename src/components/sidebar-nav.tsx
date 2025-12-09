@@ -11,7 +11,7 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from '@/components/ui/sidebar';
-import { Home, Link as LinkIcon, LayoutGrid, Settings, ChevronRight, FileText, Calendar, HardHat, BarChart, Shield, ListTodo, Building, Wrench, Lock, Cog, LayoutDashboard } from 'lucide-react';
+import { Home, Link as LinkIcon, LayoutGrid, Settings, ChevronRight, FileText, Calendar, HardHat, BarChart, Shield, ListTodo, Building, Wrench, Lock, Cog } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
@@ -66,7 +66,7 @@ export default function SidebarNav() {
               className="justify-start"
               tooltip="Modules"
             >
-              <LayoutGrid />
+              <Cog />
               <span className="group-data-[state=expanded]:inline-flex group-data-[state=collapsed]:hidden">Modules</span>
               <ChevronRight className={cn("ml-auto h-4 w-4 shrink-0 transition-transform duration-200 group-data-[state=expanded]:inline-flex group-data-[state=collapsed]:hidden", isModulesOpen && "rotate-90")} />
             </SidebarMenuButton>
