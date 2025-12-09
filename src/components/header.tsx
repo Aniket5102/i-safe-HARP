@@ -27,9 +27,9 @@ export default function Header() {
     <header className="bg-white shadow-md sticky top-0 z-40">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center gap-4">
             <AsianPaintsLogo />
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center gap-2">
                 <Image
                     src="/icons/i-safe-logo.png"
                     alt="i-safe Logo"
@@ -41,9 +41,9 @@ export default function Header() {
                 </span>
             </div>
           </div>
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center gap-4">
             <Select>
-              <SelectTrigger className="w-[180px] bg-gray-50 border-gray-200">
+              <SelectTrigger className="w-[180px] bg-gray-50 border-gray-200 hidden md:flex">
                 <SelectValue placeholder="Need Assistance" />
               </SelectTrigger>
               <SelectContent>
@@ -52,7 +52,7 @@ export default function Header() {
                 <SelectItem value="support">Support</SelectItem>
               </SelectContent>
             </Select>
-            <div className="flex items-center space-x-3 text-gray-500">
+            <div className="hidden md:flex items-center gap-3 text-gray-500">
               <Smartphone size={20} />
               <Calendar size={20} />
               <HelpCircle size={20} />
@@ -64,7 +64,7 @@ export default function Header() {
               </div>
               <Home size={20} />
             </div>
-            <div className="text-sm text-gray-600">
+            <div className="hidden lg:block text-sm text-gray-600">
               Asian Paints Limited (APL)
             </div>
             <Avatar className="h-9 w-9">
