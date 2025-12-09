@@ -71,10 +71,9 @@ export async function saveUser(
         }
       }
 
+      // This check still runs, but the primary check is now on the client.
       const existingUser = users.find(user => user.email === newUser.email);
       if (existingUser) {
-        // In this async context, we can't return this to the client directly.
-        // The check in the onSubmit function handles this for the UI.
         console.warn(`User with email ${newUser.email} already exists.`);
         return;
       }
@@ -101,9 +100,19 @@ export async function findUser(
   try {
     const fileContent = await fs.readFile(fullPath, 'utf-8');
     const users: User[] = JSON.parse(fileContent);
-    const user = users.find(u => u.email === credentials.email && u.password === credentials.password);
+
+    // For login, we need to find the user.
+    if (credentials.password) {
+        const user = users.find(u => u.email === credentials.email && u.password === credentials.password);
+        return user || null;
+    }
+
+    // For checking if a user exists during signup.
+    const user = users.find(u => u.email === credentials.email);
     return user || null;
+
   } catch (error) {
     return null;
   }
 }
+

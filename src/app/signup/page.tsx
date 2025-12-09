@@ -23,7 +23,7 @@ import {
 } from '@/components/ui/card';
 import { useAuth } from '@/context/auth-context';
 import Link from 'next/link';
-import { saveUser } from '../actions';
+import { saveUser, findUser } from '../actions';
 import { useToast } from '@/hooks/use-toast';
 import React from 'react';
 import { Loader2 } from 'lucide-react';
@@ -57,6 +57,18 @@ export default function SignupPage() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
     
+    // First, check if the user already exists.
+    const existingUser = await findUser({ email: values.email });
+    if (existingUser) {
+      toast({
+        variant: 'destructive',
+        title: 'Sign Up Failed',
+        description: 'An account with this email already exists.',
+      });
+      setIsSubmitting(false);
+      return;
+    }
+
     const role = values.email.endsWith('@asianpaints.com') ? 'Admin' : 'Client';
 
     const newUser = {
@@ -64,6 +76,8 @@ export default function SignupPage() {
       ...values,
       role: role,
     };
+    
+    // Now, save the user.
     const result = await saveUser(newUser);
 
     if (result.success) {
@@ -71,6 +85,7 @@ export default function SignupPage() {
         title: 'Account Created',
         description: "You've been successfully signed up.",
       });
+      // The crucial step: login with the new user data immediately.
       login({ name: values.name, email: values.email, role: role });
     } else {
       toast({
@@ -79,6 +94,9 @@ export default function SignupPage() {
         description: result.message,
       });
     }
+    
+    // We don't need to wait for the file to be written to stop the spinner.
+    // The login() call will navigate away anyway.
     setIsSubmitting(false);
   }
 
