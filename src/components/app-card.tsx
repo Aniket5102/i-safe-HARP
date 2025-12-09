@@ -16,7 +16,7 @@ export default function AppCard({ app, onCardClick }: AppCardProps) {
   
   const dataHref = app.dataHref || `${app.href}/data`;
   
-  const modifyHref = app.name === 'BBS' ? `${app.href}?tab=modify` : `${app.href}/modify`;
+  const modifyHref = `${app.href}?tab=modify`;
 
   const actionButtons = [
     { name: 'Modify', href: modifyHref },

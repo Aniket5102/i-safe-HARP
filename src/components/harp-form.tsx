@@ -2,6 +2,7 @@
 "use client";
 
 import * as React from "react";
+import { useSearchParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -38,27 +39,24 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import {
-  Dialog,
-  DialogContent,
-} from "@/components/ui/dialog";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
-import { CalendarIcon, ChevronLeft, FileDown, Loader2, Printer, Download, X, Upload } from "lucide-react";
-import { format } from "date-fns";
-import QRCode from "qrcode.react";
-import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
+import { CalendarIcon, Loader2, Search, Trash2 } from "lucide-react";
+import { format, parseISO } from "date-fns";
 import { Textarea } from "./ui/textarea";
-import { useRouter } from 'next/navigation';
 import { Calendar } from "@/components/ui/calendar";
-import { saveIncident } from '@/app/actions';
-import Image from "next/image";
-
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { saveIncident } from "@/app/actions";
+import incidentData from "@/lib/data/harp-incidents.json";
 
 const formSchema = z.object({
   date: z.date({ required_error: "A date is required." }),
@@ -72,7 +70,10 @@ const formSchema = z.object({
   employeeName: z.string().min(1, "Employee Name is required.").max(100),
   employeeId: z.string().min(1, "Employee ID is required.").max(100),
   designation: z.string().min(1, "Designation is required.").max(100),
-  employeeDepartment: z.string().min(1, "Employee Department is required.").max(100),
+  employeeDepartment: z
+    .string()
+    .min(1, "Employee Department is required.")
+    .max(100),
   hazard: z.string().min(1, "Hazard is required.").max(100),
   accident: z.string().min(1, "Accident is required.").max(100),
   risk: z.string().min(1, "Risk is required.").max(100),
@@ -81,6 +82,12 @@ const formSchema = z.object({
 });
 
 type FormValues = z.infer<typeof formSchema>;
+
+interface IncidentDoc {
+  id: string;
+  harpId: string;
+  [key: string]: any;
+}
 
 const locations = ["Patancheru", "Khandala", "Rohtak", "Vizag", "Mysuru", "Kasna", "Ankleshwar", "Sripi"];
 const departments = ["Production Department", "Quality Department", "Admin Department"];
@@ -109,37 +116,43 @@ const employeeDepartments = ["PRODUCTION", "QUALITY"];
 const hazards = ["Chemical Hazards", "Chemical Splash", "eyes", "face", "body"];
 const risks = ["Medium", "high", "low"];
 
-export default function HarpForm() {
+
+function HarpFormContent() {
   const { toast } = useToast();
-  const router = useRouter();
-  const formRef = React.useRef<HTMLDivElement>(null);
-  const qrCodeRef = React.useRef<HTMLDivElement>(null);
-  const [isSubmitting, setIsSubmitting] = React.useState(false);
-  const [qrCodeValue, setQrCodeValue] = React.useState<string | null>(null);
-  const [isDatePickerOpen, setIsDatePickerOpen] = React.useState(false);
-  const [harpId, setHarpId] = React.useState('');
+  const searchParams = useSearchParams();
+  const tab = searchParams.get("tab");
+
+  const [activeTab, setActiveTab] = React.useState(tab || "new");
+  const [searchId, setSearchId] = React.useState("");
+  const [foundIncident, setFoundIncident] = React.useState<IncidentDoc | null>(
+    null
+  );
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [harpId, setHarpId] = React.useState("");
+
+  const defaultFormValues = {
+    date: new Date(),
+    location: "Khandala",
+    department: "Production Department",
+    block: "SPB",
+    floor: "SPB Floor",
+    activity: "",
+    carriedOutBy: "Aniket",
+    employeeType: "APL Employee",
+    employeeName: "Aniket",
+    employeeId: "P00126717",
+    designation: "Manager - Production",
+    employeeDepartment: "PRODUCTION",
+    hazard: "Chemical Hazards",
+    accident: "Exposure to chemical while charging",
+    risk: "Medium",
+    prevention: "",
+    otherObservation: "",
+  };
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-        date: new Date(),
-        location: "Khandala",
-        department: "Production Department",
-        block: "SPB",
-        floor: "SPB Floor",
-        activity: "",
-        carriedOutBy: "Aniket",
-        employeeType: "APL Employee",
-        employeeName: "Aniket",
-        employeeId: "P00126717",
-        designation: "Manager - Production",
-        employeeDepartment: "PRODUCTION",
-        hazard: "Chemical Hazards",
-        accident: "Exposure to chemical while charging",
-        risk: "Medium",
-        prevention: "",
-        otherObservation: "",
-    },
+    defaultValues: defaultFormValues,
   });
 
   const generateNewId = React.useCallback(() => {
@@ -151,30 +164,94 @@ export default function HarpForm() {
   }, [generateNewId]);
 
   React.useEffect(() => {
-    if (form.formState.isSubmitSuccessful) {
-      form.reset(form.formState.defaultValues);
-      generateNewId();
+    if (tab) {
+      setActiveTab(tab);
     }
-  }, [form.formState.isSubmitSuccessful, form, generateNewId]);
+  }, [tab]);
 
+  const handleSearch = async () => {
+    if (!searchId) return;
+    setIsLoading(true);
+    setFoundIncident(null);
 
-  async function onSubmit(values: FormValues) {
-    setIsSubmitting(true);
-    const newIncident = {
-        id: harpId.toLowerCase().replace(/[^a-z0-9]/g, ''),
-        harpId: harpId,
-        ...values,
-        date: values.date.toISOString(),
+    const found = incidentData.find(
+      (inc) => inc.id === searchId || inc.harpId === searchId
+    );
+
+    if (found) {
+      const formattedData = {
+        ...found,
+        date: parseISO(found.date),
       };
-      
-    const result = await saveIncident('src/lib/data/harp-incidents.json', newIncident);
+      setFoundIncident(found as IncidentDoc);
+      form.reset(formattedData);
+      toast({
+        title: "Incident Found",
+        description: `Details for incident ID ${searchId} have been loaded.`,
+      });
+    } else {
+      form.reset(defaultFormValues);
+      toast({
+        variant: "destructive",
+        title: "Not Found",
+        description: "No incident found with that ID.",
+      });
+    }
+    setIsLoading(false);
+  };
+
+  const handleUpdate = async (values: FormValues) => {
+    if (!foundIncident) return;
+    setIsLoading(true);
+
+    // This is a mock implementation.
+    setTimeout(() => {
+      toast({
+        title: "Update Mocked",
+        description: "In a real app, this would update the data.",
+      });
+      setIsLoading(false);
+    }, 1000);
+  };
+
+  const handleDelete = async () => {
+    if (!foundIncident) return;
+    setIsLoading(true);
+
+    // This is a mock implementation.
+    setTimeout(() => {
+      toast({
+        title: "Delete Mocked",
+        description: "In a real app, this would delete the data.",
+      });
+      setFoundIncident(null);
+      setSearchId("");
+      form.reset(defaultFormValues);
+      setIsLoading(false);
+    }, 1000);
+  };
+
+  const onNewSubmit = async (values: FormValues) => {
+    setIsLoading(true);
+    const newIncident = {
+      id: harpId.toLowerCase().replace(/[^a-z0-9]/g, ""),
+      harpId: harpId,
+      ...values,
+      date: values.date.toISOString(),
+    };
+
+    const result = await saveIncident(
+      "src/lib/data/harp-incidents.json",
+      newIncident
+    );
 
     if (result.success) {
       toast({
         title: "Incident Raised",
         description: `HARP Incident ${harpId} has been saved successfully.`,
       });
-      form.reset();
+      form.reset(defaultFormValues);
+      generateNewId();
     } else {
       toast({
         variant: "destructive",
@@ -183,528 +260,596 @@ export default function HarpForm() {
       });
     }
 
-    setIsSubmitting(false);
-  }
-
-  const handleGenerateQrCode = () => {
-    const values = form.getValues();
-    const allValues = { ...values, harpId };
-    setQrCodeValue(JSON.stringify(allValues));
+    setIsLoading(false);
   };
 
-  const handlePrintQrCode = () => {
-    window.print();
+  const resetSearch = () => {
+    setSearchId("");
+    setFoundIncident(null);
+    form.reset(defaultFormValues);
+    generateNewId();
   };
 
-  const handleDownloadQrCode = async () => {
-    const qrElement = qrCodeRef.current;
-    if (!qrElement) return;
+  const currentForm = (
+    <fieldset
+      disabled={isLoading || (activeTab === "modify" && !foundIncident)}
+      className="space-y-4"
+    >
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-4">
+        {activeTab === 'new' && (
+            <FormItem>
+              <FormLabel>HARP ID #</FormLabel>
+              <FormControl>
+                <Input disabled value={harpId} />
+              </FormControl>
+              <FormDescription>(Auto Generated)</FormDescription>
+            </FormItem>
+        )}
+        {activeTab !== 'new' && foundIncident && (
+            <FormItem>
+              <FormLabel>HARP ID #</FormLabel>
+              <FormControl>
+                <Input disabled value={foundIncident.harpId} />
+              </FormControl>
+            </FormItem>
+        )}
+        <FormField
+          control={form.control}
+          name="date"
+          render={({ field }) => (
+            <FormItem className="flex flex-col">
+              <FormLabel>
+                Date<span className="text-red-500">*</span>
+              </FormLabel>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <FormControl>
+                    <Button
+                      variant={"outline"}
+                      className={cn(
+                        "w-full pl-3 text-left font-normal",
+                        !field.value && "text-muted-foreground"
+                      )}
+                    >
+                      {field.value ? (
+                        format(field.value, "PPP")
+                      ) : (
+                        <span>Pick a date</span>
+                      )}
+                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                    </Button>
+                  </FormControl>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={field.value}
+                    onSelect={field.onChange}
+                    disabled={(date) =>
+                      date > new Date() || date < new Date("1900-01-01")
+                    }
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="location"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                Location<span className="text-red-500">*</span>
+              </FormLabel>
+              <Select onValueChange={field.onChange} value={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a location" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {locations.map((loc) => (
+                    <SelectItem key={loc} value={loc}>
+                      {loc}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="department"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                Department<span className="text-red-500">*</span>
+              </FormLabel>
+              <Select onValueChange={field.onChange} value={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a department" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {departments.map((dep) => (
+                    <SelectItem key={dep} value={dep}>
+                      {dep}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="block"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                Block<span className="text-red-500">*</span>
+              </FormLabel>
+              <Select onValueChange={field.onChange} value={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a block" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {blocks.map((b) => (
+                    <SelectItem key={b} value={b}>
+                      {b}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="floor"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                Floor<span className="text-red-500">*</span>
+              </FormLabel>
+              <Select onValueChange={field.onChange} value={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a floor" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {floors.map((f) => (
+                    <SelectItem key={f} value={f}>
+                      {f}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="activity"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                Activity<span className="text-red-500">*</span>
+              </FormLabel>
+              <FormControl>
+                <Input placeholder="Enter activity" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="carriedOutBy"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                Carried Out By<span className="text-red-500">*</span>
+              </FormLabel>
+              <Select onValueChange={field.onChange} value={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a person" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {people.map((p) => (
+                    <SelectItem key={p} value={p}>
+                      {p}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="employeeType"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                Employee Type<span className="text-red-500">*</span>
+              </FormLabel>
+              <Select onValueChange={field.onChange} value={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select employee type" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {employeeTypes.map((et) => (
+                    <SelectItem key={et} value={et}>
+                      {et}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="employeeName"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                Employee Name<span className="text-red-500">*</span>
+              </FormLabel>
+              <Select onValueChange={field.onChange} value={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select an employee" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {people.map((p) => (
+                    <SelectItem key={p} value={p}>
+                      {p}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="employeeId"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                Employee ID<span className="text-red-500">*</span>
+              </FormLabel>
+              <Select onValueChange={field.onChange} value={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select an Employee ID" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {employeeIds.map((id) => (
+                    <SelectItem key={id} value={id}>
+                      {id}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="designation"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                Designation<span className="text-red-500">*</span>
+              </FormLabel>
+              <Select onValueChange={field.onChange} value={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a designation" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {designations.map((d) => (
+                    <SelectItem key={d} value={d}>
+                      {d}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="employeeDepartment"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                Employee Department<span className="text-red-500">*</span>
+              </FormLabel>
+              <Select onValueChange={field.onChange} value={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a department" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {employeeDepartments.map((d) => (
+                    <SelectItem key={d} value={d}>
+                      {d}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+            control={form.control}
+            name="hazard"
+            render={({ field }) => (
+                <FormItem>
+                <FormLabel>Hazard<span className="text-red-500">*</span></FormLabel>
+                <Select onValueChange={field.onChange} value={field.value}>
+                    <FormControl>
+                    <SelectTrigger>
+                        <SelectValue placeholder="Select a hazard" />
+                    </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                    {hazards.map(h => <SelectItem key={h} value={h}>{h}</SelectItem>)}
+                    </SelectContent>
+                </Select>
+                <FormMessage />
+                </FormItem>
+            )}
+            />
+            <FormField
+            control={form.control}
+            name="accident"
+            render={({ field }) => (
+                <FormItem>
+                <FormLabel>Accident<span className="text-red-500">*</span></FormLabel>
+                <FormControl>
+                    <Input placeholder="Enter accident details" {...field} />
+                </FormControl>
+                <FormMessage />
+                </FormItem>
+            )}
+            />
+            <FormField
+            control={form.control}
+            name="risk"
+            render={({ field }) => (
+                <FormItem>
+                <FormLabel>Risk<span className="text-red-500">*</span></FormLabel>
+                <Select onValueChange={field.onChange} value={field.value}>
+                    <FormControl>
+                    <SelectTrigger>
+                        <SelectValue placeholder="Select a risk level" />
+                    </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                    {risks.map(r => <SelectItem key={r} value={r}>{r}</SelectItem>)}
+                    </SelectContent>
+                </Select>
+                <FormMessage />
+                </FormItem>
+            )}
+            />
+            <FormField
+            control={form.control}
+            name="prevention"
+            render={({ field }) => (
+                <FormItem className="md:col-span-3">
+                <FormLabel>Prevention<span className="text-red-500">*</span></FormLabel>
+                <FormControl>
+                    <Textarea placeholder="Describe prevention measures" {...field} />
+                </FormControl>
+                <FormMessage />
+                </FormItem>
+            )}
+            />
+            <FormField
+            control={form.control}
+            name="otherObservation"
+            render={({ field }) => (
+                <FormItem className="md:col-span-3">
+                <FormLabel>Other Observation/Support Required</FormLabel>
+                <FormControl>
+                    <Textarea placeholder="Enter your observations" {...field} />
+                </FormControl>
+                <FormMessage />
+                </FormItem>
+            )}
+            />
+      </div>
+    </fieldset>
+  );
 
-    try {
-      const canvas = await html2canvas(qrElement, { scale: 2, backgroundColor: null });
-      const imgData = canvas.toDataURL("image/png");
-      const link = document.createElement('a');
-      link.href = imgData;
-      link.download = `harp-qr-code.png`;
-      link.click();
-      toast({ title: "Success", description: "QR Code download has started." });
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "QR Code Download Error",
-        description: "An error occurred while generating the QR Code image.",
-      });
-    }
-  };
-
-
-  const handleExportPdf = async () => {
-    const formElement = formRef.current;
-    if (!formElement) return;
-
-    try {
-      const canvas = await html2canvas(formElement, { scale: 2 });
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF({
-        orientation: "portrait",
-        unit: "pt",
-        format: "a4",
-      });
-
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
-      const imgWidth = canvas.width;
-      const imgHeight = canvas.height;
-      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
-      const imgX = (pdfWidth - imgWidth * ratio) / 2;
-      const imgY = 30;
-
-      pdf.addImage(
-        imgData,
-        "PNG",
-        imgX,
-        imgY,
-        imgWidth * ratio,
-        imgHeight * ratio
-      );
-      pdf.save(`harp-incident.pdf`);
-      toast({ title: "Success", description: "PDF export has started." });
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "PDF Export Error",
-        description: "An error occurred while generating the PDF.",
-      });
-    }
-  };
-  
   return (
-    <>
-      <Card ref={formRef} className="w-full shadow-2xl" id="harp-form-card">
-        <CardHeader className="flex flex-row items-start justify-between">
-          <div>
-            <CardTitle className="font-headline text-2xl">HARP Details</CardTitle>
+    <Card className="w-full shadow-2xl">
+      <CardHeader>
+        <Tabs
+          value={activeTab}
+          onValueChange={(value) => {
+            setActiveTab(value);
+            resetSearch();
+          }}
+          className="w-full"
+        >
+          <div className="flex justify-center mb-6">
+            <TabsList className="grid w-full grid-cols-3 max-w-md">
+              <TabsTrigger value="new">New Incident</TabsTrigger>
+              <TabsTrigger value="modify">Modify Incident</TabsTrigger>
+              <TabsTrigger value="delete">Delete Incident</TabsTrigger>
+            </TabsList>
+          </div>
+          <TabsContent value="new" className="text-center">
+            <CardTitle className="font-headline text-2xl">
+              HARP Incident Form
+            </CardTitle>
             <CardDescription>
-              Fill in the form to record a new HARP entry.
+              Fill out the form to record a new HARP incident.
             </CardDescription>
-          </div>
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={() => router.back()}>
-              <ChevronLeft />
-              Back
-            </Button>
-            <Button variant="outline" onClick={handleGenerateQrCode}>
-              <Printer />
-              Print QR Code
-            </Button>
-            <Button variant="outline" onClick={handleExportPdf}>
-              <FileDown />
-              Export as PDF
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <Accordion type="multiple" className="w-full" defaultValue={["general-details", "harp-details", "other-details"]} >
-                <AccordionItem value="general-details">
-                  <AccordionTrigger className="text-lg font-semibold">General Details</AccordionTrigger>
-                  <AccordionContent className="pt-4 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-                    <FormItem>
-                        <FormLabel>HARP ID #</FormLabel>
-                        <FormControl>
-                            <Input disabled value={harpId} />
-                        </FormControl>
-                        <FormDescription>(Auto Generated)</FormDescription>
-                    </FormItem>
-                    <FormField
-                      control={form.control}
-                      name="date"
-                      render={({ field }) => (
-                        <FormItem className="flex flex-col">
-                          <FormLabel>Date<span className="text-red-500">*</span></FormLabel>
-                          <Popover open={isDatePickerOpen} onOpenChange={setIsDatePickerOpen}>
-                            <PopoverTrigger asChild>
-                              <FormControl>
-                                <Button
-                                  variant={"outline"}
-                                  className={cn(
-                                    "w-full pl-3 text-left font-normal",
-                                    !field.value && "text-muted-foreground"
-                                  )}
-                                >
-                                  {field.value ? (
-                                    format(field.value, "PPP")
-                                  ) : (
-                                    <span>Pick a date</span>
-                                  )}
-                                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                </Button>
-                              </FormControl>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0" align="start">
-                              <Calendar
-                                mode="single"
-                                selected={field.value}
-                                onSelect={(date) => {
-                                    if (date) field.onChange(date);
-                                    setIsDatePickerOpen(false);
-                                }}
-                                disabled={(date) =>
-                                  date > new Date() || date < new Date("1900-01-01")
-                                }
-                                initialFocus
-                              />
-                            </PopoverContent>
-                          </Popover>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="location"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Location<span className="text-red-500">*</span></FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
-                              <FormControl>
-                              <SelectTrigger>
-                                  <SelectValue placeholder="Select a location" />
-                              </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                              {locations.map(loc => <SelectItem key={loc} value={loc}>{loc}</SelectItem>)}
-                              </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                     <FormField
-                      control={form.control}
-                      name="department"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Department<span className="text-red-500">*</span></FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
-                              <FormControl>
-                              <SelectTrigger>
-                                  <SelectValue placeholder="Select a department" />
-                              </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                              {departments.map(dep => <SelectItem key={dep} value={dep}>{dep}</SelectItem>)}
-                              </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                     <FormField
-                      control={form.control}
-                      name="block"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Block<span className="text-red-500">*</span></FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
-                              <FormControl>
-                              <SelectTrigger>
-                                  <SelectValue placeholder="Select a block" />
-                              </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                              {blocks.map(b => <SelectItem key={b} value={b}>{b}</SelectItem>)}
-                              </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="floor"
-                      render={({ field }) => (
-                         <FormItem>
-                          <FormLabel>Floor<span className="text-red-500">*</span></FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
-                              <FormControl>
-                              <SelectTrigger>
-                                  <SelectValue placeholder="Select a floor" />
-                              </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                              {floors.map(f => <SelectItem key={f} value={f}>{f}</SelectItem>)}
-                              </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                     <FormField
-                      control={form.control}
-                      name="activity"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Activity<span className="text-red-500">*</span></FormLabel>
-                          <FormControl>
-                            <Input placeholder="Enter activity" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="carriedOutBy"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Carried Out By<span className="text-red-500">*</span></FormLabel>
-                           <Select onValueChange={field.onChange} defaultValue={field.value}>
-                              <FormControl>
-                              <SelectTrigger>
-                                  <SelectValue placeholder="Select a person" />
-                              </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                              {people.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
-                              </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="employeeType"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Employee Type<span className="text-red-500">*</span></FormLabel>
-                           <Select onValueChange={field.onChange} defaultValue={field.value}>
-                              <FormControl>
-                              <SelectTrigger>
-                                  <SelectValue placeholder="Select employee type" />
-                              </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                              {employeeTypes.map(et => <SelectItem key={et} value={et}>{et}</SelectItem>)}
-                              </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="employeeName"
-                      render={({ field }) => (
-                         <FormItem>
-                          <FormLabel>Employee Name<span className="text-red-500">*</span></FormLabel>
-                           <Select onValueChange={field.onChange} defaultValue={field.value}>
-                              <FormControl>
-                              <SelectTrigger>
-                                  <SelectValue placeholder="Select an employee" />
-                              </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                              {people.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
-                              </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="employeeId"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Employee ID<span className="text-red-500">*</span></FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
-                              <FormControl>
-                              <SelectTrigger>
-                                  <SelectValue placeholder="Select an Employee ID" />
-                              </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                              {employeeIds.map(id => <SelectItem key={id} value={id}>{id}</SelectItem>)}
-                              </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                     <FormField
-                      control={form.control}
-                      name="designation"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Designation<span className="text-red-500">*</span></FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
-                              <FormControl>
-                              <SelectTrigger>
-                                  <SelectValue placeholder="Select a designation" />
-                              </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                              {designations.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}
-                              </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="employeeDepartment"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Employee Department<span className="text-red-500">*</span></FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
-                              <FormControl>
-                              <SelectTrigger>
-                                  <SelectValue placeholder="Select a department" />
-                              </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                              {employeeDepartments.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}
-                              </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="harp-details">
-                  <AccordionTrigger className="text-lg font-semibold">HARP Details</AccordionTrigger>
-                   <AccordionContent className="pt-4 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-                    
-                      <FormField
-                        control={form.control}
-                        name="hazard"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Hazard<span className="text-red-500">*</span></FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Select a hazard" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                {hazards.map(h => <SelectItem key={h} value={h}>{h}</SelectItem>)}
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="accident"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Accident<span className="text-red-500">*</span></FormLabel>
-                            <FormControl>
-                              <Input placeholder="Enter accident details" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="risk"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Risk<span className="text-red-500">*</span></FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Select a risk level" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                {risks.map(r => <SelectItem key={r} value={r}>{r}</SelectItem>)}
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="prevention"
-                        render={({ field }) => (
-                          <FormItem className="md:col-span-2">
-                            <FormLabel>Prevention<span className="text-red-500">*</span></FormLabel>
-                            <FormControl>
-                              <Textarea placeholder="Describe prevention measures" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    
-                  </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="other-details" className="border-b-0">
-                  <AccordionTrigger className="text-lg font-semibold">Other Details</AccordionTrigger>
-                  <AccordionContent className="pt-4 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-                     
-                      <FormField
-                        control={form.control}
-                        name="otherObservation"
-                        render={({ field }) => (
-                          <FormItem className="md:col-span-2">
-                            <FormLabel>Other Observation/Support Required</FormLabel>
-                            <FormControl>
-                              <Textarea placeholder="Enter your observations" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormItem>
-                        <FormLabel>Upload Attachment(s) If Any</FormLabel>
-                        <div className="flex items-center justify-center w-full">
-                            <label htmlFor="dropzone-file" className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
-                                <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                                    <Upload className="w-8 h-8 mb-2 text-gray-500" />
-                                    <p className="mb-2 text-sm text-gray-500"><span className="font-semibold">Click to upload</span> or drag and drop</p>
-                                    <p className="text-xs text-gray-500">SVG, PNG, JPG or GIF (MAX. 800x400px)</p>
-                                </div>
-                                <FormControl>
-                                    <input id="dropzone-file" type="file" className="hidden" />
-                                </FormControl>
-                            </label>
-                        </div> 
-                        <FormMessage />
-                      </FormItem>
-                    
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
-              <CardFooter className="flex flex-col sm:flex-row justify-end gap-4 pt-8 px-0">
-                <Button type="button" variant="outline" onClick={() => form.reset()}>
-                  Clear Form
+          </TabsContent>
+          <TabsContent value="modify" className="text-center">
+            <CardTitle className="font-headline text-2xl">
+              Modify HARP Incident
+            </CardTitle>
+            <CardDescription>
+              Enter an incident ID to find and modify an incident.
+            </CardDescription>
+          </TabsContent>
+          <TabsContent value="delete" className="text-center">
+            <CardTitle className="font-headline text-2xl">
+              Delete HARP Incident
+            </CardTitle>
+            <CardDescription>
+              Enter an incident ID to find and delete an incident.
+            </CardDescription>
+          </TabsContent>
+        </Tabs>
+      </CardHeader>
+      <CardContent>
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(
+              activeTab === "new" ? onNewSubmit : handleUpdate
+            )}
+            className="space-y-8 min-h-[500px]"
+          >
+            {(activeTab === "modify" || activeTab === "delete") && (
+              <div className="flex items-center gap-2 mb-8 max-w-md mx-auto">
+                <Input
+                  placeholder="Enter Incident ID to find..."
+                  value={searchId}
+                  onChange={(e) => setSearchId(e.target.value)}
+                  disabled={isLoading}
+                />
+                <Button
+                  type="button"
+                  onClick={handleSearch}
+                  disabled={!searchId || isLoading}
+                >
+                  {isLoading ? <Loader2 className="animate-spin" /> : <Search />}
+                  Search
                 </Button>
-                <Button type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? <Loader2 className="animate-spin" /> : <Printer />}
-                  Raise HARP Incident
+              </div>
+            )}
+
+            {(activeTab === "new" ||
+              (activeTab === "modify" && foundIncident)) &&
+              currentForm}
+
+            {activeTab === "delete" && !foundIncident && !isLoading && (
+              <div className="text-center text-muted-foreground py-10">
+                <p>Please search for an incident to delete.</p>
+              </div>
+            )}
+
+            {activeTab === "delete" && foundIncident && (
+              <div className="text-center text-muted-foreground py-10 max-w-md mx-auto">
+                <p>
+                  You have found incident{" "}
+                  <span className="font-semibold">{foundIncident.harpId}</span>.
+                  Are you sure you want to delete it?
+                </p>
+              </div>
+            )}
+
+            <CardFooter className="flex justify-end p-0 pt-4">
+              {activeTab === "new" && (
+                <Button type="submit" disabled={isLoading}>
+                  {isLoading && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
+                  Submit Incident
                 </Button>
-              </CardFooter>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
-      
-      <Dialog open={!!qrCodeValue} onOpenChange={(open) => !open && setQrCodeValue(null)}>
-        <DialogContent className="sm:max-w-md p-0">
-          <div className="bg-primary text-primary-foreground py-2 px-4 flex items-center justify-end gap-2">
-            <Button variant="ghost" className="hover:bg-primary/80" onClick={handlePrintQrCode}>
-              <Printer className="mr-2 h-4 w-4" /> Print
-            </Button>
-            <Button variant="ghost" className="hover:bg-primary/80" onClick={handleDownloadQrCode}>
-              <Download className="mr-2 h-4 w-4" /> Download
-            </Button>
-          </div>
-          <div className="p-6" ref={qrCodeRef}>
-            <div className="flex items-center justify-center space-x-4 mb-4">
-                <Image src="/asian-paints-logo.png" alt="Asian Paints Logo" width={80} height={50} />
-            </div>
-            <div className="flex items-center justify-center p-4 bg-white rounded-lg">
-              {qrCodeValue && <QRCode value={qrCodeValue} size={256} style={{ height: "auto", maxWidth: "100%", width: "100%" }} />}
-            </div>
-            <p className="text-center mt-4 text-sm text-muted-foreground">
-              Scan Using Asian Paints EHS Mobile App
-            </p>
-          </div>
-        </DialogContent>
-      </Dialog>
-    </>
+              )}
+              {activeTab === "modify" && (
+                <Button type="submit" disabled={isLoading || !foundIncident}>
+                  {isLoading && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
+                  Update Incident
+                </Button>
+              )}
+              {activeTab === "delete" && foundIncident && (
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="destructive" disabled={isLoading}>
+                      <Trash2 className="mr-2 h-4 w-4" /> Delete Incident
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>
+                        Are you absolutely sure?
+                      </AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This action cannot be undone. This will permanently
+                        delete the incident with ID:{" "}
+                        <span className="font-semibold">
+                          {foundIncident.harpId}
+                        </span>
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={handleDelete}
+                        disabled={isLoading}
+                      >
+                        {isLoading ? (
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        ) : (
+                          "Yes, delete it"
+                        )}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              )}
+            </CardFooter>
+          </form>
+        </Form>
+      </CardContent>
+    </Card>
   );
 }
 
-    
+export default function HarpForm() {
+    return (
+        <React.Suspense fallback={<div>Loading...</div>}>
+            <HarpFormContent />
+        </React.Suspense>
+    )
+}

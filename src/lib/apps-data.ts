@@ -57,7 +57,8 @@ export const apps: App[] = [
     subtitle: 'Behavioral Based Safety',
     imageUrl: '/icons/bbs.png', 
     imageHint: 'safety observation', 
-    href: '/bbs' 
+    href: '/bbs' ,
+    dataHref: '/bbs/data',
   },
   {
     name: 'Test HARP',
