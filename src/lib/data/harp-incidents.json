@@ -1,0 +1,45 @@
+
+[
+  {
+    "id": "a1b2c3d4",
+    "harpId": "HARP-1627888800000",
+    "date": "2024-07-28T10:00:00.000Z",
+    "location": "Khandala",
+    "department": "Production Department",
+    "block": "SPB",
+    "floor": "SPB Floor",
+    "activity": "Material Handling",
+    "carriedOutBy": "Aniket",
+    "employeeType": "APL Employee",
+    "employeeName": "Aniket",
+    "employeeId": "P00126717",
+    "designation": "Manager - Production",
+    "employeeDepartment": "PRODUCTION",
+    "hazard": "Chemical Hazards",
+    "accident": "Exposure to chemical while charging",
+    "risk": "Medium",
+    "prevention": "Ensure proper ventilation and use of personal protective equipment (PPE).",
+    "otherObservation": "Area requires better lighting."
+  },
+  {
+    "id": "e5f6g7h8",
+    "harpId": "HARP-1627975200000",
+    "date": "2024-07-29T14:30:00.000Z",
+    "location": "Patancheru",
+    "department": "Quality Department",
+    "block": "RH House",
+    "floor": "RH Reactor Floor",
+    "activity": "Sample Collection",
+    "carriedOutBy": "Sai",
+    "employeeType": "APG",
+    "employeeName": "Sai",
+    "employeeId": "P00126718",
+    "designation": "Executive I - Quality",
+    "employeeDepartment": "QUALITY",
+    "hazard": "Slips, Trips, and Falls",
+    "accident": "Wet floor near sampling point",
+    "risk": "Low",
+    "prevention": "Use of 'Wet Floor' signs and regular cleaning schedules.",
+    "otherObservation": ""
+  }
+]

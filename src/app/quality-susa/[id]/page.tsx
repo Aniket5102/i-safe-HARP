@@ -6,7 +6,8 @@ import { useParams, useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Loader2 } from 'lucide-react';
-import { format, isValid } from 'date-fns';
+import { format, isValid, parseISO } from 'date-fns';
+import incidentData from '@/lib/data/quality-susa-incidents.json';
 
 type QualitySusaIncident = {
     id: string;
@@ -21,9 +22,18 @@ export default function QualitySusaIncidentDetailsPage() {
   const { id } = params;
 
   useEffect(() => {
-    // DB removed
+    if (id) {
+        const foundIncident = incidentData.find(inc => inc.id === id);
+        if (foundIncident) {
+            const formattedIncident = {
+                ...foundIncident,
+                date: parseISO(foundIncident.date),
+                createdAt: foundIncident.createdAt ? parseISO(foundIncident.createdAt) : undefined,
+            };
+            setIncident(formattedIncident);
+        }
+    }
     setLoading(false);
-    setIncident(null);
   }, [id]);
 
   const renderValue = (value: any) => {
@@ -80,7 +90,7 @@ export default function QualitySusaIncidentDetailsPage() {
           </div>
         )
     }
-    return <p className="text-center text-muted-foreground">Incident not found. Database is disconnected.</p>;
+    return <p className="text-center text-muted-foreground">Incident not found.</p>;
   }
 
   return (

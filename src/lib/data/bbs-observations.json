@@ -1,0 +1,29 @@
+
+[
+  {
+    "id": "BBS-001",
+    "data": {
+      "observerName": "Aniket Khaladkar",
+      "location": "Khandala",
+      "observationDate": "2024-07-28T10:00:00.000Z",
+      "taskObserved": "Forklift Operation",
+      "properUseOfPPE": "safe",
+      "bodyPositioning": "at-risk",
+      "toolAndEquipmentHandling": "safe",
+      "comments": "Operator was not maintaining a clear line of sight while reversing."
+    }
+  },
+  {
+    "id": "BBS-002",
+    "data": {
+      "observerName": "Manmohan",
+      "location": "Patancheru",
+      "observationDate": "2024-07-29T14:30:00.000Z",
+      "taskObserved": "Welding",
+      "properUseOfPPE": "at-risk",
+      "bodyPositioning": "safe",
+      "toolAndEquipmentHandling": "safe",
+      "comments": "Welder was not using the required fire-resistant gloves."
+    }
+  }
+]

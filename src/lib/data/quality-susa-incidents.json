@@ -1,0 +1,47 @@
+
+[
+  {
+    "id": "susa-001",
+    "susaId": "SUSA-1627888800000",
+    "bbqReferenceNumber": "BBQ-1627888800000",
+    "date": "2024-07-30T09:00:00.000Z",
+    "location": "Rohtak",
+    "department": "Admin Department",
+    "block": "WPB",
+    "floor": "WPB Floor",
+    "activity": "Routine Inspection",
+    "carriedOutBy": "Ashish",
+    "employeeType": "PPGAP",
+    "employeeName": "Ashish",
+    "employeeId": "P00126719",
+    "designation": "Assistant Manager - Quality",
+    "employeeDepartment": "QUALITY",
+    "hazard": "Improper Tool Storage",
+    "accident": "Tools left on walkway",
+    "risk": "Medium",
+    "prevention": "Dedicated storage area for tools and regular housekeeping checks.",
+    "otherObservation": "Emergency exit path partially blocked."
+  },
+  {
+    "id": "susa-002",
+    "susaId": "SUSA-1627975200000",
+    "bbqReferenceNumber": "BBQ-1627975200000",
+    "date": "2024-07-31T11:00:00.000Z",
+    "location": "Mysuru",
+    "department": "Production Department",
+    "block": "EH House",
+    "floor": "EH Reactor Floor",
+    "activity": "Machine Operation",
+    "carriedOutBy": "Tanmay",
+    "employeeType": "APL Employee",
+    "employeeName": "Tanmay",
+    "employeeId": "P00126720",
+    "designation": "Executive II - Production",
+    "employeeDepartment": "PRODUCTION",
+    "hazard": "Noise Exposure",
+    "accident": "High noise levels from machinery",
+    "risk": "High",
+    "prevention": "Mandatory use of ear protection in designated zones.",
+    "otherObservation": "Safety guard on machine needs repair."
+  }
+]

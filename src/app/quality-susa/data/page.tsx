@@ -7,15 +7,21 @@ import { DataTable } from '@/components/data-table';
 import { Button } from '@/components/ui/button';
 import { FileDown, ListFilter, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+import incidentData from '@/lib/data/quality-susa-incidents.json';
+
 
 export default function QualitySusaDataPage() {
   const [data, setData] = useState<QualitySusaIncident[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // DB removed, setting loading to false and data to empty array
+    // Load data from the imported JSON file
+    const formattedData = incidentData.map(item => ({
+      ...item,
+      date: new Date(item.date),
+    }));
+    setData(formattedData);
     setLoading(false);
-    setData([]);
   }, []);
 
   const renderContent = () => {

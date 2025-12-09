@@ -43,11 +43,12 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { CalendarIcon, Loader2, Search, Trash2 } from "lucide-react";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { Textarea } from "./ui/textarea";
 import { Calendar } from "@/components/ui/calendar";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import observationData from "@/lib/data/bbs-observations.json";
 
 const formSchema = z.object({
   observerName: z.string().min(1, "Observer name is required."),
@@ -83,18 +84,20 @@ function BbsFormContent() {
     const [foundIncident, setFoundIncident] = React.useState<ObservationDoc | null>(null);
     const [isLoading, setIsLoading] = React.useState(false);
 
+    const defaultFormValues = {
+      observerName: "John Doe",
+      location: "Workshop A",
+      observationDate: new Date(),
+      taskObserved: "Welding, Forklift Operation",
+      properUseOfPPE: "n/a" as const,
+      bodyPositioning: "n/a" as const,
+      toolAndEquipmentHandling: "n/a" as const,
+      comments: "",
+    };
+
     const form = useForm<FormValues>({
         resolver: zodResolver(formSchema),
-        defaultValues: {
-        observerName: "John Doe",
-        location: "Workshop A",
-        observationDate: new Date(),
-        taskObserved: "Welding, Forklift Operation",
-        properUseOfPPE: "n/a",
-        bodyPositioning: "n/a",
-        toolAndEquipmentHandling: "n/a",
-        comments: "",
-        },
+        defaultValues: defaultFormValues,
     });
 
     React.useEffect(() => {
@@ -107,26 +110,39 @@ function BbsFormContent() {
         if (!incidentId) return;
         setIsLoading(true);
         setFoundIncident(null);
-        form.reset();
+        
+        // Search in the local JSON file
+        const found = observationData.find(obs => obs.id === incidentId);
 
-        // DB removed
-        setTimeout(() => {
+        if (found) {
+          const formattedData = {
+            ...found.data,
+            observationDate: parseISO(found.data.observationDate),
+          };
+          setFoundIncident({id: found.id, data: formattedData as FormValues});
+          form.reset(formattedData);
+          toast({
+            title: "Observation Found",
+            description: `Details for observation ID ${incidentId} have been loaded.`,
+          });
+        } else {
+          form.reset(defaultFormValues);
           toast({
             variant: "destructive",
-            title: "Database Disconnected",
-            description: "No incident found with that ID.",
+            title: "Not Found",
+            description: "No observation found with that ID.",
           });
-          setIsLoading(false);
-        }, 1000);
+        }
+        setIsLoading(false);
     };
 
     const handleUpdate = async (values: FormValues) => {
         if (!foundIncident) return;
         setIsLoading(true);
 
-        // DB removed
+        // This is a mock implementation since we can't write to a file.
         setTimeout(() => {
-          toast({ title: "Database Disconnected", description: "Incident cannot be updated." });
+          toast({ title: "Update Mocked", description: "In a real app, this would update the data." });
           setIsLoading(false);
         }, 1000);
     };
@@ -135,25 +151,26 @@ function BbsFormContent() {
         if (!foundIncident) return;
         setIsLoading(true);
 
-        // DB removed
+        // This is a mock implementation.
         setTimeout(() => {
-          toast({ title: "Database Disconnected", description: "Incident cannot be deleted." });
+          toast({ title: "Delete Mocked", description: "In a real app, this would delete the data." });
           setFoundIncident(null);
           setIncidentId('');
-          form.reset();
+          form.reset(defaultFormValues);
           setIsLoading(false);
         }, 1000);
     };
 
     const onNewSubmit = async (values: FormValues) => {
         setIsLoading(true);
-        // DB removed
+        // This is a mock implementation.
         setTimeout(() => {
+          const newId = `BBS-${Date.now()}`;
           toast({
-              title: "Database Disconnected",
-              description: `Safety observation cannot be recorded.`,
+              title: "Observation Mock-Submitted",
+              description: `A new observation with ID ${newId} was created (simulation).`,
           });
-          form.reset();
+          form.reset(defaultFormValues);
           setIsLoading(false);
         }, 1000);
     };
@@ -161,16 +178,7 @@ function BbsFormContent() {
     const resetSearch = () => {
         setIncidentId("");
         setFoundIncident(null);
-        form.reset({
-        observerName: "John Doe",
-        location: "Workshop A",
-        observationDate: new Date(),
-        taskObserved: "Welding, Forklift Operation",
-        properUseOfPPE: "n/a",
-        bodyPositioning: "n/a",
-        toolAndEquipmentHandling: "n/a",
-        comments: "",
-        });
+        form.reset(defaultFormValues);
     };
     
     const currentForm = (
@@ -376,12 +384,18 @@ function BbsFormContent() {
                 </div>
                 )}
                 
-                { (activeTab === 'new' || activeTab === 'modify') && currentForm }
+                { (activeTab === 'new' || (activeTab === 'modify' && foundIncident)) && currentForm }
                 
                 {activeTab === 'delete' && !foundIncident && !isLoading && (
                 <div className="text-center text-muted-foreground py-10">
                     <p>Please search for an incident to delete.</p>
                 </div>
+                )}
+
+                {activeTab === 'delete' && foundIncident && (
+                    <div className="text-center text-muted-foreground py-10 max-w-md mx-auto">
+                        <p>You have found incident <span className="font-semibold">{foundIncident.id}</span>. Are you sure you want to delete it?</p>
+                    </div>
                 )}
                 
                 <CardFooter className="flex justify-end p-0 pt-4">
