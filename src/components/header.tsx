@@ -29,16 +29,18 @@ export default function Header() {
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
-              <AsianPaintsLogo />
-              <Image
-                src="/icons/i-safe-logo.png"
-                alt="i-safe Logo"
-                width={40}
-                height={40}
-              />
-              <span className="text-lg font-light text-gray-600 tracking-wider">
-                i-safe
-              </span>
+                <AsianPaintsLogo />
+                <div className="flex items-center space-x-2">
+                    <Image
+                        src="/icons/i-safe-logo.png"
+                        alt="i-safe Logo"
+                        width={40}
+                        height={40}
+                    />
+                    <span className="text-lg font-light text-gray-600 tracking-wider">
+                        i-safe
+                    </span>
+                </div>
             </div>
           </div>
           <div className="flex items-center space-x-4">
@@ -91,3 +93,4 @@ export default function Header() {
     </header>
   );
 }
+
