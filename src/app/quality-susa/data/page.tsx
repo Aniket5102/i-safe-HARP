@@ -8,7 +8,8 @@ import { Button } from '@/components/ui/button';
 import { FileDown, ListFilter, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import incidentData from '@/lib/data/quality-susa-incidents.json';
-
+import IncidentsByLocationChart from '@/components/incidents-by-location-chart';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function QualitySusaDataPage() {
   const [data, setData] = useState<QualitySusaIncident[]>([]);
@@ -32,7 +33,7 @@ export default function QualitySusaDataPage() {
   }
 
   return (
-    <div className="bg-gray-50 min-h-screen p-4 sm:p-6 lg:p-8">
+    <div className="bg-background min-h-screen p-4 sm:p-6 lg:p-8">
       <div className="max-w-screen-2xl mx-auto">
         <header className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">Quality SUSA List</h1>
@@ -50,19 +51,35 @@ export default function QualitySusaDataPage() {
           </div>
         </header>
         
-        <div className="bg-white p-4 rounded-lg shadow">
-            <div className="flex justify-between items-center mb-4">
-                <div className="flex items-center gap-4">
-                    <p className="text-sm text-muted-foreground">Total Records : {loading ? '...' : data.length}</p>
-                </div>
-                <div className="flex items-center gap-2">
-                    <Button variant="outline">
-                    <ListFilter className="mr-2 h-4 w-4" />
-                    Filters
-                    </Button>
-                </div>
-            </div>
-            {renderContent()}
+        <div className="space-y-6">
+            <Card>
+                <CardHeader>
+                    <CardTitle>Incidents by Location</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <IncidentsByLocationChart data={data} />
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardHeader>
+                    <div className="flex justify-between items-center">
+                        <CardTitle>All Incidents</CardTitle>
+                        <div className="flex items-center gap-2">
+                             <Button variant="outline">
+                                <ListFilter className="mr-2 h-4 w-4" />
+                                Filters
+                            </Button>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-4 pt-4">
+                        <p className="text-sm text-muted-foreground">Total Records : {loading ? '...' : data.length}</p>
+                    </div>
+                </CardHeader>
+                <CardContent>
+                    {renderContent()}
+                </CardContent>
+            </Card>
         </div>
       </div>
     </div>
