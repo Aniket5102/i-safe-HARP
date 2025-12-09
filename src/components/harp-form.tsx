@@ -692,7 +692,7 @@ export default function HarpForm() {
           </div>
           <div className="p-6" ref={qrCodeRef}>
             <div className="flex items-center justify-center space-x-4 mb-4">
-                <Image src="/asian-paints-logo.png" alt="Asian Paints Logo" width={120} height={18} />
+                <Image src="/asian-paints-logo.png" alt="Asian Paints Logo" width={80} height={50} />
             </div>
             <div className="flex items-center justify-center p-4 bg-white rounded-lg">
               {qrCodeValue && <QRCode value={qrCodeValue} size={256} style={{ height: "auto", maxWidth: "100%", width: "100%" }} />}
