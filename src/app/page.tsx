@@ -2,39 +2,21 @@
 'use client';
 
 import { useState } from 'react';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
-  Calendar,
-  Search,
-  MoreHorizontal,
-  User,
-  MapPin,
-  FileText,
   CalendarDays,
+  FileText,
   HardHat,
   ClipboardCheck,
-  CheckCircle,
-  X,
   Database,
   PenSquare,
   PlusCircle,
-  Settings,
   LayoutGrid,
+  PlayCircle,
+  Info,
 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Input } from '@/components/ui/input';
 import {
   Dialog,
   DialogContent,
@@ -42,51 +24,45 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { App, apps } from '@/lib/apps-data';
-import { Separator } from '@/components/ui/separator';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 const modules = [
-  { name: 'Calendar/Task Management', icon: CalendarDays },
-  { name: 'Inspections & Audits', icon: FileText },
-  { name: 'Incident Management', icon: HardHat },
-  { name: 'Risk Assessment', icon: ClipboardCheck },
+  { name: 'Calendar/Task Management', icon: CalendarDays, href: '#' },
+  { name: 'Inspections & Audits', icon: FileText, href: '#' },
+  { name: 'Incident Management', icon: HardHat, href: '#' },
+  { name: 'Risk Assessment', icon: ClipboardCheck, href: '#' },
 ];
-
-const quickLinks = {
-  'Calendar/Task Management': ['All Activity', 'Manage Task', 'My Action Items for Approval', 'My Activity'],
-  'Incident Management': ['Incidents without Case Classification', 'My Management Review', 'Report Head Count and Hours', 'View Incidents'],
-  'Inspections & Audits': ['Conduct Audits', 'Manage Findings', 'Risk Assessment', 'Manage Risk Assessments'],
-};
 
 
 export default function HomePage() {
   const [selectedApp, setSelectedApp] = useState<App | null>(null);
+  const heroImage = PlaceHolderImages.find(img => img.id === 'hero-background');
 
   return (
-    <div className="bg-background min-h-screen">
-      <div className="max-w-screen-2xl mx-auto p-4 sm:p-6 lg:p-8">
-        <header className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">Welcome, Aniket!</h1>
-            <p className="text-muted-foreground">Here's a quick overview of your workspace.</p>
-          </div>
-          <Button variant="outline">
-            <Settings className="mr-2 h-4 w-4" />
-            Customize Layout
-          </Button>
-        </header>
+    <div className="bg-background min-h-screen text-foreground">
+      <main className="flex-1">
+        <HeroSection heroImage={heroImage} />
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 space-y-8">
-            <ModulesCard />
-            <QuickLinksCard />
-          </div>
+        <div className="p-4 sm:p-6 lg:p-8 space-y-12">
+           <ContentCarousel 
+            title="My Apps"
+            items={apps}
+            renderItem={(app) => (
+              <AppCarouselItem key={app.name} app={app} onAppClick={setSelectedApp} />
+            )}
+          />
 
-          <div className="space-y-8">
-            <UserProfileCard />
-            <AppsCard onAppClick={setSelectedApp} />
-          </div>
+           <ContentCarousel 
+            title="Modules"
+            items={modules}
+            renderItem={(module) => (
+              <ModuleCarouselItem key={module.name} module={module} />
+            )}
+          />
         </div>
-      </div>
+      </main>
+      
       {selectedApp && (
         <AppOptionsDialog
           app={selectedApp}
@@ -102,141 +78,116 @@ export default function HomePage() {
   );
 }
 
-function UserProfileCard() {
-  const profileDetails = {
-    name: 'Aniket Khaladkar',
-    loginName: 'P00126717',
-    activeDate: 'October 15, 2025',
-    scope: '264',
-  };
-
-  const actionItems = [
-    { label: 'Management Review (Open)', value: 0 },
-    { label: 'Open Action Items', value: 0 },
-    { label: 'Overdue Action Items', value: 0 },
-  ];
-
+function HeroSection({ heroImage }: { heroImage: any }) {
   return (
-    <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 bg-card">
-      <CardHeader className="flex flex-row items-center justify-between pb-4">
-        <CardTitle className="text-lg font-bold">User Profile</CardTitle>
-        <MoreHorizontal className="text-muted-foreground cursor-pointer" size={20} />
-      </CardHeader>
-      <CardContent>
-        <div className="flex items-center gap-4 mb-6">
-          <Avatar className="h-16 w-16 border-2 border-primary">
-            <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-            <AvatarFallback className="bg-primary/20 text-primary font-bold text-xl">AK</AvatarFallback>
-          </Avatar>
-          <div>
-            <p className="text-lg font-semibold text-foreground">{profileDetails.name}</p>
-            <p className="text-sm text-green-600 font-medium flex items-center">
-              <CheckCircle size={14} className="mr-1" /> Active
-            </p>
-          </div>
+    <div className="relative h-[50vh] w-full flex items-center justify-center">
+      <div className="absolute inset-0">
+        {heroImage && (
+           <Image
+            src={heroImage.imageUrl}
+            alt={heroImage.description}
+            fill
+            className="object-cover"
+            data-ai-hint={heroImage.imageHint}
+            priority
+          />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-transparent" />
+      </div>
+      <div className="relative z-10 text-center text-white p-4">
+        <h1 className="text-5xl md:text-7xl font-extrabold drop-shadow-lg">iSafe 3.0</h1>
+        <p className="mt-4 text-xl text-foreground/80 drop-shadow-md">
+          Your central hub for safety and incident management.
+        </p>
+        <div className="mt-8 flex justify-center gap-4">
+          <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-lg">
+            <PlayCircle className="mr-2 h-6 w-6" />
+            Get Started
+          </Button>
+          <Button size="lg" variant="secondary" className="bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 font-bold text-lg">
+             <Info className="mr-2 h-6 w-6" />
+            Learn More
+          </Button>
         </div>
-        
-        <Separator className="my-4" />
-
-        <div className="space-y-4 text-sm">
-          {actionItems.map((item) => (
-            <div key={item.label} className="flex justify-between items-center hover:bg-accent p-2 rounded-md">
-              <p className="text-muted-foreground">{item.label}</p>
-              <span className="font-bold text-primary">{item.value}</span>
-            </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
 
-function ModulesCard() {
+
+interface ContentCarouselProps<T> {
+  title: string;
+  items: T[];
+  renderItem: (item: T) => React.ReactNode;
+}
+
+function ContentCarousel<T>({ title, items, renderItem }: ContentCarouselProps<T>) {
   return (
-    <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 bg-card">
-      <CardHeader className="pb-4">
-        <CardTitle className="text-lg font-bold flex items-center gap-2">
-          <LayoutGrid className="text-primary" />
-          Modules
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {modules.map((module) => (
-            <div key={module.name} className="flex flex-col items-center text-center p-4 rounded-lg hover:bg-accent transition-colors duration-200 cursor-pointer">
-              <div className="p-4 rounded-full bg-primary/10 mb-3 shadow-md">
-                 <module.icon className="h-7 w-7 text-primary" />
-              </div>
-              <p className="text-sm font-semibold text-foreground">{module.name}</p>
-            </div>
+    <section>
+      <h2 className="text-2xl font-bold mb-4 px-4 sm:px-0">{title}</h2>
+      <Carousel
+        opts={{
+          align: "start",
+          loop: false,
+          dragFree: true,
+        }}
+        className="w-full"
+      >
+        <CarouselContent className="-ml-4">
+          {items.map((item, index) => (
+            <CarouselItem key={index} className="basis-1/2 sm:basis-1/3 md:basis-1/4 lg:basis-1/5 xl:basis-1/6 pl-4">
+              {renderItem(item)}
+            </CarouselItem>
           ))}
-        </div>
-      </CardContent>
-    </Card>
+        </CarouselContent>
+        <CarouselPrevious className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-black/50 hover:bg-black/80 border-none text-white disabled:hidden" />
+        <CarouselNext className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-black/50 hover:bg-black/80 border-none text-white disabled:hidden" />
+      </Carousel>
+    </section>
   );
 }
 
-interface AppsCardProps {
+
+interface AppCarouselItemProps {
+  app: App;
   onAppClick: (app: App) => void;
 }
 
-function AppsCard({ onAppClick }: AppsCardProps) {
-  const displayedApps = apps.slice(0, 8); // Show a limited number of apps
-
+function AppCarouselItem({ app, onAppClick }: AppCarouselItemProps) {
   return (
-    <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 bg-card">
-      <CardHeader className="flex flex-row items-center justify-between pb-4">
-        <CardTitle className="text-lg font-bold">My Apps</CardTitle>
-        <Link href="/apps" passHref>
-          <Button variant="link" className="text-sm">View All</Button>
-        </Link>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-          {displayedApps.map((app) => (
-             <button key={app.name} onClick={() => onAppClick(app)} className="flex flex-col items-center text-center no-underline text-current cursor-pointer hover:bg-accent rounded-lg p-2 transition-colors">
-              <div className="p-1 rounded-lg bg-accent mb-2 h-16 w-16 flex items-center justify-center">
-                <Image 
-                  src={app.imageUrl} 
-                  alt={app.name} 
-                  width={200} 
-                  height={200} 
-                  className="h-14 w-14 object-contain rounded-md"
-                  data-ai-hint={app.imageHint}
-                />
-              </div>
-              <p className="text-xs font-semibold leading-tight">{app.name}</p>
-            </button>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+     <button 
+      onClick={() => onAppClick(app)} 
+      className="group w-full aspect-[16/9] rounded-lg overflow-hidden relative block cursor-pointer transition-transform duration-300 ease-in-out hover:scale-105"
+    >
+      <Image 
+        src={app.imageUrl} 
+        alt={app.name} 
+        fill
+        className="object-cover transition-opacity duration-300 group-hover:opacity-80"
+        sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, (max-width: 1280px) 20vw, 16vw"
+        data-ai-hint={app.imageHint}
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+      <div className="absolute bottom-0 left-0 p-3 text-white">
+        <h3 className="font-bold text-sm leading-tight drop-shadow-lg">{app.name}</h3>
+      </div>
+    </button>
   );
 }
 
-function QuickLinksCard() {
+interface ModuleCarouselItemProps {
+  module: { name: string; href: string; icon: React.ElementType };
+}
+
+function ModuleCarouselItem({ module }: ModuleCarouselItemProps) {
+  const Icon = module.icon;
   return (
-    <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 bg-card">
-      <CardHeader className="pb-4">
-        <CardTitle className="text-lg font-bold">Quick Links</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-6">
-          {Object.entries(quickLinks).map(([category, links]) => (
-            <div key={category}>
-              <h3 className="font-semibold mb-3 border-b-2 border-primary/50 pb-2 text-foreground">{category}</h3>
-              <ul className="space-y-2">
-                {links.map(link => (
-                  <li key={link}>
-                    <a href="#" className="text-sm text-primary hover:underline transition-colors duration-200">{link}</a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+    <Link href={module.href}>
+      <div className="group w-full aspect-[16/9] rounded-lg bg-accent/10 flex flex-col items-center justify-center text-center p-4 transition-all duration-300 ease-in-out hover:bg-accent/20 hover:scale-105">
+        <Icon className="h-10 w-10 text-primary mb-2" />
+        <p className="text-sm font-semibold text-foreground/80 group-hover:text-foreground">{module.name}</p>
+      </div>
+    </Link>
   );
 }
 
@@ -260,14 +211,14 @@ function AppOptionsDialog({ app, isOpen, onOpenChange }: AppOptionsDialogProps) 
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-xs">
+      <DialogContent className="sm:max-w-xs bg-zinc-900 border-zinc-800">
         <DialogHeader>
           <DialogTitle>{app.name}</DialogTitle>
         </DialogHeader>
         <div className="flex flex-col space-y-2">
           {options.map((option) => (
             <Link key={option.name} href={option.href} passHref>
-              <Button variant="outline" className="w-full justify-start text-base p-6 bg-accent border-primary/20 hover:bg-primary/10">
+              <Button variant="outline" className="w-full justify-start text-base p-6 bg-zinc-800 border-zinc-700 hover:bg-zinc-700">
                 <option.icon className="mr-3 h-5 w-5 text-primary" />
                 {option.name}
               </Button>
@@ -278,5 +229,3 @@ function AppOptionsDialog({ app, isOpen, onOpenChange }: AppOptionsDialogProps) 
     </Dialog>
   );
 }
-
-    
