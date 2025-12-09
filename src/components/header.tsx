@@ -31,14 +31,11 @@ export default function Header() {
             <AsianPaintsLogo />
             <div className="flex items-center gap-2">
                 <Image
-                    src="/icons/i-safe-logo.png"
+                    src="/i-safe-logo.png"
                     alt="i-safe Logo"
-                    width={20}
+                    width={80}
                     height={20}
                 />
-                <span className="text-lg font-light text-gray-600 tracking-wider">
-                    i-safe
-                </span>
             </div>
           </div>
           <div className="flex items-center gap-4">
