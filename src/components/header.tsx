@@ -31,7 +31,6 @@ export default function Header() {
             <Link href="/" passHref>
                <div className="flex items-center gap-4 text-primary">
                  <AsianPaintsLogo className="h-6 w-auto" />
-                 <Image src="/i-safe-logo.png" alt="i-safe logo" width={80} height={20} />
                </div>
             </Link>
           </div>
