@@ -31,7 +31,7 @@ export default function AppsPage() {
   return (
     <>
       <div className="bg-background min-h-screen">
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
           <header className="mb-8 bg-card p-6 rounded-lg shadow-md flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-foreground">Apps</h1>
@@ -124,5 +124,3 @@ function AppOptionsDialog({ app, isOpen, onOpenChange }: AppOptionsDialogProps) 
     </Dialog>
   );
 }
-
-    
