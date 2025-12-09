@@ -1,9 +1,8 @@
 
-"use client";
+'use client';
 
 import { Bell, LayoutGrid } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import AsianPaintsLogo from "./asian-paints-logo";
 import Link from "next/link";
 import { useAuth } from "@/context/auth-context";
 import { Button } from "./ui/button";
@@ -21,13 +20,16 @@ export default function Header() {
   const { user, logout } = useAuth();
 
   return (
-    <header className="bg-background/80 backdrop-blur-sm sticky top-0 z-40">
+    <header className="bg-white shadow-md sticky top-0 z-40">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center gap-4">
              <Link href="/" passHref>
-                <div className="flex items-center gap-4 text-primary">
-                    <AsianPaintsLogo className="h-6 w-auto" />
+                <div className="flex items-center space-x-4">
+                    <div className="flex items-center space-x-2">
+                        <Image src="/asian-paints-logo.png" alt="Asian Paints Logo" width={60} height={9} />
+                        <Image src="/i-safe-logo.png" alt="i-Safe Logo" width={80} height={20} />
+                    </div>
                 </div>
             </Link>
           </div>
