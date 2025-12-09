@@ -2,8 +2,8 @@
   "placeholderImages": [
     {
       "id": "hero-background",
-      "description": "Abstract technology background for hero section",
-      "imageUrl": "/hero-background.jpg",
+      "description": "Abstract background from public folder",
+      "imageUrl": "/abstract.jpg",
       "imageHint": "technology abstract"
     }
   ]
