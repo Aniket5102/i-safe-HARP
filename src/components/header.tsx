@@ -33,8 +33,8 @@ export default function Header() {
                 <Image
                     src="/icons/i-safe-logo.png"
                     alt="i-safe Logo"
-                    width={10}
-                    height={10}
+                    width={20}
+                    height={20}
                 />
                 <span className="text-lg font-light text-gray-600 tracking-wider">
                     i-safe
