@@ -28,7 +28,7 @@ export default function Header() {
                 <div className="flex items-center space-x-4">
                     <div className="flex items-center space-x-2">
                         <Image src="/asian-paints-logo.png" alt="Asian Paints Logo" width={120} height={18} />
-                        <span className="text-2xl font-bold text-red-600">i-Safe</span>
+                        <span className="text-2xl font-bold text-primary">i-Safe</span>
                     </div>
                 </div>
             </Link>
