@@ -125,7 +125,7 @@ function HeroSection({ heroImage }: { heroImage: any }) {
           </Button>
           <Dialog>
             <DialogTrigger asChild>
-              <Button size="lg" variant="secondary" className="bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 font-bold text-lg">
+              <Button size="lg" variant="secondary" className="bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 font-bold text-lg justify-center">
                 <Info className="mr-2 h-6 w-6" />
                 Learn More
               </Button>
