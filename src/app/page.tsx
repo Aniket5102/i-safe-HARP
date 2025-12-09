@@ -29,10 +29,10 @@ import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 
 const modules = [
-  { name: 'Calendar/Task Management', icon: CalendarDays, href: '#' },
-  { name: 'Inspections & Audits', icon: FileText, href: '#' },
-  { name: 'Incident Management', icon: HardHat, href: '#' },
-  { name: 'Risk Assessment', icon: ClipboardCheck, href: '#' },
+  { name: 'Calendar/Task Management', icon: CalendarDays, href: '#', description: 'Track tasks and schedules' },
+  { name: 'Inspections & Audits', icon: FileText, href: '#', description: 'Conduct and manage audits' },
+  { name: 'Incident Management', icon: HardHat, href: '#', description: 'Report and track incidents' },
+  { name: 'Risk Assessment', icon: ClipboardCheck, href: '#', description: 'Identify and assess risks' },
 ];
 
 
@@ -200,7 +200,7 @@ function AppCarouselItem({ app, onAppClick }: AppCarouselItemProps) {
 
 
 interface ModuleCarouselItemProps {
-  module: { name: string; href: string; icon: React.ElementType };
+  module: { name: string; href: string; icon: React.ElementType; description: string };
 }
 
 function ModuleCarouselItem({ module }: ModuleCarouselItemProps) {
@@ -210,6 +210,7 @@ function ModuleCarouselItem({ module }: ModuleCarouselItemProps) {
       <div className="group w-full aspect-[16/9] rounded-lg bg-accent/10 flex flex-col items-center justify-center text-center p-4 transition-all duration-300 ease-in-out hover:bg-accent/20 hover:scale-105">
         <Icon className="h-10 w-10 text-primary mb-2" />
         <p className="text-sm font-semibold text-foreground/80 group-hover:text-foreground">{module.name}</p>
+        <p className="text-xs text-muted-foreground mt-1">{module.description}</p>
       </div>
     </Link>
   );
