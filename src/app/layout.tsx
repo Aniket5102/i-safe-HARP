@@ -7,8 +7,8 @@ import ConditionalSidebarLayout from '@/components/conditional-sidebar-layout';
 
 
 export const metadata: Metadata = {
-  title: 'HARP Incident',
-  description: 'Capture, manage, and analyze HARP data with AI-powered suggestions.',
+  title: 'Asian Paints: i-Safe',
+  description: 'An integrated application for safety and incident management.',
 };
 
 export default function RootLayout({
