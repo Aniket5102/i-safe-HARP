@@ -52,7 +52,7 @@ export default function SidebarNav() {
       <SidebarMenuItem>
           <NextLink href={'/dashboard'} passHref>
             <SidebarMenuButton as="a" tooltip={'Dashboard'} isActive={pathname.startsWith('/dashboard')} className="justify-start">
-              <LayoutDashboard />
+              <LayoutGrid />
               <span className="group-data-[state=expanded]:inline-flex group-data-[state=collapsed]:hidden">Dashboard</span>
             </SidebarMenuButton>
           </NextLink>
