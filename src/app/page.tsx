@@ -112,7 +112,7 @@ function HeroSection({ heroImage }: { heroImage: any }) {
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-transparent" />
       </div>
       <div className="relative z-10 text-center text-white p-4">
-        <h1 className="text-5xl md:text-7xl font-extrabold drop-shadow-lg">iSafe 3.0</h1>
+        <h1 className="text-5xl md:text-7xl font-extrabold drop-shadow-lg">i-Safe 3.0</h1>
         <p className="mt-4 text-xl text-foreground/80 drop-shadow-md">
           Your central hub for safety and incident management.
         </p>
