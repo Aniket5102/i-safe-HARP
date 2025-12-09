@@ -5,8 +5,8 @@ const AsianPaintsLogo = (props: Omit<React.ComponentProps<typeof Image>, 'src' |
   <Image
     src="/asian-paints-logo.png"
     alt="Asian Paints Logo"
-    width={80}
-    height={12}
+    width={60}
+    height={9}
     {...props}
   />
 );
