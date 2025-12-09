@@ -18,6 +18,8 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import { App, apps } from '@/lib/apps-data';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
@@ -121,10 +123,25 @@ function HeroSection({ heroImage }: { heroImage: any }) {
               Get Started
             </Link>
           </Button>
-          <Button size="lg" variant="secondary" className="bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 font-bold text-lg">
-             <Info className="mr-2 h-6 w-6" />
-            Learn More
-          </Button>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button size="lg" variant="secondary" className="bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 font-bold text-lg">
+                <Info className="mr-2 h-6 w-6" />
+                Learn More
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md bg-zinc-900 border-zinc-800">
+              <DialogHeader className="items-center text-center">
+                <Image src="/asian-paints-logo.png" alt="Asian Paints Logo" width={100} height={60} />
+                <DialogTitle className="text-2xl">i-Safe: Integrated Safety Management</DialogTitle>
+              </DialogHeader>
+              <div className="py-4 text-center text-muted-foreground">
+                <p>
+                  Powered by <span className="font-semibold text-foreground">Asian Paints - Systems</span>, i-Safe offers the most integrated incident reporting and safety management solution in the industry, giving safety managers a <span className="font-semibold text-foreground">“single source of truth.”</span>
+                </p>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
     </div>
