@@ -2,17 +2,8 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
-import Header from '@/components/header';
-import {
-  SidebarProvider,
-  Sidebar,
-  SidebarHeader,
-  SidebarContent,
-  SidebarTrigger,
-  SidebarInset,
-} from '@/components/ui/sidebar';
-import SidebarNav from '@/components/sidebar-nav';
 import { AuthProvider } from '@/context/auth-context';
+import ConditionalSidebarLayout from '@/components/conditional-sidebar-layout';
 
 
 export const metadata: Metadata = {
@@ -34,25 +25,10 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased bg-background">
         <AuthProvider>
-          <SidebarProvider>
-            <div className="relative min-h-screen">
-              <Sidebar>
-                <SidebarHeader>
-                  <SidebarTrigger />
-                </SidebarHeader>
-                <SidebarContent>
-                  <SidebarNav />
-                </SidebarContent>
-              </Sidebar>
-              <SidebarInset>
-                <Header />
-                <main className="flex-1">
-                  {children}
-                </main>
-              </SidebarInset>
-            </div>
-            <Toaster />
-          </SidebarProvider>
+          <ConditionalSidebarLayout>
+            {children}
+          </ConditionalSidebarLayout>
+          <Toaster />
         </AuthProvider>
       </body>
     </html>
