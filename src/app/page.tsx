@@ -206,7 +206,7 @@ interface AppOptionsDialogProps {
 function AppOptionsDialog({ app, isOpen, onOpenChange }: AppOptionsDialogProps) {
   const dataHref = app.dataHref || `${app.href}/data`;
   
-  const modifyHref = `${app.href}?tab=modify`;
+  const modifyHref = app.dataHref || `${app.href}/data`;
 
   const options = [
     { name: 'Data', href: dataHref },

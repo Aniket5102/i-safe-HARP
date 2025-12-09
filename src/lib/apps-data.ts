@@ -65,7 +65,8 @@ export const apps: App[] = [
     subtitle: 'This is to be used for HARP Report Development',
     imageUrl: '/icons/test-harp.png',
     imageHint: 'report development',
-    href: '/harp'
+    href: '/harp',
+    dataHref: '/harp/data',
   },
   { 
     name: 'Quality SUSA',

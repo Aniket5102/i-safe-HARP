@@ -42,8 +42,8 @@ interface DataTableProps<TData, TValue> {
 export function DataTable<TData, TValue>({
   columns,
   data,
-  filterColumn = 'harpId', // Default to 'harpId' for backward compatibility
-  filterPlaceholder = 'Filter by ID...', // Default placeholder
+  filterColumn = 'id',
+  filterPlaceholder = 'Filter by ID...',
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
@@ -66,14 +66,16 @@ export function DataTable<TData, TValue>({
   return (
     <div>
         <div className="flex items-center py-4">
-            <Input
-            placeholder={filterPlaceholder}
-            value={(table.getColumn(filterColumn)?.getFilterValue() as string) ?? ""}
-            onChange={(event) =>
-                table.getColumn(filterColumn)?.setFilterValue(event.target.value)
-            }
-            className="max-w-sm"
-            />
+            {filterColumn && (
+                <Input
+                placeholder={filterPlaceholder}
+                value={(table.getColumn(filterColumn)?.getFilterValue() as string) ?? ""}
+                onChange={(event) =>
+                    table.getColumn(filterColumn)?.setFilterValue(event.target.value)
+                }
+                className="max-w-sm"
+                />
+            )}
         </div>
       <div className="rounded-md border">
         <Table>
