@@ -2,26 +2,13 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import IncidentsByLocationChart from "@/components/incidents-by-location-chart";
 import BbsObservationsByLocationChart from "@/components/bbs-observations-by-location-chart";
 import BbsObservationsStatusChart from "@/components/bbs-observations-status-chart";
 
-import harpIncidentData from '@/lib/data/harp-incidents.json';
-import qualitySusaIncidentData from '@/lib/data/quality-susa-incidents.json';
 import bbsObservationData from "@/lib/data/bbs-observations.json";
 
 
 export default function DashboardPage() {
-    const formattedHarpData = harpIncidentData.map(item => ({
-        ...item,
-        date: new Date(item.date),
-    }));
-
-    const formattedSusaData = qualitySusaIncidentData.map(item => ({
-        ...item,
-        date: new Date(item.date),
-    }));
-
     const formattedBbsData = bbsObservationData.map(item => ({
         id: item.id,
         ...item.data,
@@ -36,26 +23,8 @@ export default function DashboardPage() {
                     <p className="text-muted-foreground">An overview of all application data.</p>
                 </header>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                    <Card className="xl:col-span-1">
-                        <CardHeader>
-                            <CardTitle>HARP Incidents by Location</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <IncidentsByLocationChart data={formattedHarpData} />
-                        </CardContent>
-                    </Card>
-                    
-                    <Card className="xl:col-span-1">
-                        <CardHeader>
-                            <CardTitle>Quality SUSA Incidents by Location</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <IncidentsByLocationChart data={formattedSusaData} />
-                        </CardContent>
-                    </Card>
-
-                    <Card className="xl:col-span-1">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <Card className="lg:col-span-1">
                         <CardHeader>
                             <CardTitle>BBS Observations by Location</CardTitle>
                         </CardHeader>
@@ -64,7 +33,7 @@ export default function DashboardPage() {
                         </CardContent>
                     </Card>
                     
-                    <Card className="xl:col-span-3">
+                    <Card className="lg:col-span-1">
                         <CardHeader>
                             <CardTitle>BBS Observation Status</CardTitle>
                         </CardHeader>
