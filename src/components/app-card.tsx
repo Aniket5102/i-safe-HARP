@@ -15,12 +15,14 @@ interface AppCardProps {
 
 export default function AppCard({ app, onCardClick }: AppCardProps) {
   
-  const dataHref = `${app.href}/data`;
+  const dataHref = app.dataHref || `${app.href}/data`;
+  
+  const modifyHref = app.name === 'BBS' ? `${app.href}?tab=modify` : `${app.href}/modify`;
 
   const actionButtons = [
-    { name: 'Modify', icon: PenSquare, href: `${app.href}/modify` },
-    { name: 'Data', icon: Database, href: dataHref },
-    { name: 'New', icon: PlusCircle, href: app.href },
+    { name: 'Modify', href: modifyHref },
+    { name: 'Data', href: dataHref },
+    { name: 'New', href: app.href },
   ];
 
   return (
@@ -35,14 +37,6 @@ export default function AppCard({ app, onCardClick }: AppCardProps) {
       <CardContent className="p-4 flex flex-col flex-grow">
         <div className="flex justify-between items-start mb-3">
             <div className="flex items-center gap-3">
-                 <Image
-                    src={app.imageUrl}
-                    alt={`${app.name} logo`}
-                    width={40}
-                    height={40}
-                    className="rounded-lg object-contain transition-transform duration-300 group-hover:scale-105"
-                    data-ai-hint={app.imageHint}
-                />
                 <div className="flex-1">
                   <h3 className="font-semibold text-sm leading-tight text-foreground">{app.name}</h3>
                   {app.subtitle && (
@@ -65,7 +59,6 @@ export default function AppCard({ app, onCardClick }: AppCardProps) {
                   className="flex flex-col h-auto p-2 text-muted-foreground hover:bg-accent hover:text-primary transition-colors duration-200"
                   onClick={(e) => e.stopPropagation()} // Stop propagation to prevent card click
                 >
-                  <action.icon size={20} />
                   <span className="text-xs mt-1">{action.name}</span>
                 </Button>
               </Link>
