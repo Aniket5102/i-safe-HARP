@@ -27,7 +27,7 @@ export default function Header() {
     <header className="bg-white shadow-md sticky top-0 z-40">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-6">
             <AsianPaintsLogo />
             <div className="flex items-center gap-2">
                 <Image
@@ -91,4 +91,3 @@ export default function Header() {
     </header>
   );
 }
-
