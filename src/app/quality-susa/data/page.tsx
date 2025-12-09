@@ -38,7 +38,7 @@ export default function QualitySusaDataPage() {
         <header className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">Quality SUSA List</h1>
           <div className="flex items-center gap-2">
-            <Link href="/apps" passHref>
+            <Link href="/" passHref>
               <Button variant="outline">
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 Back
