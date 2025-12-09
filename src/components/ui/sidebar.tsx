@@ -177,6 +177,11 @@ const Sidebar = React.forwardRef<
     ref
   ) => {
     const { isMobile, state, open, setOpen, openMobile, setOpenMobile } = useSidebar()
+    const [isMounted, setIsMounted] = React.useState(false);
+
+    React.useEffect(() => {
+      setIsMounted(true);
+    }, []);
     
     const handleMouseEnter = () => {
       if (!isMobile && !open) {
@@ -204,6 +209,10 @@ const Sidebar = React.forwardRef<
           {children}
         </div>
       )
+    }
+
+    if (!isMounted) {
+        return null;
     }
 
     if (isMobile) {
@@ -310,7 +319,13 @@ const SidebarInset = React.forwardRef<
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => {
   const { state, isMobile } = useSidebar();
-  if (isMobile) {
+  const [isMounted, setIsMounted] = React.useState(false);
+
+    React.useEffect(() => {
+      setIsMounted(true);
+    }, []);
+
+  if (isMobile || !isMounted) {
     return <div ref={ref} className={cn("bg-background", className)} {...props} />;
   }
   
@@ -757,3 +772,5 @@ export {
   SidebarTrigger,
   useSidebar,
 }
+
+    
