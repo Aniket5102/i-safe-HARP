@@ -29,6 +29,13 @@ export default function Header() {
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center gap-4">
             <AsianPaintsLogo />
+            <Image
+              src="/i-safe-logo.png"
+              alt="i-safe Logo"
+              width={80}
+              height={20}
+              className="object-contain"
+            />
           </div>
           <div className="flex items-center gap-4">
             <Select>
