@@ -57,6 +57,7 @@ import { Textarea } from "./ui/textarea";
 import { useRouter } from 'next/navigation';
 import AsianPaintsLogo from "./asian-paints-logo";
 import { Calendar } from "@/components/ui/calendar";
+import { saveIncident } from "@/app/actions";
 
 const formSchema = z.object({
   date: z.date({ required_error: "A date is required." }),
@@ -162,15 +163,31 @@ export default function QualitySusaForm() {
   async function onSubmit(values: FormValues) {
     setIsSubmitting(true);
     
-    // DB removed
-    setTimeout(() => {
-        toast({
-          title: "Database Disconnected",
-          description: `Quality SUSA Incident cannot be raised.`,
-        });
-        form.reset();
-        setIsSubmitting(false);
-    }, 1000);
+    const newIncident = {
+      id: susaId.toLowerCase().replace(/[^a-z0-9]/g, ''),
+      susaId,
+      bbqReferenceNumber,
+      ...values,
+      date: values.date.toISOString(),
+    };
+
+    const result = await saveIncident('src/lib/data/quality-susa-incidents.json', newIncident);
+
+    if (result.success) {
+      toast({
+        title: "Incident Raised",
+        description: `Quality SUSA Incident ${susaId} has been saved.`,
+      });
+      form.reset();
+    } else {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: `Failed to save incident: ${result.message}`,
+      });
+    }
+
+    setIsSubmitting(false);
   }
 
   const handleGenerateQrCode = () => {

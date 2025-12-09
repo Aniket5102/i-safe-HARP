@@ -57,6 +57,7 @@ import { Textarea } from "./ui/textarea";
 import { useRouter } from 'next/navigation';
 import AsianPaintsLogo from "./asian-paints-logo";
 import { Calendar } from "@/components/ui/calendar";
+import { saveIncident } from '@/app/actions';
 
 
 const formSchema = z.object({
@@ -159,15 +160,30 @@ export default function HarpForm() {
 
   async function onSubmit(values: FormValues) {
     setIsSubmitting(true);
-    // DB removed
-    setTimeout(() => {
+    const newIncident = {
+        id: harpId.toLowerCase().replace(/[^a-z0-9]/g, ''),
+        harpId: harpId,
+        ...values,
+        date: values.date.toISOString(),
+      };
+      
+    const result = await saveIncident('src/lib/data/harp-incidents.json', newIncident);
+
+    if (result.success) {
       toast({
-        title: "Database Disconnected",
-        description: `HARP Incident cannot be raised.`,
+        title: "Incident Raised",
+        description: `HARP Incident ${harpId} has been saved successfully.`,
       });
       form.reset();
-      setIsSubmitting(false);
-    }, 1000);
+    } else {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: `Failed to save incident: ${result.message}`,
+      });
+    }
+
+    setIsSubmitting(false);
   }
 
   const handleGenerateQrCode = () => {
