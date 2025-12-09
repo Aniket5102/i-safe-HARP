@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   CalendarDays,
@@ -22,6 +22,8 @@ import {
 import { App, apps } from '@/lib/apps-data';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { useAuth } from '@/context/auth-context';
+import { useRouter } from 'next/navigation';
 
 const modules = [
   { name: 'Calendar/Task Management', icon: CalendarDays, href: '#' },
@@ -34,6 +36,18 @@ const modules = [
 export default function HomePage() {
   const [selectedApp, setSelectedApp] = useState<App | null>(null);
   const heroImage = PlaceHolderImages.find(img => img.id === 'hero-background');
+  const { user } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (user === null) {
+      router.push('/login');
+    }
+  }, [user, router]);
+
+  if (!user) {
+    return null; // Or a loading spinner
+  }
 
   return (
     <div className="bg-background min-h-screen text-foreground">

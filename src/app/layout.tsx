@@ -12,6 +12,7 @@ import {
   SidebarInset,
 } from '@/components/ui/sidebar';
 import SidebarNav from '@/components/sidebar-nav';
+import { AuthProvider } from '@/context/auth-context';
 
 
 export const metadata: Metadata = {
@@ -32,25 +33,27 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased bg-background">
-        <SidebarProvider>
-          <div className="relative min-h-screen">
-            <Sidebar>
-              <SidebarHeader>
-                <SidebarTrigger />
-              </SidebarHeader>
-              <SidebarContent>
-                <SidebarNav />
-              </SidebarContent>
-            </Sidebar>
-            <SidebarInset>
-              <Header />
-              <main className="flex-1">
-                {children}
-              </main>
-            </SidebarInset>
-          </div>
-          <Toaster />
-        </SidebarProvider>
+        <AuthProvider>
+          <SidebarProvider>
+            <div className="relative min-h-screen">
+              <Sidebar>
+                <SidebarHeader>
+                  <SidebarTrigger />
+                </SidebarHeader>
+                <SidebarContent>
+                  <SidebarNav />
+                </SidebarContent>
+              </Sidebar>
+              <SidebarInset>
+                <Header />
+                <main className="flex-1">
+                  {children}
+                </main>
+              </SidebarInset>
+            </div>
+            <Toaster />
+          </SidebarProvider>
+        </AuthProvider>
       </body>
     </html>
   );
