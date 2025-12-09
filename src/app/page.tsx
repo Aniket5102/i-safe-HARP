@@ -115,9 +115,11 @@ function HeroSection({ heroImage }: { heroImage: any }) {
           Your central hub for safety and incident management.
         </p>
         <div className="mt-8 flex justify-center gap-4">
-          <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-lg">
-            <PlayCircle className="mr-2 h-6 w-6" />
-            Get Started
+          <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-lg" asChild>
+            <Link href="/apps">
+              <PlayCircle className="mr-2 h-6 w-6" />
+              Get Started
+            </Link>
           </Button>
           <Button size="lg" variant="secondary" className="bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 font-bold text-lg">
              <Info className="mr-2 h-6 w-6" />
