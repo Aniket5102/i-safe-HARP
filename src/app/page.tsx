@@ -165,25 +165,15 @@ interface AppCarouselItemProps {
 
 function AppCarouselItem({ app, onAppClick }: AppCarouselItemProps) {
   return (
-     <button 
-      onClick={() => onAppClick(app)} 
-      className="group w-full aspect-[16/9] rounded-lg overflow-hidden relative block cursor-pointer transition-transform duration-300 ease-in-out hover:scale-105"
+    <button
+      onClick={() => onAppClick(app)}
+      className="group w-full aspect-[16/9] rounded-lg bg-accent/10 flex flex-col items-center justify-center text-center p-4 transition-all duration-300 ease-in-out hover:bg-accent/20 hover:scale-105"
     >
-      <Image 
-        src={app.imageUrl} 
-        alt={app.name} 
-        fill
-        className="object-cover transition-opacity duration-300 group-hover:opacity-80"
-        sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, (max-width: 1280px) 20vw, 16vw"
-        data-ai-hint={app.imageHint}
-      />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-      <div className="absolute bottom-0 left-0 p-3 text-white">
-        <h3 className="font-bold text-sm leading-tight drop-shadow-lg">{app.name}</h3>
-      </div>
+      <p className="text-sm font-semibold text-foreground/80 group-hover:text-foreground">{app.name}</p>
     </button>
   );
 }
+
 
 interface ModuleCarouselItemProps {
   module: { name: string; href: string; icon: React.ElementType };
