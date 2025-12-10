@@ -10,6 +10,8 @@ import Link from 'next/link';
 import { getBbsObservations } from '@/lib/data-loader';
 import BbsObservationsByLocationChart from '@/components/bbs-observations-by-location-chart';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import * as XLSX from 'xlsx';
+import { format } from 'date-fns';
 
 export default function BbsDataPage() {
   const [data, setData] = useState<BbsObservation[]>([]);
@@ -32,6 +34,23 @@ export default function BbsDataPage() {
     loadData();
   }, []);
 
+  const handleExport = () => {
+    const flattenedData = data.map(item => ({
+      'Observation ID': item.id,
+      'Observer Name': item.data.observerName,
+      'Location': item.data.location,
+      'Observation Date': format(new Date(item.data.observationDate), 'yyyy-MM-dd HH:mm:ss'),
+      'Task Observed': item.data.taskObserved,
+      'Proper Use of PPE': item.data.properUseOfPPE,
+      'Body Positioning': item.data.bodyPositioning,
+      'Tool and Equipment Handling': item.data.toolAndEquipmentHandling,
+    }));
+    const worksheet = XLSX.utils.json_to_sheet(flattenedData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'BBS Observations');
+    XLSX.writeFile(workbook, 'BBS_Observations.xlsx');
+  };
+
   const renderContent = () => {
     if (loading) {
         return <div className="text-center p-8">Loading observations...</div>;
@@ -53,7 +72,7 @@ export default function BbsDataPage() {
                 Back
               </Button>
             </Link>
-            <Button variant="outline">
+            <Button variant="outline" onClick={handleExport}>
               <FileDown className="mr-2 h-4 w-4" />
               Export
             </Button>
