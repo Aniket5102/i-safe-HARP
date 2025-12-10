@@ -50,6 +50,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getBbsObservations } from "@/lib/data-loader";
+import { saveIncident } from "@/app/actions";
 
 const formSchema = z.object({
   observerName: z.string().min(1, "Observer name is required."),
@@ -109,6 +110,17 @@ function BbsFormContent() {
             setActiveTab(tab);
         }
     }, [tab]);
+    
+    const generateNewId = React.useCallback(() => {
+        setNewObservationId(`BBS-${Date.now()}`);
+    }, []);
+
+    React.useEffect(() => {
+        if (activeTab === 'new') {
+            generateNewId();
+        }
+    }, [activeTab, generateNewId]);
+
 
     const handleSearch = async () => {
         if (!incidentId) return;
@@ -167,19 +179,35 @@ function BbsFormContent() {
 
     const onNewSubmit = async (values: FormValues) => {
         setIsLoading(true);
-        // This is a mock implementation.
-        setTimeout(() => {
-          const newId = `BBS-${Date.now()}`;
-          setNewObservationId(newId);
+        const newObservation = {
+          id: newObservationId,
+          data: {
+            ...values,
+            observationDate: values.observationDate.toISOString(),
+          }
+        };
+    
+        const result = await saveIncident("src/lib/data/bbs-observations.json", newObservation as any);
+    
+        if (result.success) {
           setShowSuccess(true);
-          setIsLoading(false);
-        }, 1000);
+        } else {
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: `Failed to save observation: ${result.message}`,
+          });
+        }
+    
+        setIsLoading(false);
     };
+    
 
     const resetSearch = () => {
         setIncidentId("");
         setFoundIncident(null);
         form.reset(defaultFormValues);
+        generateNewId();
         setShowSuccess(false);
     };
 
@@ -471,3 +499,5 @@ export default function BbsForm() {
         </React.Suspense>
     )
 }
+
+    

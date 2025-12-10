@@ -1,5 +1,27 @@
 [
   {
+    "id": "susa1765338259977",
+    "susaId": "SUSA-1765338259977",
+    "bbqReferenceNumber": "BBQ-1765338259977",
+    "date": "2025-12-10T03:44:19.890Z",
+    "location": "Mysuru",
+    "department": "Production Department",
+    "block": "SPB",
+    "floor": "SPB Floor",
+    "activity": "Chemical Splash",
+    "carriedOutBy": "Aniket",
+    "employeeType": "APL Employee",
+    "employeeName": "Aniket",
+    "employeeId": "P00126717",
+    "designation": "Manager - Production",
+    "employeeDepartment": "PRODUCTION",
+    "hazard": "Chemical Hazards",
+    "accident": "Exposure to chemical while charging",
+    "risk": "Medium",
+    "prevention": "ok",
+    "otherObservation": ""
+  },
+  {
     "id": "susa1765274253506",
     "susaId": "SUSA-1765274253506",
     "bbqReferenceNumber": "BBQ-1765274253506",
