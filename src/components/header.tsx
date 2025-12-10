@@ -1,7 +1,7 @@
 
 'use client';
 
-import { Bell, LayoutGrid, Moon, Sun } from "lucide-react";
+import { Bell, LayoutGrid } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
 import { useAuth } from "@/context/auth-context";
@@ -16,13 +16,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import Image from "next/image";
 import { Badge } from "./ui/badge";
-import { useTheme } from "@/context/theme-provider";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "./ui/label";
 
 export default function Header() {
   const { user, logout } = useAuth();
-  const { theme, setTheme } = useTheme();
 
   return (
     <header className="bg-background shadow-md sticky top-0 z-40">
@@ -71,19 +67,6 @@ export default function Header() {
                     <DropdownMenuSeparator />
                     <DropdownMenuItem>Profile</DropdownMenuItem>
                     <DropdownMenuItem>Settings</DropdownMenuItem>
-                     <DropdownMenuSeparator />
-                      <div className="px-2 py-1.5">
-                         <Label htmlFor="theme-toggle" className="flex items-center gap-2 cursor-pointer text-sm">
-                            {theme === 'dark' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
-                            <span>Dark Mode</span>
-                            <Switch
-                                id="theme-toggle"
-                                checked={theme === 'dark'}
-                                onCheckedChange={(checked) => setTheme(checked ? 'dark' : 'light')}
-                                className="ml-auto"
-                            />
-                        </Label>
-                      </div>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={logout}>Log Out</DropdownMenuItem>
                   </DropdownMenuContent>
