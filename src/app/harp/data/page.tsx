@@ -10,8 +10,6 @@ import Link from 'next/link';
 import IncidentsByLocationChart from '@/components/incidents-by-location-chart';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getHarpIncidents } from '@/lib/data-loader';
-import * as XLSX from 'xlsx';
-import { format } from 'date-fns';
 
 export default function HarpDataPage() {
   const [data, setData] = useState<HarpIncident[]>([]);
@@ -32,30 +30,8 @@ export default function HarpDataPage() {
   }, []);
 
   const handleExport = () => {
-    const flattenedData = data.map(item => ({
-      'HARP ID #': item.harpId,
-      'Date': format(new Date(item.date), 'yyyy-MM-dd HH:mm:ss'),
-      'Location': item.location,
-      'Department': item.department,
-      'Floor': item.floor,
-      'Block': item.block,
-      'Activity': item.activity,
-      'Carried Out By': item.carriedOutBy,
-      'Employee Type': item.employeeType,
-      'Employee Name': item.employeeName,
-      'Employee ID': item.employeeId,
-      'Designation': item.designation,
-      'Employee Department': item.employeeDepartment,
-      'Hazard': item.hazard,
-      'Accident': item.accident,
-      'Risk': item.risk,
-      'Prevention': item.prevention,
-      'Other Observation': item.otherObservation,
-    }));
-    const worksheet = XLSX.utils.json_to_sheet(flattenedData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'HARP Incidents');
-    XLSX.writeFile(workbook, 'HARP_Incidents.xlsx');
+    // This is a placeholder for the export functionality.
+    alert('Export functionality is not implemented yet.');
   };
 
   const renderContent = () => {
