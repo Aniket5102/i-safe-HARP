@@ -26,9 +26,8 @@ export default function AppCard({ app, onCardClick }: AppCardProps) {
 
   return (
     <Card 
-      className="bg-card shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col group cursor-pointer"
+      className="bg-card shadow-lg hover:shadow-primary/20 transition-all duration-300 flex flex-col group cursor-pointer hover:border-primary/50"
       onClick={(e) => {
-        // Prevent card click when an action button is clicked
         if ((e.target as HTMLElement).closest('a')) return;
         onCardClick(app);
       }}
@@ -49,7 +48,7 @@ export default function AppCard({ app, onCardClick }: AppCardProps) {
         </div>
         
         <div className="mt-auto pt-3">
-          <div className="border-t-2 border-primary/20 w-full mb-3"></div>
+          <div className="border-t border-border/50 w-full mb-3"></div>
           <div className="flex justify-around items-center">
             {actionButtons.map((action) => (
               <Link key={action.name} href={action.href} passHref>
