@@ -56,8 +56,8 @@ export default function BbsObservationDetailsPage() {
   }
   
   const displayOrder = [
-    'observerName', 'location', 'observationDate', 'taskObserved', 
-    'properUseOfPPE', 'bodyPositioning', 'toolAndEquipmentHandling', 'comments'
+    'observername', 'location', 'observationdate', 'taskobserved', 
+    'properuseofppe', 'bodypositioning', 'toolandequipmenthandling', 'comments'
   ];
 
   const renderContent = () => {

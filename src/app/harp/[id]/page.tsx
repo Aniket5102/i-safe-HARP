@@ -32,7 +32,7 @@ export default function HarpIncidentDetailsPage() {
                     ...foundIncident,
                     // The date from JSON is a string, so we parse it into a Date object
                     date: parseISO(foundIncident.date), 
-                    createdAt: foundIncident.createdAt ? parseISO(foundIncident.createdAt) : undefined,
+                    createdAt: foundIncident.createdat ? parseISO(foundIncident.createdat) : undefined,
                 };
                 setIncident(formattedIncident);
             }
@@ -56,10 +56,10 @@ export default function HarpIncidentDetailsPage() {
   }
   
   const displayOrder = [
-    'harpId', 'date', 'location', 'department', 'block', 'floor', 
-    'activity', 'carriedOutBy', 'employeeType', 'employeeName', 
-    'employeeId', 'designation', 'employeeDepartment', 'hazard', 
-    'accident', 'risk', 'prevention', 'otherObservation', 'createdAt'
+    'harpid', 'date', 'location', 'department', 'block', 'floor', 
+    'activity', 'carriedoutby', 'employeetype', 'employeename', 
+    'employeeid', 'designation', 'employeedepartment', 'hazard', 
+    'accident', 'risk', 'prevention', 'otherobservation', 'createdat'
   ];
 
   const renderContent = () => {
@@ -112,7 +112,7 @@ export default function HarpIncidentDetailsPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Incident ID: {incident?.harpId || (loading ? 'Loading...' : id)}</CardTitle>
+            <CardTitle>Incident ID: {incident?.harpid || (loading ? 'Loading...' : id)}</CardTitle>
             <CardDescription>
               Detailed information for the selected HARP incident.
             </CardDescription>

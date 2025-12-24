@@ -183,13 +183,21 @@ function QualitySusaFormContent() {
     setFoundIncident(null);
 
     const incidentData = await getQualitySusaIncidents();
-    const found = incidentData.find(
-      (inc: any) => inc.id === searchId || inc.susaId === searchId
+     const found = incidentData.find(
+      (inc: any) => inc.id === searchId || inc.susaid === searchId
     );
 
+
     if (found) {
-      const formattedData = {
+       const formattedData = {
         ...found,
+        carriedoutby: found.carriedoutby,
+        employeetype: found.employeetype,
+        employeename: found.employeename,
+        employeeid: found.employeeid,
+        employeedepartment: found.employeedepartment,
+        otherobservation: found.otherobservation,
+        bbqreferencenumber: found.bbqreferencenumber,
         date: parseISO(found.date),
       };
       setFoundIncident(found as IncidentDoc);
@@ -213,31 +221,15 @@ function QualitySusaFormContent() {
     if (!foundIncident) return;
     setIsLoading(true);
 
-    // This is a mock implementation.
-    setTimeout(() => {
-      toast({
-        title: "Update Mocked",
-        description: "In a real app, this would update the data.",
-      });
-      setIsLoading(false);
-    }, 1000);
+    toast({ title: "Update Not Implemented", description: "Database update functionality is not yet implemented." });
+    setIsLoading(false);
   };
 
   const handleDelete = async () => {
     if (!foundIncident) return;
     setIsLoading(true);
-
-    // This is a mock implementation.
-    setTimeout(() => {
-      toast({
-        title: "Delete Mocked",
-        description: "In a real app, this would delete the data.",
-      });
-      setFoundIncident(null);
-      setSearchId("");
-      form.reset(defaultFormValues);
-      setIsLoading(false);
-    }, 1000);
+    toast({ title: "Delete Not Implemented", description: "Database delete functionality is not yet implemented." });
+    setIsLoading(false);
   };
 
   const onNewSubmit = async (values: FormValues) => {
@@ -251,7 +243,7 @@ function QualitySusaFormContent() {
     };
 
     const result = await saveIncident(
-      "src/lib/data/quality-susa-incidents.json",
+      "quality_susa_incidents",
       newIncident
     );
 

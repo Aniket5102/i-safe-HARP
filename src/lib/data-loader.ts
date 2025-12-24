@@ -1,28 +1,41 @@
 
 'use server';
 
-import fs from 'fs/promises';
-import path from 'path';
+import { getDbPool } from '@/lib/db';
 
-async function readJsonFile(filePath: string) {
+async function queryDatabase(query: string, params: any[] = []) {
+  const pool = getDbPool();
   try {
-    const fullPath = path.join(process.cwd(), filePath);
-    const fileContent = await fs.readFile(fullPath, 'utf-8');
-    return JSON.parse(fileContent);
+    const res = await pool.query(query, params);
+    return res.rows;
   } catch (error) {
-    console.error(`Error reading or parsing file at ${filePath}:`, error);
+    console.error(`Error executing query:`, error);
     return [];
   }
 }
 
 export async function getHarpIncidents() {
-  return readJsonFile('src/lib/data/harp-incidents.json');
+  return queryDatabase('SELECT * FROM harp_incidents ORDER BY date DESC');
 }
 
 export async function getBbsObservations() {
-    return readJsonFile('src/lib/data/bbs-observations.json');
+  const observations = await queryDatabase('SELECT * FROM bbs_observations ORDER BY "observationDate" DESC');
+  // The database returns a full data object for each row, we need to restructure it to match the old format
+  return observations.map(obs => ({
+    id: obs.id,
+    data: {
+      observerName: obs.observername,
+      location: obs.location,
+      observationDate: obs.observationdate,
+      taskObserved: obs.taskobserved,
+      properUseOfPPE: obs.properuseofppe,
+      bodyPositioning: obs.bodypositioning,
+      toolAndEquipmentHandling: obs.toolandequipmenthandling,
+      comments: obs.comments,
+    }
+  }));
 }
 
 export async function getQualitySusaIncidents() {
-    return readJsonFile('src/lib/data/quality-susa-incidents.json');
+  return queryDatabase('SELECT * FROM quality_susa_incidents ORDER BY date DESC');
 }

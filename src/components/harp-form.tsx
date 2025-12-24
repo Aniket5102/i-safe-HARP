@@ -179,12 +179,18 @@ function HarpFormContent() {
 
     const incidentData = await getHarpIncidents();
     const found = incidentData.find(
-      (inc: any) => inc.id === searchId || inc.harpId === searchId
+      (inc: any) => inc.id === searchId || inc.harpid === searchId
     );
 
     if (found) {
       const formattedData = {
         ...found,
+        carriedoutby: found.carriedoutby,
+        employeetype: found.employeetype,
+        employeename: found.employeename,
+        employeeid: found.employeeid,
+        employeedepartment: found.employeedepartment,
+        otherobservation: found.otherobservation,
         date: parseISO(found.date),
       };
       setFoundIncident(found as IncidentDoc);
@@ -208,44 +214,44 @@ function HarpFormContent() {
     if (!foundIncident) return;
     setIsLoading(true);
 
-    // This is a mock implementation.
-    setTimeout(() => {
-      toast({
-        title: "Update Mocked",
-        description: "In a real app, this would update the data.",
-      });
-      setIsLoading(false);
-    }, 1000);
+    toast({ title: "Update Not Implemented", description: "Database update functionality is not yet implemented." });
+    setIsLoading(false);
   };
 
   const handleDelete = async () => {
     if (!foundIncident) return;
     setIsLoading(true);
-
-    // This is a mock implementation.
-    setTimeout(() => {
-      toast({
-        title: "Delete Mocked",
-        description: "In a real app, this would delete the data.",
-      });
-      setFoundIncident(null);
-      setSearchId("");
-      form.reset(defaultFormValues);
-      setIsLoading(false);
-    }, 1000);
+    toast({ title: "Delete Not Implemented", description: "Database delete functionality is not yet implemented." });
+    setIsLoading(false);
   };
 
   const onNewSubmit = async (values: FormValues) => {
     setIsLoading(true);
+    
     const newIncident = {
-      id: harpId.toLowerCase().replace(/[^a-z0-9]/g, ""),
-      harpId: harpId,
-      ...values,
-      date: values.date.toISOString(),
-    };
+        id: harpId.toLowerCase().replace(/[^a-z0-9]/g, ""),
+        harpId: harpId,
+        date: values.date.toISOString(),
+        location: values.location,
+        department: values.department,
+        block: values.block,
+        floor: values.floor,
+        activity: values.activity,
+        carriedOutBy: values.carriedOutBy,
+        employeeType: values.employeeType,
+        employeeName: values.employeeName,
+        employeeId: values.employeeId,
+        designation: values.designation,
+        employeeDepartment: values.employeeDepartment,
+        hazard: values.hazard,
+        accident: values.accident,
+        risk: values.risk,
+        prevention: values.prevention,
+        otherObservation: values.otherObservation,
+      };
 
     const result = await saveIncident(
-      "src/lib/data/harp-incidents.json",
+      "harp_incidents",
       newIncident
     );
 

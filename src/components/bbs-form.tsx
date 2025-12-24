@@ -156,38 +156,34 @@ function BbsFormContent() {
         if (!foundIncident) return;
         setIsLoading(true);
 
-        // This is a mock implementation since we can't write to a file.
-        setTimeout(() => {
-          toast({ title: "Update Mocked", description: "In a real app, this would update the data." });
-          setIsLoading(false);
-        }, 1000);
+        toast({ title: "Update Not Implemented", description: "Database update functionality is not yet implemented." });
+        setIsLoading(false);
     };
 
     const handleDelete = async () => {
         if (!foundIncident) return;
         setIsLoading(true);
 
-        // This is a mock implementation.
-        setTimeout(() => {
-          toast({ title: "Delete Mocked", description: "In a real app, this would delete the data." });
-          setFoundIncident(null);
-          setIncidentId('');
-          form.reset(defaultFormValues);
-          setIsLoading(false);
-        }, 1000);
+        toast({ title: "Delete Not Implemented", description: "Database delete functionality is not yet implemented." });
+        setIsLoading(false);
     };
 
     const onNewSubmit = async (values: FormValues) => {
         setIsLoading(true);
+        
         const newObservation = {
-          id: newObservationId,
-          data: {
-            ...values,
+            id: newObservationId,
+            observerName: values.observerName,
+            location: values.location,
             observationDate: values.observationDate.toISOString(),
-          }
+            taskObserved: values.taskObserved,
+            properUseOfPPE: values.properUseOfPPE,
+            bodyPositioning: values.bodyPositioning,
+            toolAndEquipmentHandling: values.toolAndEquipmentHandling,
+            comments: values.comments,
         };
     
-        const result = await saveIncident("src/lib/data/bbs-observations.json", newObservation as any);
+        const result = await saveIncident("bbs_observations", newObservation);
     
         if (result.success) {
           setShowSuccess(true);
@@ -499,5 +495,3 @@ export default function BbsForm() {
         </React.Suspense>
     )
 }
-
-    

@@ -30,7 +30,7 @@ export default function QualitySusaIncidentDetailsPage() {
                 const formattedIncident = {
                     ...foundIncident,
                     date: parseISO(foundIncident.date),
-                    createdAt: foundIncident.createdAt ? parseISO(foundIncident.createdAt) : undefined,
+                    createdat: foundIncident.createdat ? parseISO(foundIncident.createdat) : undefined,
                 };
                 setIncident(formattedIncident);
             }
@@ -54,10 +54,10 @@ export default function QualitySusaIncidentDetailsPage() {
   }
   
   const displayOrder = [
-    'susaId', 'bbqReferenceNumber', 'date', 'location', 'department', 'block', 'floor', 
-    'activity', 'carriedOutBy', 'employeeType', 'employeeName', 
-    'employeeId', 'designation', 'employeeDepartment', 'hazard', 
-    'accident', 'risk', 'prevention', 'otherObservation', 'createdAt'
+    'susaid', 'bbqreferencenumber', 'date', 'location', 'department', 'block', 'floor', 
+    'activity', 'carriedoutby', 'employeetype', 'employeename', 
+    'employeeid', 'designation', 'employeedepartment', 'hazard', 
+    'accident', 'risk', 'prevention', 'otherobservation', 'createdat'
   ];
 
   const renderContent = () => {
@@ -110,7 +110,7 @@ export default function QualitySusaIncidentDetailsPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Incident ID: {incident?.susaId || (loading ? 'Loading...' : id)}</CardTitle>
+            <CardTitle>Incident ID: {incident?.susaid || (loading ? 'Loading...' : id)}</CardTitle>
             <CardDescription>
               Detailed information for the selected Quality SUSA incident.
             </CardDescription>
