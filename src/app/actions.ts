@@ -60,7 +60,7 @@ export async function saveUser(
   const { id, name, email, password, role } = newUser;
 
   const query = `
-    INSERT INTO users (id, name, email, password, role)
+    INSERT INTO users (id, name, email, "password", role)
     VALUES ($1, $2, $3, $4, $5)
     ON CONFLICT (email) DO NOTHING
     RETURNING *;
@@ -89,7 +89,7 @@ export async function findUser(
 
   if (password) {
     // For login: check email and password
-    query = 'SELECT * FROM users WHERE email = $1 AND password = $2';
+    query = 'SELECT * FROM users WHERE email = $1 AND "password" = $2';
     queryParams = [email, password];
   } else {
     // For checking existence: check email only
