@@ -5,13 +5,15 @@ let pool: Pool | undefined;
 
 export function getDbPool() {
   if (!pool) {
-    if (!process.env.POSTGRES_URL) {
+    const connectionString = process.env.POSTGRES_URL || "postgresql://postgres:postgres@localhost:5432/isafe_app";
+    
+    if (!connectionString) {
       throw new Error(
         'POSTGRES_URL environment variable is not set. Please create a .env.local file and add it.'
       );
     }
     pool = new Pool({
-      connectionString: process.env.POSTGRES_URL,
+      connectionString: connectionString,
     });
   }
   return pool;
