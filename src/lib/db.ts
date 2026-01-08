@@ -1,7 +1,4 @@
 import { Pool } from 'pg';
-import { config } from 'dotenv';
-
-config({ path: '.env.local' });
 
 // This is a singleton to ensure we only have one pool instance.
 let pool: Pool | undefined;
