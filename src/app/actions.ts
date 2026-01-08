@@ -34,7 +34,7 @@ export async function saveIncident(
 ): Promise<{ success: boolean; message: string }> {
   const pool = getDbPool();
   // Sanitize keys to be valid SQL identifiers (lowercase, no special chars)
-  const keys = Object.keys(incidentData).map(key => key.toLowerCase());
+  const keys = Object.keys(incidentData).map(key => key.toLowerCase().replace(/[^a-z0-9_]/g, ''));
   const values = Object.values(incidentData);
   const placeholders = keys.map((_, i) => `$${i + 1}`).join(', ');
 
