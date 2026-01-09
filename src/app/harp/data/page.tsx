@@ -42,24 +42,23 @@ export default function HarpDataPage() {
       return;
     }
 
-    const headers = Object.keys(columns.reduce((acc, col) => ({...acc, [col.header as string]: '' }), {}));
-    const keys = columns.map(c => c.accessorKey as string);
-
+    const headers = [
+        'HARP ID', 'Date', 'Location', 'Department', 'Employee Name', 'Hazard', 'Risk'
+    ];
+    
     const csvContent = [
-      headers.join(','),
-      ...data.map(item =>
-        keys.map(key => {
-          let value = (item as any)[key];
-          if (key === 'date') {
-            value = format(new Date(value), 'yyyy-MM-dd HH:mm:ss');
-          }
-          if (typeof value === 'string') {
-            return `"${value.replace(/"/g, '""')}"`;
-          }
-          return value;
-        }).join(',')
-      )
+        headers.join(','),
+        ...data.map(item => [
+            item.harpId,
+            format(new Date(item.date), 'yyyy-MM-dd HH:mm:ss'),
+            `"${item.location.replace(/"/g, '""')}"`,
+            `"${item.department.replace(/"/g, '""')}"`,
+            `"${item.employeeName.replace(/"/g, '""')}"`,
+            `"${item.hazard.replace(/"/g, '""')}"`,
+            `"${item.risk.replace(/"/g, '""')}"`,
+        ].join(','))
     ].join('\n');
+
 
      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
