@@ -19,7 +19,7 @@ export async function getHarpIncidents() {
 }
 
 export async function getBbsObservations() {
-  const observations = await queryDatabase('SELECT * FROM bbs_observations ORDER BY "observationDate" DESC');
+  const observations = await queryDatabase('SELECT * FROM bbs_observations ORDER BY "observationdate" DESC');
   // The database returns a full data object for each row, we need to restructure it to match the old format
   return observations.map(obs => ({
     id: obs.id,
