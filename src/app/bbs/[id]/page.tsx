@@ -1,13 +1,15 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Loader2 } from 'lucide-react';
+import { ArrowLeft, Loader2, FileDown } from 'lucide-react';
 import { format, isValid } from 'date-fns';
 import { getBbsObservations } from '@/lib/data-loader';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 type BbsObservation = {
     id: string;
@@ -20,6 +22,7 @@ export default function BbsObservationDetailsPage() {
   const params = useParams();
   const router = useRouter();
   const { id } = params;
+  const pdfRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     async function loadData() {
@@ -27,7 +30,6 @@ export default function BbsObservationDetailsPage() {
             const observationData = await getBbsObservations();
             const foundObservation = observationData.find((obs: any) => obs.id === id);
             if (foundObservation) {
-                // The data from the loader is already formatted with Date objects in the `data` property
                 setObservation(foundObservation);
             }
         }
@@ -35,6 +37,25 @@ export default function BbsObservationDetailsPage() {
     }
     loadData();
   }, [id]);
+  
+  const handleExportPdf = () => {
+    const input = pdfRef.current;
+    if (!input) return;
+
+    html2canvas(input, { scale: 2 }).then((canvas) => {
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const imgWidth = canvas.width;
+      const imgHeight = canvas.height;
+      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+      const imgX = (pdfWidth - imgWidth * ratio) / 2;
+      const imgY = 10;
+      pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
+      pdf.save(`BBS-Observation-${id}.pdf`);
+    });
+  };
 
   const renderValue = (value: any) => {
     if (value instanceof Date && isValid(value)) {
@@ -95,23 +116,31 @@ export default function BbsObservationDetailsPage() {
       <div className="max-w-4xl mx-auto">
         <header className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">BBS Observation Details</h1>
-          <Button variant="outline" onClick={() => router.back()}>
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back
-          </Button>
+           <div className="flex items-center gap-2">
+            <Button variant="outline" onClick={handleExportPdf}>
+              <FileDown className="mr-2 h-4 w-4" />
+              Export PDF
+            </Button>
+            <Button variant="outline" onClick={() => router.back()}>
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back
+            </Button>
+          </div>
         </header>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Observation ID: {loading ? 'Loading...' : id}</CardTitle>
-            <CardDescription>
-              Detailed information for the selected BBS observation.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {renderContent()}
-          </CardContent>
-        </Card>
+        <div ref={pdfRef}>
+          <Card>
+            <CardHeader>
+              <CardTitle>Observation ID: {loading ? 'Loading...' : id}</CardTitle>
+              <CardDescription>
+                Detailed information for the selected BBS observation.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {renderContent()}
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );

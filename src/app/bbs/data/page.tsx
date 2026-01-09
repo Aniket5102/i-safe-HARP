@@ -10,6 +10,7 @@ import Link from 'next/link';
 import { getBbsObservations } from '@/lib/data-loader';
 import BbsObservationsByLocationChart from '@/components/bbs-observations-by-location-chart';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { format } from 'date-fns';
 
 export default function BbsDataPage() {
   const [data, setData] = useState<BbsObservation[]>([]);
@@ -18,7 +19,6 @@ export default function BbsDataPage() {
   useEffect(() => {
     async function loadData() {
         const observationData = await getBbsObservations();
-        // The data loader already formats the data, so we just need to parse the date
         const formattedData = observationData.map((item: any) => ({
             ...item,
             data: {
@@ -33,8 +33,39 @@ export default function BbsDataPage() {
   }, []);
 
   const handleExport = () => {
-    // This is a placeholder for the export functionality.
-    alert('Export functionality is not implemented yet.');
+    if (data.length === 0) {
+        alert('No data to export.');
+        return;
+    }
+
+    const headers = [
+        'ID', 'Observer Name', 'Location', 'Observation Date', 'Task Observed', 
+        'Proper Use of PPE', 'Body Positioning', 'Tool and Equipment Handling'
+    ];
+    
+    const csvContent = [
+        headers.join(','),
+        ...data.map(item => [
+            item.id,
+            `"${item.data.observerName.replace(/"/g, '""')}"`,
+            `"${item.data.location.replace(/"/g, '""')}"`,
+            format(new Date(item.data.observationDate), 'yyyy-MM-dd HH:mm:ss'),
+            `"${item.data.taskObserved.replace(/"/g, '""')}"`,
+            item.data.properUseOfPPE,
+            item.data.bodyPositioning,
+            item.data.toolAndEquipmentHandling,
+        ].join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'bbs_observations.csv');
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const renderContent = () => {

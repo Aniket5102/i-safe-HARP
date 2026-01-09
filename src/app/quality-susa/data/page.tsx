@@ -10,6 +10,8 @@ import Link from 'next/link';
 import { getQualitySusaIncidents } from '@/lib/data-loader';
 import IncidentsByLocationChart from '@/components/incidents-by-location-chart';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { format } from 'date-fns';
+
 
 export default function QualitySusaDataPage() {
   const [data, setData] = useState<QualitySusaIncident[]>([]);
@@ -18,7 +20,6 @@ export default function QualitySusaDataPage() {
   useEffect(() => {
     async function loadData() {
         const incidentData = await getQualitySusaIncidents();
-        // Map database fields (snake_case) to component props (camelCase)
         const formattedData = incidentData.map((item: any) => ({
             ...item,
             susaId: item.susaid,
@@ -38,8 +39,38 @@ export default function QualitySusaDataPage() {
   }, []);
 
   const handleExport = () => {
-    // This is a placeholder for the export functionality.
-    alert('Export functionality is not implemented yet.');
+    if (data.length === 0) {
+      alert('No data to export.');
+      return;
+    }
+
+    const headers = [
+        'SUSA ID', 'BBQ Ref #', 'Date', 'Location', 'Department', 'Employee Name', 'Hazard', 'Risk'
+    ];
+    
+    const csvContent = [
+        headers.join(','),
+        ...data.map(item => [
+            item.susaId,
+            item.bbqReferenceNumber,
+            format(new Date(item.date), 'yyyy-MM-dd HH:mm:ss'),
+            `"${item.location.replace(/"/g, '""')}"`,
+            `"${item.department.replace(/"/g, '""')}"`,
+            `"${item.employeeName.replace(/"/g, '""')}"`,
+            `"${item.hazard.replace(/"/g, '""')}"`,
+            `"${item.risk.replace(/"/g, '""')}"`
+        ].join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'quality_susa_incidents.csv');
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const renderContent = () => {

@@ -1,13 +1,15 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Loader2 } from 'lucide-react';
+import { ArrowLeft, Loader2, FileDown } from 'lucide-react';
 import { format, isValid } from 'date-fns';
 import { getQualitySusaIncidents } from '@/lib/data-loader';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 type QualitySusaIncident = {
     id: string;
@@ -20,6 +22,7 @@ export default function QualitySusaIncidentDetailsPage() {
   const params = useParams();
   const router = useRouter();
   const { id } = params;
+  const pdfRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     async function loadData() {
@@ -27,10 +30,8 @@ export default function QualitySusaIncidentDetailsPage() {
             const incidentData = await getQualitySusaIncidents();
             const foundIncident = incidentData.find((inc: any) => inc.id === id);
             if (foundIncident) {
-                // The data from the loader is already formatted with Date objects
                 const formattedIncident = {
                     ...foundIncident,
-                    // Map snake_case to camelCase
                     susaId: foundIncident.susaid,
                     bbqReferenceNumber: foundIncident.bbqreferencenumber,
                     carriedOutBy: foundIncident.carriedoutby,
@@ -48,6 +49,25 @@ export default function QualitySusaIncidentDetailsPage() {
     }
     loadData();
   }, [id]);
+
+  const handleExportPdf = () => {
+    const input = pdfRef.current;
+    if (!input || !incident) return;
+
+    html2canvas(input, { scale: 2 }).then((canvas) => {
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const imgWidth = canvas.width;
+      const imgHeight = canvas.height;
+      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+      const imgX = (pdfWidth - imgWidth * ratio) / 2;
+      const imgY = 10;
+      pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
+      pdf.save(`SUSA-Incident-${incident.susaId}.pdf`);
+    });
+  };
 
   const renderValue = (value: any) => {
     if (value instanceof Date && isValid(value)) {
@@ -78,14 +98,12 @@ export default function QualitySusaIncidentDetailsPage() {
         )
     }
     if (incident) {
-        // Create a sorted list of entries based on the desired order
         const sortedEntries = displayOrder
             .map(key => ([key, incident[key]]))
             .filter(([, value]) => value !== undefined);
 
-        // Append any fields from the incident that are not in the displayOrder
         const remainingEntries = Object.entries(incident)
-            .filter(([key]) => !displayOrder.map(k => k.toLowerCase()).includes(key.toLowerCase()) && key !== 'id');
+            .filter(([key]) => !displayOrder.map(k => k.toLowerCase()).includes(key.toLowerCase()) && key !== 'id' && !displayOrder.includes(key));
 
         const allEntries = [...sortedEntries, ...remainingEntries];
 
@@ -111,23 +129,32 @@ export default function QualitySusaIncidentDetailsPage() {
       <div className="max-w-4xl mx-auto">
         <header className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">Quality SUSA Incident Details</h1>
-          <Button variant="outline" onClick={() => router.back()}>
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" onClick={handleExportPdf}>
+              <FileDown className="mr-2 h-4 w-4" />
+              Export PDF
+            </Button>
+            <Button variant="outline" onClick={() => router.back()}>
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back
+            </Button>
+          </div>
         </header>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Incident ID: {incident?.susaId || (loading ? 'Loading...' : id)}</CardTitle>
-            <CardDescription>
-              Detailed information for the selected Quality SUSA incident.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {renderContent()}
-          </CardContent>
-        </Card>
+        <div ref={pdfRef}>
+          <Card>
+            <CardHeader>
+              <CardTitle>Incident ID: {incident?.susaId || (loading ? 'Loading...' : id)}</CardTitle>
+              <CardDescription>
+                Detailed information for the selected Quality SUSA incident.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {renderContent()}
+            </CardContent>
+          </Card>
+        </div>
+
       </div>
     </div>
   );

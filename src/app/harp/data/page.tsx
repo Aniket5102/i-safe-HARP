@@ -10,6 +10,7 @@ import Link from 'next/link';
 import IncidentsByLocationChart from '@/components/incidents-by-location-chart';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getHarpIncidents } from '@/lib/data-loader';
+import { format } from 'date-fns';
 
 export default function HarpDataPage() {
   const [data, setData] = useState<HarpIncident[]>([]);
@@ -18,7 +19,6 @@ export default function HarpDataPage() {
   useEffect(() => {
     async function loadData() {
         const incidentData = await getHarpIncidents();
-        // Map database fields (snake_case) to component props (camelCase)
         const formattedData = incidentData.map((item: any) => ({
           ...item,
           harpId: item.harpid,
@@ -37,8 +37,39 @@ export default function HarpDataPage() {
   }, []);
 
   const handleExport = () => {
-    // This is a placeholder for the export functionality.
-    alert('Export functionality is not implemented yet.');
+    if (data.length === 0) {
+      alert('No data to export.');
+      return;
+    }
+
+    const headers = Object.keys(columns.reduce((acc, col) => ({...acc, [col.header as string]: '' }), {}));
+    const keys = columns.map(c => c.accessorKey as string);
+
+    const csvContent = [
+      headers.join(','),
+      ...data.map(item =>
+        keys.map(key => {
+          let value = (item as any)[key];
+          if (key === 'date') {
+            value = format(new Date(value), 'yyyy-MM-dd HH:mm:ss');
+          }
+          if (typeof value === 'string') {
+            return `"${value.replace(/"/g, '""')}"`;
+          }
+          return value;
+        }).join(',')
+      )
+    ].join('\n');
+
+     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'harp_incidents.csv');
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const renderContent = () => {
