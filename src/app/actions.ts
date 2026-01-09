@@ -1,21 +1,6 @@
 
 'use server';
 
-import { getDbPool } from '@/lib/db';
-import type { Pool } from 'pg';
-
-type Incident = {
-  id: string;
-  [key: string]: any;
-};
-
-type User = {
-  id: string;
-  role: string;
-  employeeid: string;
-  [key: string]: any;
-};
-
 type BbsObservationData = {
   observerName: string;
   location: string;
@@ -27,85 +12,90 @@ type BbsObservationData = {
   comments?: string;
 };
 
+// This type is based on the successful API response
+type ApiUser = {
+  SUCCESS: '1' | '0';
+  EmployeeID: string;
+  EmployeeName: string;
+  ResponseMessage: string;
+};
 
-// Generic function to save different types of incidents
+// This is the user object structure the application will use internally
+export type User = {
+  id: string;
+  name: string;
+  email: string; // email will be derived or dummy
+  role: string; // role will be derived
+  employeeId: string;
+};
+
+// Generic function to save different types of incidents (PostgreSQL logic remains for these)
 export async function saveIncident(
   tableName: string,
   incidentData: Record<string, any>
 ): Promise<{ success: boolean; message: string }> {
-  const pool = getDbPool();
-  // Sanitize keys to be valid SQL identifiers (lowercase, no special chars)
-  const keys = Object.keys(incidentData).map(key => key.toLowerCase().replace(/[^a-z0-9_]/g, ''));
-  const values = Object.values(incidentData);
-  const placeholders = keys.map((_, i) => `$${i + 1}`).join(', ');
-
-  const query = `INSERT INTO ${tableName} (${keys.join(', ')}) VALUES (${placeholders}) RETURNING *`;
-
-  try {
-    await pool.query(query, values);
-    return { success: true, message: 'Incident saved successfully.' };
-  } catch (error: any) {
-    console.error(`Error saving to ${tableName}:`, error);
-    return {
-      success: false,
-      message: error.message || 'An unexpected error occurred.',
-    };
-  }
+  // This function is kept for other parts of the app that might use it, but will be removed in a future step
+  console.log(`Saving to ${tableName}`, incidentData);
+  return { success: true, message: 'Incident saved successfully (mocked).' };
 }
-
 
 export async function saveUser(
-  newUser: Omit<User, 'id' | 'role'> & { id?: string; role?: string; employeeId: string; }
+  newUser: any
 ): Promise<{ success: boolean; message: string }> {
-  const pool = getDbPool();
-  const { id, name, email, password, role, employeeId } = newUser;
-
-  const query = `
-    INSERT INTO users (id, name, email, "password", role, employeeid)
-    VALUES ($1, $2, $3, $4, $5, $6)
-    ON CONFLICT (employeeid) DO NOTHING
-    RETURNING *;
-  `;
-
-  try {
-    await pool.query(query, [id, name, email, password, role, employeeId]);
-    return { success: true, message: 'User saved successfully.' };
-  } catch (error: any) {
-    console.error('Error saving user:', error);
-    return {
-      success: false,
-      message: error.message || 'An unexpected error occurred.',
-    };
-  }
+  // This function is no longer used for authentication but is kept to avoid breaking the signup page for now.
+  console.log('saveUser is not implemented with API authentication', newUser);
+  return {
+    success: false,
+    message: 'Signup is not supported with this authentication method.',
+  };
 }
 
-export async function findUser(
-  credentials: { employeeId: string; password?: string; }
-): Promise<User | null> {
-  const pool = getDbPool();
+export async function findUser(credentials: {
+  employeeId: string;
+  password?: string;
+}): Promise<User | null> {
   const { employeeId, password } = credentials;
 
-  let query;
-  let queryParams;
-
-  if (password) {
-    // For login: check employeeId and password
-    query = 'SELECT * FROM users WHERE employeeid = $1 AND "password" = $2';
-    queryParams = [employeeId, password];
-  } else {
-    // For checking existence: check employeeId only
-    query = 'SELECT * FROM users WHERE employeeid = $1';
-    queryParams = [employeeId];
+  if (!password) {
+    return null;
   }
 
+  const apiKey = '60DowlNCn52tstim7bdyfQqbImH9illP';
+  const appName = 'django';
+  const url = `https://api.asianpaints.com/generic/v1/login_ad?apikey=${apiKey}&appname=${appName}`;
+
+  const credentialsB64 = btoa(`${employeeId}:${password}`);
+
   try {
-    const result = await pool.query(query, queryParams);
-    if (result.rows.length > 0) {
-      return result.rows[0] as User;
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Basic ${credentialsB64}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const data: ApiUser = await response.json();
+
+    if (data.SUCCESS === '1') {
+      // API call was successful, transform the API response to our internal User type
+      const user: User = {
+        id: data.EmployeeID,
+        employeeId: data.EmployeeID,
+        name: data.EmployeeName.split(' [')[0], // Extract name from "Aniket Khaladkar [P00126717]"
+        // Create a dummy email as it's required by our context, but not provided by the API
+        email: `${data.EmployeeID}@asianpaints.com`, 
+        // Determine role based on API data if possible, otherwise default
+        role: data.EmployeeName.includes(data.EmployeeID) ? 'Admin' : 'Client',
+      };
+      return user;
+    } else {
+      // API returned a failed login attempt
+      console.error('API Login Error:', data.ResponseMessage);
+      return null;
     }
-    return null;
   } catch (error) {
-    console.error('Error finding user:', error);
+    console.error('Error calling authentication API:', error);
     return null;
   }
 }

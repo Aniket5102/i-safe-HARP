@@ -55,8 +55,9 @@ export default function LoginPage() {
     const user = await findUser(values);
     
     if (user) {
-      // The role is already part of the user object from the database
-      login({ name: user.name, email: user.email, role: user.role, employeeId: user.employeeid });
+      // The user object is now coming from the API via our server action.
+      // The `login` function in our context expects an object with name, email, role, and employeeId.
+      login({ name: user.name, email: user.email, role: user.role, employeeId: user.employeeId });
     } else {
       toast({
         variant: 'destructive',
