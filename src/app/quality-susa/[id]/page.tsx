@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,7 +9,6 @@ import { ArrowLeft, Loader2, FileDown } from 'lucide-react';
 import { format, isValid } from 'date-fns';
 import { getQualitySusaIncidents } from '@/lib/data-loader';
 import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
 
 type QualitySusaIncident = {
     id: string;
@@ -19,10 +18,10 @@ type QualitySusaIncident = {
 export default function QualitySusaIncidentDetailsPage() {
   const [incident, setIncident] = useState<QualitySusaIncident | null>(null);
   const [loading, setLoading] = useState(true);
+  const [allEntries, setAllEntries] = useState<[string, any][]>([]);
   const params = useParams();
   const router = useRouter();
   const { id } = params;
-  const pdfRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     async function loadData() {
@@ -50,28 +49,79 @@ export default function QualitySusaIncidentDetailsPage() {
     loadData();
   }, [id]);
 
-  const handleExportPdf = () => {
-    const input = pdfRef.current;
-    if (!input || !incident) return;
+  const displayOrder = [
+    'susaId', 'bbqReferenceNumber', 'date', 'location', 'department', 'block', 'floor', 
+    'activity', 'carriedOutBy', 'employeeType', 'employeeName', 
+    'employeeId', 'designation', 'employeeDepartment', 'hazard', 
+    'accident', 'risk', 'prevention', 'otherObservation', 'createdAt'
+  ];
+  
+  useEffect(() => {
+    if (incident) {
+        const sortedEntries = displayOrder
+            .map(key => ([key, incident[key]]))
+            .filter(([, value]) => value !== undefined);
 
-    html2canvas(input, { scale: 2 }).then((canvas) => {
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
-      const imgWidth = canvas.width;
-      const imgHeight = canvas.height;
-      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
-      const imgX = (pdfWidth - imgWidth * ratio) / 2;
-      const imgY = 10;
-      pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
-      pdf.save(`SUSA-Incident-${incident.susaId}.pdf`);
+        const remainingKeys = Object.keys(incident)
+            .filter(key => !displayOrder.map(k => k.toLowerCase()).includes(key.toLowerCase()) && key !== 'id' && !displayOrder.includes(key));
+        
+        const remainingEntries = remainingKeys.map(key => [key, incident[key]]);
+        
+        setAllEntries([...sortedEntries, ...remainingEntries]);
+    }
+  }, [incident]);
+
+
+  const handleExportPdf = () => {
+    if (!incident) return;
+    
+    const doc = new jsPDF();
+    const margin = 15;
+    const pageWidth = doc.internal.pageSize.getWidth();
+    let y = margin;
+
+    // Header
+    doc.setFontSize(18);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Quality SUSA Incident Report', pageWidth / 2, y, { align: 'center' });
+    y += 8;
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Incident ID: ${incident.susaId}`, pageWidth / 2, y, { align: 'center' });
+    y += 10;
+    
+    // Line separator
+    doc.line(margin, y, pageWidth - margin, y);
+    y += 10;
+
+    // Content
+    doc.setFontSize(11);
+    allEntries.forEach(([key, value]) => {
+      if (y > doc.internal.pageSize.getHeight() - margin) {
+        doc.addPage();
+        y = margin;
+      }
+      
+      const label = key.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase());
+      const formattedValue = renderValue(value, true);
+
+      doc.setFont('helvetica', 'bold');
+      doc.text(`${label}:`, margin, y);
+      
+      doc.setFont('helvetica', 'normal');
+      const textWidth = doc.getTextWidth(`${label}: `) + 2;
+      const splitText = doc.splitTextToSize(formattedValue, pageWidth - margin - textWidth - margin);
+      doc.text(splitText, margin + textWidth, y);
+      
+      y += (splitText.length * 6) + 4; // Adjust spacing based on lines
     });
+
+    doc.save(`SUSA-Incident-${incident.susaId}.pdf`);
   };
 
-  const renderValue = (value: any) => {
+  const renderValue = (value: any, isPdf = false) => {
     if (value instanceof Date && isValid(value)) {
-      return format(value, 'PPP p');
+      return format(value, isPdf ? 'yyyy-MM-dd HH:mm' : 'PPP p');
     }
     if (value === null || value === undefined) {
       return 'N/A';
@@ -81,13 +131,6 @@ export default function QualitySusaIncidentDetailsPage() {
     }
     return value.toString();
   }
-  
-  const displayOrder = [
-    'susaId', 'bbqReferenceNumber', 'date', 'location', 'department', 'block', 'floor', 
-    'activity', 'carriedOutBy', 'employeeType', 'employeeName', 
-    'employeeId', 'designation', 'employeeDepartment', 'hazard', 
-    'accident', 'risk', 'prevention', 'otherObservation', 'createdAt'
-  ];
 
   const renderContent = () => {
     if (loading) {
@@ -98,23 +141,14 @@ export default function QualitySusaIncidentDetailsPage() {
         )
     }
     if (incident) {
-        const sortedEntries = displayOrder
-            .map(key => ([key, incident[key]]))
-            .filter(([, value]) => value !== undefined);
-
-        const remainingEntries = Object.entries(incident)
-            .filter(([key]) => !displayOrder.map(k => k.toLowerCase()).includes(key.toLowerCase()) && key !== 'id' && !displayOrder.includes(key));
-
-        const allEntries = [...sortedEntries, ...remainingEntries];
-
         return (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 text-sm">
             {allEntries.map(([key, value]) => {
                 const label = key.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase());
                 return (
-                    <div key={key} className="grid grid-cols-2 items-center">
+                    <div key={key} className="grid grid-cols-2 items-start">
                         <strong className="text-muted-foreground">{label}:</strong>
-                        <span>{renderValue(value)}</span>
+                        <span className="break-words">{renderValue(value)}</span>
                     </div>
                 )
             })}
@@ -141,7 +175,7 @@ export default function QualitySusaIncidentDetailsPage() {
           </div>
         </header>
 
-        <div ref={pdfRef}>
+        <div>
           <Card>
             <CardHeader>
               <CardTitle>Incident ID: {incident?.susaId || (loading ? 'Loading...' : id)}</CardTitle>

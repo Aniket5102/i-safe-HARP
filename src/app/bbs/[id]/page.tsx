@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,7 +9,6 @@ import { ArrowLeft, Loader2, FileDown } from 'lucide-react';
 import { format, isValid } from 'date-fns';
 import { getBbsObservations } from '@/lib/data-loader';
 import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
 
 type BbsObservation = {
     id: string;
@@ -19,10 +18,10 @@ type BbsObservation = {
 export default function BbsObservationDetailsPage() {
   const [observation, setObservation] = useState<BbsObservation | null>(null);
   const [loading, setLoading] = useState(true);
+  const [allEntries, setAllEntries] = useState<[string, any][]>([]);
   const params = useParams();
   const router = useRouter();
   const { id } = params;
-  const pdfRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     async function loadData() {
@@ -37,29 +36,79 @@ export default function BbsObservationDetailsPage() {
     }
     loadData();
   }, [id]);
+
+  const displayOrder = [
+    'observerName', 'location', 'observationDate', 'taskObserved', 
+    'properUseOfPPE', 'bodyPositioning', 'toolAndEquipmentHandling', 'comments'
+  ];
+
+  useEffect(() => {
+    if (observation) {
+        const incidentData = (observation as any).data;
+        const sortedEntries = displayOrder
+            .map(key => ([key, incidentData[key]]))
+            .filter(([, value]) => value !== undefined);
+
+        const remainingKeys = Object.keys(incidentData)
+            .filter(key => !displayOrder.includes(key) && key !== 'id');
+
+        const remainingEntries = remainingKeys.map(key => [key, incidentData[key]]);
+        
+        setAllEntries([...sortedEntries, ...remainingEntries]);
+    }
+  }, [observation]);
   
   const handleExportPdf = () => {
-    const input = pdfRef.current;
-    if (!input) return;
+    if (!observation) return;
 
-    html2canvas(input, { scale: 2 }).then((canvas) => {
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
-      const imgWidth = canvas.width;
-      const imgHeight = canvas.height;
-      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
-      const imgX = (pdfWidth - imgWidth * ratio) / 2;
-      const imgY = 10;
-      pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
-      pdf.save(`BBS-Observation-${id}.pdf`);
+    const doc = new jsPDF();
+    const margin = 15;
+    const pageWidth = doc.internal.pageSize.getWidth();
+    let y = margin;
+
+    // Header
+    doc.setFontSize(18);
+    doc.setFont('helvetica', 'bold');
+    doc.text('BBS Observation Report', pageWidth / 2, y, { align: 'center' });
+    y += 8;
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Observation ID: ${observation.id}`, pageWidth / 2, y, { align: 'center' });
+    y += 10;
+    
+    // Line separator
+    doc.line(margin, y, pageWidth - margin, y);
+    y += 10;
+
+    // Content
+    doc.setFontSize(11);
+    allEntries.forEach(([key, value]) => {
+      if (y > doc.internal.pageSize.getHeight() - margin) {
+        doc.addPage();
+        y = margin;
+      }
+      
+      const label = key.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase());
+      const formattedValue = renderValue(value, true);
+
+      doc.setFont('helvetica', 'bold');
+      doc.text(`${label}:`, margin, y);
+      
+      doc.setFont('helvetica', 'normal');
+      const textWidth = doc.getTextWidth(`${label}: `) + 2;
+      const splitText = doc.splitTextToSize(formattedValue, pageWidth - margin - textWidth - margin);
+      doc.text(splitText, margin + textWidth, y);
+      
+      y += (splitText.length * 6) + 4; // Adjust spacing based on lines
     });
+
+
+    doc.save(`BBS-Observation-${id}.pdf`);
   };
 
-  const renderValue = (value: any) => {
+  const renderValue = (value: any, isPdf = false) => {
     if (value instanceof Date && isValid(value)) {
-      return format(value, 'PPP p');
+      return format(value, isPdf ? 'yyyy-MM-dd HH:mm' : 'PPP p');
     }
     if (value === null || value === undefined) {
       return 'N/A';
@@ -69,11 +118,6 @@ export default function BbsObservationDetailsPage() {
     }
     return value.toString();
   }
-  
-  const displayOrder = [
-    'observerName', 'location', 'observationDate', 'taskObserved', 
-    'properUseOfPPE', 'bodyPositioning', 'toolAndEquipmentHandling', 'comments'
-  ];
 
   const renderContent = () => {
     if (loading) {
@@ -84,24 +128,14 @@ export default function BbsObservationDetailsPage() {
         )
     }
     if (observation) {
-        const incidentData = (observation as any).data;
-        const sortedEntries = displayOrder
-            .map(key => ([key, incidentData[key]]))
-            .filter(([, value]) => value !== undefined);
-
-        const remainingEntries = Object.entries(incidentData)
-            .filter(([key]) => !displayOrder.map(k => k.toLowerCase()).includes(key.toLowerCase()) && key !== 'id');
-
-        const allEntries = [...sortedEntries, ...remainingEntries];
-
         return (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 text-sm">
             {allEntries.map(([key, value]) => {
                 const label = key.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase());
                 return (
-                    <div key={key} className="grid grid-cols-2 items-center">
+                    <div key={key} className="grid grid-cols-2 items-start">
                         <strong className="text-muted-foreground">{label}:</strong>
-                        <span>{renderValue(value)}</span>
+                        <span className="break-words">{renderValue(value)}</span>
                     </div>
                 )
             })}
@@ -128,7 +162,7 @@ export default function BbsObservationDetailsPage() {
           </div>
         </header>
 
-        <div ref={pdfRef}>
+        <div>
           <Card>
             <CardHeader>
               <CardTitle>Observation ID: {loading ? 'Loading...' : id}</CardTitle>
