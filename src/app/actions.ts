@@ -1,6 +1,8 @@
 
 'use server';
 
+import { getDbPool } from '@/lib/db';
+
 type BbsObservationData = {
   observerName: string;
   location: string;
@@ -29,14 +31,35 @@ export type User = {
   employeeId: string;
 };
 
-// Generic function to save different types of incidents (PostgreSQL logic remains for these)
+// Generic function to save different types of incidents to the PostgreSQL database.
 export async function saveIncident(
   tableName: string,
   incidentData: Record<string, any>
 ): Promise<{ success: boolean; message: string }> {
-  // This function is kept for other parts of the app that might use it, but will be removed in a future step
-  console.log(`Saving to ${tableName}`, incidentData);
-  return { success: true, message: 'Incident saved successfully (mocked).' };
+  const pool = getDbPool();
+  
+  // The keys from the incidentData object will be our column names.
+  // We need to ensure they are lowercase and free of special characters to match DB conventions.
+  const columns = Object.keys(incidentData).map(key => key.toLowerCase().replace(/[^a-z0-9_]/g, ''));
+  
+  // The values are the corresponding data points for each column.
+  const values = Object.values(incidentData);
+
+  // We create parameter placeholders ($1, $2, $3, etc.) for the SQL query.
+  const valuePlaceholders = columns.map((_, index) => `$${index + 1}`).join(', ');
+
+  // Construct the final INSERT statement.
+  const query = `INSERT INTO ${tableName} (${columns.join(', ')}) VALUES (${valuePlaceholders})`;
+
+  try {
+    // Execute the query with the values.
+    await pool.query(query, values);
+    return { success: true, message: 'Incident saved successfully.' };
+  } catch (error: any) {
+    console.error(`Database error saving to ${tableName}:`, error);
+    // Return a more informative error message.
+    return { success: false, message: error.message || 'An unknown database error occurred.' };
+  }
 }
 
 export async function saveUser(
