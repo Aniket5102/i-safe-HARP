@@ -66,10 +66,10 @@ export default function BbsObservationDetailsPage() {
         const incidentData = (observation as any).data;
         const sortedEntries = displayOrder
             .map(key => ([key, incidentData[key]]))
-            .filter(([key, value]) => value !== undefined);
+            .filter(([, value]) => value !== undefined);
 
         const remainingEntries = Object.entries(incidentData)
-            .filter(([key]) => !displayOrder.includes(key.toLowerCase()) && key !== 'id');
+            .filter(([key]) => !displayOrder.map(k => k.toLowerCase()).includes(key.toLowerCase()) && key !== 'id');
 
         const allEntries = [...sortedEntries, ...remainingEntries];
 

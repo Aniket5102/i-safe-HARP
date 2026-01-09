@@ -81,11 +81,11 @@ export default function QualitySusaIncidentDetailsPage() {
         // Create a sorted list of entries based on the desired order
         const sortedEntries = displayOrder
             .map(key => ([key, incident[key]]))
-            .filter(([key, value]) => value !== undefined && key !== 'id');
+            .filter(([, value]) => value !== undefined);
 
         // Append any fields from the incident that are not in the displayOrder
         const remainingEntries = Object.entries(incident)
-            .filter(([key]) => !displayOrder.includes(key) && key !== 'id' && !displayOrder.map(k => k.toLowerCase()).includes(key));
+            .filter(([key]) => !displayOrder.map(k => k.toLowerCase()).includes(key.toLowerCase()) && key !== 'id');
 
         const allEntries = [...sortedEntries, ...remainingEntries];
 
