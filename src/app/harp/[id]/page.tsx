@@ -6,7 +6,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Loader2 } from 'lucide-react';
-import { format, isValid, parseISO } from 'date-fns';
+import { format, isValid } from 'date-fns';
 import { getHarpIncidents } from '@/lib/data-loader';
 
 type HarpIncident = {
@@ -27,13 +27,10 @@ export default function HarpIncidentDetailsPage() {
             const incidentData = await getHarpIncidents();
             const foundIncident = incidentData.find((inc: any) => inc.id === id);
             if (foundIncident) {
-                // Create a new object to avoid modifying the imported JSON data directly
+                // The data from the loader is already formatted with Date objects
                 const formattedIncident = {
                     ...foundIncident,
-                    // The date from JSON is a string, so we parse it into a Date object
-                    date: parseISO(foundIncident.date), 
-                    createdAt: foundIncident.createdat ? parseISO(foundIncident.createdat) : undefined,
-                    // Map snake_case to camelCase
+                    // Map snake_case to camelCase for display
                     harpId: foundIncident.harpid,
                     carriedOutBy: foundIncident.carriedoutby,
                     employeeType: foundIncident.employeetype,
@@ -41,6 +38,7 @@ export default function HarpIncidentDetailsPage() {
                     employeeId: foundIncident.employeeid,
                     employeeDepartment: foundIncident.employeedepartment,
                     otherObservation: foundIncident.otherobservation,
+                    createdAt: foundIncident.createdat,
                 };
                 setIncident(formattedIncident);
             }

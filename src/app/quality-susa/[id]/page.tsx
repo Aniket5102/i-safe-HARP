@@ -6,7 +6,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Loader2 } from 'lucide-react';
-import { format, isValid, parseISO } from 'date-fns';
+import { format, isValid } from 'date-fns';
 import { getQualitySusaIncidents } from '@/lib/data-loader';
 
 type QualitySusaIncident = {
@@ -27,10 +27,9 @@ export default function QualitySusaIncidentDetailsPage() {
             const incidentData = await getQualitySusaIncidents();
             const foundIncident = incidentData.find((inc: any) => inc.id === id);
             if (foundIncident) {
+                // The data from the loader is already formatted with Date objects
                 const formattedIncident = {
                     ...foundIncident,
-                    date: parseISO(foundIncident.date),
-                    createdAt: foundIncident.createdat ? parseISO(foundIncident.createdat) : undefined,
                     // Map snake_case to camelCase
                     susaId: foundIncident.susaid,
                     bbqReferenceNumber: foundIncident.bbqreferencenumber,
@@ -40,6 +39,7 @@ export default function QualitySusaIncidentDetailsPage() {
                     employeeId: foundIncident.employeeid,
                     employeeDepartment: foundIncident.employeedepartment,
                     otherObservation: foundIncident.otherobservation,
+                    createdAt: foundIncident.createdat,
                 };
                 setIncident(formattedIncident);
             }

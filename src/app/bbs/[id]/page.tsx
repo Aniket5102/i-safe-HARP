@@ -6,7 +6,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Loader2 } from 'lucide-react';
-import { format, isValid, parseISO } from 'date-fns';
+import { format, isValid } from 'date-fns';
 import { getBbsObservations } from '@/lib/data-loader';
 
 type BbsObservation = {
@@ -27,14 +27,8 @@ export default function BbsObservationDetailsPage() {
             const observationData = await getBbsObservations();
             const foundObservation = observationData.find((obs: any) => obs.id === id);
             if (foundObservation) {
-                const formattedObservation = {
-                    ...foundObservation,
-                    data: {
-                        ...foundObservation.data,
-                        observationDate: parseISO(foundObservation.data.observationDate),
-                    }
-                };
-                setObservation(formattedObservation as any);
+                // The data from the loader is already formatted with Date objects in the `data` property
+                setObservation(foundObservation);
             }
         }
         setLoading(false);
