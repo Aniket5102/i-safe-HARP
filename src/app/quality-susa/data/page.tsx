@@ -18,12 +18,20 @@ export default function QualitySusaDataPage() {
   useEffect(() => {
     async function loadData() {
         const incidentData = await getQualitySusaIncidents();
-        // Load data from the imported JSON file
+        // Map database fields (snake_case) to component props (camelCase)
         const formattedData = incidentData.map((item: any) => ({
-        ...item,
-        date: new Date(item.date),
+            ...item,
+            susaId: item.susaid,
+            bbqReferenceNumber: item.bbqreferencenumber,
+            carriedOutBy: item.carriedoutby,
+            employeeType: item.employeetype,
+            employeeName: item.employeename,
+            employeeId: item.employeeid,
+            employeeDepartment: item.employeedepartment,
+            otherObservation: item.otherobservation,
+            date: new Date(item.date),
         }));
-        setData(formattedData);
+        setData(formattedData as QualitySusaIncident[]);
         setLoading(false);
     }
     loadData();

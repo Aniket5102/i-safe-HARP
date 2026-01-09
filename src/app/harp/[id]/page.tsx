@@ -33,6 +33,14 @@ export default function HarpIncidentDetailsPage() {
                     // The date from JSON is a string, so we parse it into a Date object
                     date: parseISO(foundIncident.date), 
                     createdAt: foundIncident.createdat ? parseISO(foundIncident.createdat) : undefined,
+                    // Map snake_case to camelCase
+                    harpId: foundIncident.harpid,
+                    carriedOutBy: foundIncident.carriedoutby,
+                    employeeType: foundIncident.employeetype,
+                    employeeName: foundIncident.employeename,
+                    employeeId: foundIncident.employeeid,
+                    employeeDepartment: foundIncident.employeedepartment,
+                    otherObservation: foundIncident.otherobservation,
                 };
                 setIncident(formattedIncident);
             }
@@ -56,10 +64,10 @@ export default function HarpIncidentDetailsPage() {
   }
   
   const displayOrder = [
-    'harpid', 'date', 'location', 'department', 'block', 'floor', 
-    'activity', 'carriedoutby', 'employeetype', 'employeename', 
-    'employeeid', 'designation', 'employeedepartment', 'hazard', 
-    'accident', 'risk', 'prevention', 'otherobservation', 'createdat'
+    'harpId', 'date', 'location', 'department', 'block', 'floor', 
+    'activity', 'carriedOutBy', 'employeeType', 'employeeName', 
+    'employeeId', 'designation', 'employeeDepartment', 'hazard', 
+    'accident', 'risk', 'prevention', 'otherObservation', 'createdAt'
   ];
 
   const renderContent = () => {
@@ -78,7 +86,7 @@ export default function HarpIncidentDetailsPage() {
 
         // Append any fields from the incident that are not in the displayOrder
         const remainingEntries = Object.entries(incident)
-            .filter(([key]) => !displayOrder.includes(key) && key !== 'id');
+            .filter(([key]) => !displayOrder.includes(key) && key !== 'id' && !displayOrder.map(k => k.toLowerCase()).includes(key));
 
         const allEntries = [...sortedEntries, ...remainingEntries];
 
@@ -112,7 +120,7 @@ export default function HarpIncidentDetailsPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Incident ID: {incident?.harpid || (loading ? 'Loading...' : id)}</CardTitle>
+            <CardTitle>Incident ID: {incident?.harpId || (loading ? 'Loading...' : id)}</CardTitle>
             <CardDescription>
               Detailed information for the selected HARP incident.
             </CardDescription>

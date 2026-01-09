@@ -30,7 +30,16 @@ export default function QualitySusaIncidentDetailsPage() {
                 const formattedIncident = {
                     ...foundIncident,
                     date: parseISO(foundIncident.date),
-                    createdat: foundIncident.createdat ? parseISO(foundIncident.createdat) : undefined,
+                    createdAt: foundIncident.createdat ? parseISO(foundIncident.createdat) : undefined,
+                    // Map snake_case to camelCase
+                    susaId: foundIncident.susaid,
+                    bbqReferenceNumber: foundIncident.bbqreferencenumber,
+                    carriedOutBy: foundIncident.carriedoutby,
+                    employeeType: foundIncident.employeetype,
+                    employeeName: foundIncident.employeename,
+                    employeeId: foundIncident.employeeid,
+                    employeeDepartment: foundIncident.employeedepartment,
+                    otherObservation: foundIncident.otherobservation,
                 };
                 setIncident(formattedIncident);
             }
@@ -54,10 +63,10 @@ export default function QualitySusaIncidentDetailsPage() {
   }
   
   const displayOrder = [
-    'susaid', 'bbqreferencenumber', 'date', 'location', 'department', 'block', 'floor', 
-    'activity', 'carriedoutby', 'employeetype', 'employeename', 
-    'employeeid', 'designation', 'employeedepartment', 'hazard', 
-    'accident', 'risk', 'prevention', 'otherobservation', 'createdat'
+    'susaId', 'bbqReferenceNumber', 'date', 'location', 'department', 'block', 'floor', 
+    'activity', 'carriedOutBy', 'employeeType', 'employeeName', 
+    'employeeId', 'designation', 'employeeDepartment', 'hazard', 
+    'accident', 'risk', 'prevention', 'otherObservation', 'createdAt'
   ];
 
   const renderContent = () => {
@@ -76,7 +85,7 @@ export default function QualitySusaIncidentDetailsPage() {
 
         // Append any fields from the incident that are not in the displayOrder
         const remainingEntries = Object.entries(incident)
-            .filter(([key]) => !displayOrder.includes(key) && key !== 'id');
+            .filter(([key]) => !displayOrder.includes(key) && key !== 'id' && !displayOrder.map(k => k.toLowerCase()).includes(key));
 
         const allEntries = [...sortedEntries, ...remainingEntries];
 
@@ -110,7 +119,7 @@ export default function QualitySusaIncidentDetailsPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Incident ID: {incident?.susaid || (loading ? 'Loading...' : id)}</CardTitle>
+            <CardTitle>Incident ID: {incident?.susaId || (loading ? 'Loading...' : id)}</CardTitle>
             <CardDescription>
               Detailed information for the selected Quality SUSA incident.
             </CardDescription>

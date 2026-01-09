@@ -56,8 +56,8 @@ export default function BbsObservationDetailsPage() {
   }
   
   const displayOrder = [
-    'observername', 'location', 'observationdate', 'taskobserved', 
-    'properuseofppe', 'bodypositioning', 'toolandequipmenthandling', 'comments'
+    'observerName', 'location', 'observationDate', 'taskObserved', 
+    'properUseOfPPE', 'bodyPositioning', 'toolAndEquipmentHandling', 'comments'
   ];
 
   const renderContent = () => {
@@ -75,7 +75,7 @@ export default function BbsObservationDetailsPage() {
             .filter(([key, value]) => value !== undefined);
 
         const remainingEntries = Object.entries(incidentData)
-            .filter(([key]) => !displayOrder.includes(key) && key !== 'id');
+            .filter(([key]) => !displayOrder.includes(key.toLowerCase()) && key !== 'id');
 
         const allEntries = [...sortedEntries, ...remainingEntries];
 

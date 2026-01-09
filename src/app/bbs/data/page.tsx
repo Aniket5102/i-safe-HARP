@@ -18,13 +18,13 @@ export default function BbsDataPage() {
   useEffect(() => {
     async function loadData() {
         const observationData = await getBbsObservations();
-        // Load data from the imported JSON file
+        // The data loader already formats the data, so we just need to parse the date
         const formattedData = observationData.map((item: any) => ({
-        ...item,
-        data: {
-            ...item.data,
-            observationDate: new Date(item.data.observationDate),
-        },
+            ...item,
+            data: {
+                ...item.data,
+                observationDate: new Date(item.data.observationDate),
+            },
         }));
         setData(formattedData as BbsObservation[]);
         setLoading(false);
