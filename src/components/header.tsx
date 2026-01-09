@@ -58,7 +58,7 @@ export default function Header() {
                   <DropdownMenuContent align="end">
                     <DropdownMenuLabel className="flex flex-col">
                       <span>{user.name}</span>
-                      <span className="text-xs text-muted-foreground font-normal">{user.email}</span>
+                      <span className="text-xs text-muted-foreground font-normal">{user.employeeId}</span>
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <div className="px-2 py-1.5">

@@ -12,6 +12,7 @@ type Incident = {
 type User = {
   id: string;
   role: string;
+  employeeid: string;
   [key: string]: any;
 };
 
@@ -54,20 +55,20 @@ export async function saveIncident(
 
 
 export async function saveUser(
-  newUser: User
+  newUser: Omit<User, 'id' | 'role'> & { id?: string; role?: string; employeeId: string; }
 ): Promise<{ success: boolean; message: string }> {
   const pool = getDbPool();
-  const { id, name, email, password, role } = newUser;
+  const { id, name, email, password, role, employeeId } = newUser;
 
   const query = `
-    INSERT INTO users (id, name, email, "password", role)
-    VALUES ($1, $2, $3, $4, $5)
-    ON CONFLICT (email) DO NOTHING
+    INSERT INTO users (id, name, email, "password", role, employeeid)
+    VALUES ($1, $2, $3, $4, $5, $6)
+    ON CONFLICT (employeeid) DO NOTHING
     RETURNING *;
   `;
 
   try {
-    await pool.query(query, [id, name, email, password, role]);
+    await pool.query(query, [id, name, email, password, role, employeeId]);
     return { success: true, message: 'User saved successfully.' };
   } catch (error: any) {
     console.error('Error saving user:', error);
@@ -79,22 +80,22 @@ export async function saveUser(
 }
 
 export async function findUser(
-  credentials: Partial<User>
+  credentials: { employeeId: string; password?: string; }
 ): Promise<User | null> {
   const pool = getDbPool();
-  const { email, password } = credentials;
+  const { employeeId, password } = credentials;
 
   let query;
   let queryParams;
 
   if (password) {
-    // For login: check email and password
-    query = 'SELECT * FROM users WHERE email = $1 AND "password" = $2';
-    queryParams = [email, password];
+    // For login: check employeeId and password
+    query = 'SELECT * FROM users WHERE employeeid = $1 AND "password" = $2';
+    queryParams = [employeeId, password];
   } else {
-    // For checking existence: check email only
-    query = 'SELECT * FROM users WHERE email = $1';
-    queryParams = [email];
+    // For checking existence: check employeeId only
+    query = 'SELECT * FROM users WHERE employeeid = $1';
+    queryParams = [employeeId];
   }
 
   try {

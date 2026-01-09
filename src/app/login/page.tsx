@@ -29,8 +29,8 @@ import { Loader2 } from 'lucide-react';
 import React from 'react';
 
 const formSchema = z.object({
-  email: z.string().email({
-    message: 'Invalid email address.',
+  employeeId: z.string().min(1, {
+    message: 'Employee ID is required.',
   }),
   password: z.string().min(1, {
     message: 'Password is required.',
@@ -45,7 +45,7 @@ export default function LoginPage() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: '',
+      employeeId: '',
       password: '',
     },
   });
@@ -55,13 +55,13 @@ export default function LoginPage() {
     const user = await findUser(values);
     
     if (user) {
-      const role = user.email.endsWith('@asianpaints.com') ? 'Admin' : 'Client';
-      login({ name: user.name, email: user.email, role: role });
+      // The role is already part of the user object from the database
+      login({ name: user.name, email: user.email, role: user.role, employeeId: user.employeeid });
     } else {
       toast({
         variant: 'destructive',
         title: 'Login Failed',
-        description: 'Invalid email or password.',
+        description: 'Invalid Employee ID or password.',
       });
     }
     setIsSubmitting(false);
@@ -73,7 +73,7 @@ export default function LoginPage() {
         <CardHeader>
           <CardTitle className="text-2xl">Login</CardTitle>
           <CardDescription>
-            Enter your email below to login to your account.
+            Enter your Employee ID below to login to your account.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -81,12 +81,12 @@ export default function LoginPage() {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField
                 control={form.control}
-                name="email"
+                name="employeeId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>Employee ID</FormLabel>
                     <FormControl>
-                      <Input placeholder="m@example.com" {...field} />
+                      <Input placeholder="P00126717" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

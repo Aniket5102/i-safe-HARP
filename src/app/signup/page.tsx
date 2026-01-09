@@ -35,6 +35,9 @@ const formSchema = z.object({
   email: z.string().email({
     message: 'Invalid email address.',
   }),
+  employeeId: z.string().min(1, {
+    message: 'Employee ID is required.',
+  }),
   password: z.string().min(6, {
     message: 'Password must be at least 6 characters.',
   }),
@@ -50,6 +53,7 @@ export default function SignupPage() {
     defaultValues: {
       name: '',
       email: '',
+      employeeId: '',
       password: '',
     },
   });
@@ -58,12 +62,12 @@ export default function SignupPage() {
     setIsSubmitting(true);
     
     // First, check if the user already exists.
-    const existingUser = await findUser({ email: values.email });
+    const existingUser = await findUser({ employeeId: values.employeeId });
     if (existingUser) {
       toast({
         variant: 'destructive',
         title: 'Sign Up Failed',
-        description: 'An account with this email already exists.',
+        description: 'An account with this Employee ID already exists.',
       });
       setIsSubmitting(false);
       return;
@@ -86,7 +90,7 @@ export default function SignupPage() {
         description: "You've been successfully signed up.",
       });
       // The crucial step: login with the new user data immediately.
-      login({ name: values.name, email: values.email, role: role });
+      login({ name: values.name, email: values.email, role: role, employeeId: values.employeeId });
     } else {
       toast({
         variant: 'destructive',
@@ -133,6 +137,19 @@ export default function SignupPage() {
                     <FormLabel>Email</FormLabel>
                     <FormControl>
                       <Input placeholder="m@example.com" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="employeeId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Employee ID</FormLabel>
+                    <FormControl>
+                      <Input placeholder="P00126717" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
