@@ -112,7 +112,7 @@ function AppOptionsDialog({ app, isOpen, onOpenChange }: AppOptionsDialogProps) 
         <div className="flex flex-col space-y-2">
           {options.map((option) => (
             <Link key={option.name} href={option.href} passHref>
-              <Button variant="outline" className="w-full justify-center text-base p-6 bg-accent border-primary/20 hover:bg-primary/10">
+              <Button variant="outline" className="w-full justify-center text-base p-6">
                 {option.name}
               </Button>
             </Link>

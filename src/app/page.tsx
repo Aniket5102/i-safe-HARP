@@ -236,14 +236,14 @@ function AppOptionsDialog({ app, isOpen, onOpenChange }: AppOptionsDialogProps) 
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-xs bg-zinc-900 border-zinc-800">
+      <DialogContent className="sm:max-w-xs">
         <DialogHeader>
           <DialogTitle>{app.name}</DialogTitle>
         </DialogHeader>
         <div className="flex flex-col space-y-2">
           {options.map((option) => (
             <Link key={option.name} href={option.href} passHref>
-              <Button variant="outline" className="w-full justify-center text-base p-6 bg-zinc-800 border-zinc-700 hover:bg-zinc-700">
+              <Button variant="outline" className="w-full justify-center text-base p-6">
                 {option.name}
               </Button>
             </Link>
