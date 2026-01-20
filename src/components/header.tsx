@@ -1,7 +1,7 @@
 
 'use client';
 
-import { Bell, LayoutGrid } from "lucide-react";
+import { Bell, LayoutGrid, Moon, Sun } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
 import { useAuth } from "@/context/auth-context";
@@ -16,9 +16,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import Image from "next/image";
 import { Badge } from "./ui/badge";
+import { useTheme } from "next-themes";
+import { Switch } from "./ui/switch";
+import { Label } from "./ui/label";
 
 export default function Header() {
   const { user, logout } = useAuth();
+  const { setTheme, theme } = useTheme();
 
   return (
     <header className="bg-background shadow-md sticky top-0 z-40">
@@ -67,6 +71,20 @@ export default function Header() {
                     <DropdownMenuSeparator />
                     <DropdownMenuItem>Profile</DropdownMenuItem>
                     <DropdownMenuItem>Settings</DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                        <div className="flex items-center justify-between w-full gap-2">
+                            <Label htmlFor="theme-toggle" className="flex items-center gap-2 cursor-pointer">
+                                {theme === 'dark' ? <Moon /> : <Sun />}
+                                <span>Theme</span>
+                            </Label>
+                            <Switch
+                                id="theme-toggle"
+                                checked={theme === 'dark'}
+                                onCheckedChange={(checked) => setTheme(checked ? 'dark' : 'light')}
+                            />
+                        </div>
+                    </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={logout}>Log Out</DropdownMenuItem>
                   </DropdownMenuContent>
